@@ -2,7 +2,7 @@
 
 Layerbasierte Embedded-Systems-Laborübung mit MSP430F5335 und Crazy Car Plattform. Ziel ist die Entwicklung eines autonomen Mini-Fahrzeugs inkl. GPIO, Timer, PWM, ADC (DMA), SPI-Display, Sensorik und Regelalgorithmen in C. Projektstruktur mit HAL, DL, AL. Entwicklung mit Code Composer Studio.
 
-## Projektüberblick
+## Laborübersicht
 
 Dieses Repository begleitet die Embedded-Systems-Laborreihe im Studiengang Elektronik und Computer Engineering (FH JOANNEUM). Im Zentrum steht die systematische Entwicklung eines autonomen Fahrzeugs (Crazy Car) auf Basis des MSP430F5335-Mikrocontrollers.
 
@@ -11,7 +11,6 @@ Die Übung vermittelt praxisnah:
 - Strukturierte Layer-Architektur (HAL / DL / AL)
 - Debugging, Registerzugriffe, ISR
 - Modularisierung und Wiederverwendbarkeit von Komponenten
-
 ---
 
 ## Kapitelübersicht & Aufgabenstellungen
