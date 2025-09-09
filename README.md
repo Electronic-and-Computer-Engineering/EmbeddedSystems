@@ -4,8 +4,17 @@ Layerbasierte Embedded-Systems-Laborübung mit MSP430F5335 und Crazy Car Plattfo
 ## Projektüberblick
 
 Dieses Repository begleitet die Embedded-Systems-Laborreihe im Studiengang Elektronik und Computer Engineering (FH JOANNEUM). Im Zentrum steht die systematische Entwicklung eines autonomen Fahrzeugs (Crazy Car) auf Basis des MSP430F5335-Mikrocontrollers.
-
 Die Übung vermittelt praxisnah die hardwarenahe Programmierung, modulare Softwarearchitektur und den systematischen Umgang mit Mikrocontroller-Peripherie.
+
+## Kapitelübersicht & Aufgabenstellungen
+
+<details>
+<summary> Expand </summary>
+
+- [An Optimization-Based Approach to One-Bit Quantization](41_ISCAS2024/README.md)
+- [Block-Based Optimization for Frequency-Selective One-Bit Quantization](42_ISCAS2025/README.md)
+
+</details>
 
 ## Ziele
 
