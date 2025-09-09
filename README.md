@@ -9,10 +9,61 @@ Die Übung vermittelt praxisnah die hardwarenahe Programmierung, modulare Softwa
 ## Kapitelübersicht & Aufgabenstellungen
 
 <details>
-<summary> Expand </summary>
+<summary>Expand</summary>
 
-- [An Optimization-Based Approach to One-Bit Quantization](41_ISCAS2024/README.md)
-- [Block-Based Optimization for Frequency-Selective One-Bit Quantization](42_ISCAS2025/README.md)
+### 1. [Einführung und Projektstruktur](Kapitel_01_Einfuehrung/README.md)
+- Crazy Car Platine – Hardwareübersicht
+- Softwarearchitektur: HAL / DL / AL
+- Projektaufbau in Code Composer Studio
+- Git-Versionierung
+
+### 2. [Digitale Ein-/Ausgabe](Kapitel_02_GPIO/README.md)
+- GPIO-Konfiguration
+- Interruptsteuerung für Start-/Stoptaste
+- Performance-Messung (Integer vs. Float)
+- Debugging mit Breakpoints
+
+### 3. [Clock System und Timer B0](Kapitel_03_TimerB0/README.md)
+- Unified Clock System (UCS)
+- TimerB0-Konfiguration
+- Periodische Aufgaben & Oszilloskopmessung
+
+### 4. [PWM und Aktorik](Kapitel_04_PWM_Aktorik/README.md)
+- PWM mit Timer A1
+- Servo- und ESC-Steuerung
+- Abstraktion über Driver Layer
+
+### 5. [SPI-Kommunikation](Kapitel_05_SPI/README.md)
+- USCI_B1 im SPI-Master-Modus
+- Interruptgesteuerte Übertragung
+- Chip Select Handling
+
+### 6. [LC-Display Ansteuerung](Kapitel_06_LCD/README.md)
+- Initialisierung
+- Text-/Zahlenausgabe
+- Cursor-Positionierung
+
+### 7. [SPI / LCD-Integration](Kapitel_07_SPI_LCD/README.md)
+- Zusammenspiel von Displaydriver und SPI
+- Vollständiger Textausgabestack
+
+### 8. [ADC-Konfiguration](Kapitel_08_ADC/README.md)
+- Konfiguration des ADC12_A
+- Sensorabfrage über Timer-Trigger
+- Pufferung und Flag-Handling
+
+### 9. [ADC mit DMA](Kapitel_09_ADC_DMA/README.md)
+- Automatischer Datenübertrag per DMA0
+- Entkopplung von CPU und ADC
+
+### 10. [Sharp Abstandssensoren](Kapitel_10_SharpSensoren/README.md)
+- Kennlinienmessung
+- Linearisierung: Formel oder Lookup-Table
+
+### 11. [Fahralgorithmen](Kapitel_11_Fahralgorithmen/README.md)
+- Regelung (z. B. PID, statische Schwellen)
+- Zustandsautomat
+- Spurhaltung, Bandeverfolgung, Kurvenerkennung
 
 </details>
 
