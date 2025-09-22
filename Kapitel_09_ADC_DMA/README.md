@@ -13,12 +13,6 @@ Die Übung vermittelt praxisnah:
 - Modularisierung und Wiederverwendbarkeit von Komponenten
 ---
 
-## Unterlagen
-- [Crazy Car Schematic](https://fhjoanneum-my.sharepoint.com/:b:/g/personal/florian_mayer_fh-joanneum_at/EfXYu-rqsLRErJbybsbN4AEB_RUMizJhwpb5D_ysimZehA?e=Ti7PtO)
-- [MSP430f5335-Datasheet](https://www.ti.com/lit/ds/symlink/msp430f5335.pdf)
-- [MSP430x5xx and MSP430x6xx Family Guide](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf)
-
-
 ## Kapitelübersicht & Aufgabenstellungen
 
 <details>
