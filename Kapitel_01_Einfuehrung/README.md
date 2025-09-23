@@ -292,4 +292,12 @@ In dieser Aufgabe geht es darum, die Beschaltung der Crazy-Car-Platine – wie s
 6. `hal_GpioInit()` in `hal_Init()` aufrufen
 7. Funktionalität im Debugger überprüfen (z. B. Lesbarkeit der Inputs, korrekte OUT-Zustände)
 
+## Referenzen
+
+- **MSP430x5xx and MSP430x6xx Family User Guide**, Texas Instruments, Literature Number: SLAU208O, Rev. O, April 2019.  
+  Verfügbar unter: [https://www.ti.com/lit/pdf/slau208](https://www.ti.com/lit/pdf/slau208)
+
+- **MSP430F5335 Datasheet**, Texas Instruments, Document Number: SLAS590N, Rev. N, October 2018.  
+  Verfügbar unter: [https://www.ti.com/lit/gpn/msp430f5335](https://www.ti.com/lit/gpn/msp430f5335)
+
 [⬆ Zurück zum Hauptverzeichnis](../README.md#kapitelübersicht--aufgabenstellungen)
