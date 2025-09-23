@@ -65,6 +65,7 @@ Wenn z. B. XT2 = 20 MHz ist und über `SELMx` dem MCLK zugewiesen wird, ergi
 - ACLK = 32.768 Hz (aus REFO)
 
 Diese Konfiguration bildet die Basis für Timer- und UART-Module, die auf eine präzise Taktrate angewiesen sind.
+
 ---
 
 ## Power Management Module (PMM)
