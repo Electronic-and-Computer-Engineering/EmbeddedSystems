@@ -19,9 +19,9 @@
  - [Einführungsvideo - Einheit 2](https://www.youtube.com/watch?v=SLzDcItz5a0&list=PLE5VC62wmcV_2V82u8OShJfm6QY_ELb_5&index=3)
 ---
 ### Durchzuführende Aufgaben
-- [[AUFGABE] Rechendauer-Performance-Test](#durchzuführende-arbeit--dokumentation)
-- [[AUFGABE] Recherche Allgemeine Interruptsteuerung](#recherche-durchzuführende-arbeit--dokumentation)
-- [[AUFGABE] Implementierung Allgemeine Interruptsteuerung](#implementierung-durchzuführende-arbeit--dokumentation)
+- [[AUFGABE] Rechendauer-Performance-Test](#durchzuführende-arbeit--dokumentation-für-die-meilensteinüberprüfung)
+- [[AUFGABE] Recherche Allgemeine Interruptsteuerung](#recherche-durchzuführende-arbeit--dokumentation-für-die-meilensteinüberprüfung)
+- [[AUFGABE] Implementierung Allgemeine Interruptsteuerung](#implementierung-durchzuführende-arbeit--dokumentation-für-die-meilensteinüberprüfung)
 - [[AUFGABE] Debugging Übung](#aufgaben)
 
 ## Rechendauer-Performance-Test
@@ -167,5 +167,5 @@ Debugging ist von entscheidender Bedeutung, um Fehler in der Software zu finden 
 
 - **MSP430F5335 Datasheet**, Texas Instruments, Document Number: SLAS590N, Rev. N, October 2018.  
   Verfügbar unter: [https://www.ti.com/lit/gpn/msp430f5335](https://www.ti.com/lit/gpn/msp430f5335)
-  
+
 [⬆ Zurück zum Hauptverzeichnis](../README.md#kapitelübersicht--aufgabenstellungen)

@@ -12,14 +12,14 @@
 - [IO Port Konfiguration](#io-port-konfiguration)
 ### Durchzuführende Aufgaben
 - [[AUFGABE] Anlegen eines Basis Projektes](#anlegen-eines-basis-projektes)
-- [[AUFGABE] Durchzuführende Aufgabe](#aufgabe-durchzuführende-aufgabe)
+- [[AUFGABE] Grundkonfiguration der GPIOs](#aufgabe-grundkonfiguration-der-gpio)
 
 ### Unterlagen
 - [Family Guide - Digital I/O Ports Chapter 12](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=408)
 
 ## Crazy Car Platine
 
-- MSP430F5335 — MSP430 5 Core
+- MSP430F5335
 - 3 analoge Eingänge für Abstandssensoren
 - 1 Hall-Effekt-Sensor für Drehzahl/Drehrichtungsmessung der Hinterachse
 - MPU-9250: 9-Achsen-Sensor (Beschleunigung, Gyroskop, Kompass)
@@ -275,7 +275,7 @@ Nicht genutzte Pins sollten definiert konfiguriert werden (z. B. als Ausgang m
 
 ---
 
-## [AUFGABE] Durchzuführende Aufgabe
+## [AUFGABE] Grundkonfiguration der GPIO
 
 In dieser Aufgabe geht es darum, die Beschaltung der Crazy-Car-Platine – wie sie im Schaltplan ersichtlich ist – systematisch im Code abzubilden. Alle relevanten Pins sollen im Rahmen eines hal_-GPIO-Moduls konfiguriert werden. Dabei werden die Pins je nach Funktion als Ein- oder Ausgang initialisiert. Die Namen und Registerkonfigurationen sollen so gewählt werden, dass eine klare Zuordnung zwischen physischer Schaltung und Software möglich ist. Ziel ist eine robuste, nachvollziehbare Pininitialisierung im hal_-Stil.
 
@@ -299,5 +299,7 @@ In dieser Aufgabe geht es darum, die Beschaltung der Crazy-Car-Platine – wie s
 
 - **MSP430F5335 Datasheet**, Texas Instruments, Document Number: SLAS590N, Rev. N, October 2018.  
   Verfügbar unter: [https://www.ti.com/lit/gpn/msp430f5335](https://www.ti.com/lit/gpn/msp430f5335)
+
+- John H. Davies, **MSP430 Microcontroller Basics**, Newnes/Elsevier, ISBN 978‑0‑7506‑8276‑3.  
 
 [⬆ Zurück zum Hauptverzeichnis](../README.md#kapitelübersicht--aufgabenstellungen)
