@@ -34,6 +34,39 @@
 - [[AUFGABE] Konfiguration und Aufsetzen des TimerB0](#durchzuführende-arbeit--dokumentation-für-die-überprüfung-der-meilensteine)
 ---
 
+## Taktquellen und Taktverteilung im MSP430
+
+Bevor der Unified Clock System (UCS) konfiguriert wird, ist es hilfreich, die grundlegende Struktur des Taktsystems des MSP430 zu verstehen. Die folgende Abbildung zeigt die drei zentralen Taktpfade:
+
+<p align="center">
+  <img src="./media/clocks.png" alt="MSP430 Clock System Diagram" width="650">
+</p>
+
+### Oszillatoren und Taktquellen
+- **VLO**: Very Low Frequency Oscillator (typ. 10 kHz), stromsparend, geringe Genauigkeit
+- **LFXT1**: Low-Frequency Crystal (z. B. 32.768 Hz Quarz)
+- **XT2**: Optionaler Hochfrequenzquarz (z. B. 20 MHz)
+- **DCO**: Digitally Controlled Oscillator – Haupttaktquelle für schnellen Systemtakt (bis 25 MHz)
+
+### Taktverteilung über Selektoren und Teiler
+Die Taktquellen können über Multiplexer (Selector) jeweils einem der drei Haupttakte zugewiesen werden. Jeder Takt kann zusätzlich durch einen Teiler reduziert werden:
+
+- **ACLK** (Auxiliary Clock): für stromsparende Peripherien (z. B. RTC, Timer)
+- **SMCLK** (Sub-Main Clock): für schnelle Peripherien (Timer, UART, etc.)
+- **MCLK** (Main Clock): Systemtakt für die CPU
+
+Die Register `SELAx`, `SELSx`, `SELMx` steuern die Zuweisung der Taktquellen, während `DIVAx`, `DIVSx`, `DIVMx` die Division der Frequenz konfigurieren.
+
+### Beispiel
+Wenn z. B. XT2 = 20 MHz ist und über `SELMx` dem MCLK zugewiesen wird, ergibt sich:
+
+- MCLK = 20 MHz
+- SMCLK = 2.5 MHz (XT2 mit Divider /8)
+- ACLK = 32.768 Hz (aus REFO)
+
+Diese Konfiguration bildet die Basis für Timer- und UART-Module, die auf eine präzise Taktrate angewiesen sind.
+---
+
 ## Power Management Module (PMM)
 
 Das PMM wird in dieser Laborübung nicht detailliert behandelt, eine Grundkonfiguration ist jedoch notwendig, um den MSP430 mit 20 MHz betreiben zu können. Binden Sie hierzu `hal_pmm.c` und die zugehörige Header-Datei gemäß [Anlegen eines Projektes](../Kapitel_01_Einfuehrung/README.md#projekt-erstellen) ein.
