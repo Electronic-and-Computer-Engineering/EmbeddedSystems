@@ -1,149 +1,155 @@
-# EmbeddedSystems
+[⬅ Zurück zur Kapitelübersicht](../README.md#kapitelübersicht--aufgabenstellungen)
+# PWM-Erzeugung, Aktorik
 
-Layerbasierte Embedded-Systems-Laborübung mit MSP430F5335 und Crazy Car Plattform. Ziel ist die Entwicklung eines autonomen Mini-Fahrzeugs inkl. GPIO, Timer, PWM, ADC (DMA), SPI-Display, Sensorik und Regelalgorithmen in C. Projektstruktur mit HAL, DL, AL. Entwicklung mit Code Composer Studio.
+## Inhalt
 
-## Laborübersicht
+**Laborübung**
 
-Dieses Repository begleitet die Embedded-Systems-Laborreihe im Studiengang Elektronik und Computer Engineering (FH JOANNEUM). Im Zentrum steht die systematische Entwicklung eines autonomen Fahrzeugs (Crazy Car) auf Basis des MSP430F5335-Mikrocontrollers.
+- *MSP430x5xx and MSP430x6xx Family User Guide Rev. O* – Texas Instruments
+  - Kapitel 17: [Timer A](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=462)
 
-Die Übung vermittelt praxisnah:
-- Hardwarenahe C-Programmierung
-- Strukturierte Layer-Architektur (HAL / DL / AL)
-- Debugging, Registerzugriffe, ISR
-- Modularisierung und Wiederverwendbarkeit von Komponenten
+- Crazy Car Controller FHJ Schaltplan [Crazy Car Schematic](https://fhjoanneum-my.sharepoint.com/:b:/g/personal/florian_mayer_fh-joanneum_at/EfXYu-rqsLRErJbybsbN4AEB_RUMizJhwpb5D_ysimZehA?e=Ti7PtO)
+
+**Wissensüberprüfung**
+
+- Recherche:
+  - Was ist ein PWM-Signal?
+  - Was ist der Duty Cycle?
+  - Wie sieht das Standard-Servo-Signal im Modellbau aus?
+- Family User Guide – Kapitel 17
+  - 17.1: [Timer A Introduction](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=463)
+    - Beschreibung
+    - Timer-Bitbreite
+    - Blockschaltbild
+  - 17.2.3.1: [Timer A Up Mode](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=466)
+    - Zusammenhang: Eingangsfrequenz → PWM-Auflösung
+    - Zusammenhang: Timer-Teiler → PWM Duty Cycle/Pulsbreite
+  - 17.2.4.2: [Compare Mode](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=471)
+  - 17.2.5.1: [Output Modes – Table 17-2](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=471)
+  - 17.2.5.1.1: [Output Example](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=471)
 ---
+**Video**
+ - [Einführungsvideo - Einheit 4](https://youtu.be/OJhuOfwQRsg?si=YxCrUnW_ZD87oew3)
 
-## Kapitelübersicht & Aufgabenstellungen
+### Durchzuführende Aufgaben
+- [[AUFGABE] TimerA Erzeugung der PWM](#aufgabe-durchzuführende-arbeit--dokumentation-für-die-meilensteinüberprüfung)
+- [[AUFGABE] DriverLayer, Steering & Throttle](#aufgabe-durchzuführende-arbeit--dokumentation-für-die-meilensteinüberprüfung-1)
+- [[AUFGABE] Drehzahlmessung](#aufgabe-drehzahlmessung-komplett-eigenständig)
 
-<details>
-<summary><strong>1–3: Einführung, GPIO, Timer</strong></summary>
+## Grundlagen: PWM beim MSP430
+<p align="center">
+  <img src="./media/pwm.png" alt="Include Options">
+</p>
+Die Pulsweitenmodulation (PWM) ist eine Technik zur Erzeugung eines periodischen digitalen Signals, bei dem das Verhältnis von High- zu Low-Zeit innerhalb einer Periode – der sogenannte **Duty Cycle** – variiert wird. Beim MSP430 wird PWM typischerweise über die Hardwaretimer (Timer A oder B) realisiert, wobei folgende Prinzipien gelten:
 
-### 1. [Einführung und Projektstruktur](Kapitel_01_Einfuehrung/README.md)
-- Überblick zur Crazy Car Platine
-- Softwarearchitektur: HAL, DL, AL
-- Projektstruktur in CCS
-- Git-Versionierung & Setup
+- Der Timer zählt von 0 bis zu einem festgelegten Maximalwert (z. B. in `TAxCCR0`).
+- Ein Vergleichswert (z. B. `TAxCCR1`) bestimmt den Umschaltpunkt zwischen High und Low innerhalb der Periode.
+- Der Vergleich erfolgt hardwareseitig und benötigt keine CPU-Zeit (stromsparend und präzise).
 
-### 2. [Digitale Ein-/Ausgabe](Kapitel_02_GPIO/README.md)
-- GPIO-Initialisierung
-- Interruptgesteuerte Tasterauswertung
-- Performancevergleich: Integer vs. Float
-- Debugging (Breakpoints, Register, Expressions)
+Ein PWM-Signal mit konstanter Periode (z. B. 16.67 ms für 60 Hz) und variabler Pulsbreite (z. B. 1–2 ms) eignet sich ideal zur Ansteuerung von Servos oder Motoren.
 
-### 3. [Clock System und Timer B0](Kapitel_03_TimerB0/README.md)
-- Unified Clock System (UCS)
-- TimerB0: ISR-basierte LED/PWM-Steuerung
-- Frequenzmessung per Oszilloskop
+### Was ist ein PWM-Signal?
+Ein PWM-Signal ist ein digitales Rechtecksignal, bei dem innerhalb eines festen Zeitintervalls (z. B. 16.67 ms) die Länge des High-Pegels variiert werden kann. Die Schaltfrequenz bleibt gleich, nur das Tastverhältnis (Duty Cycle) ändert sich.
 
-</details>
+### Was ist der Duty Cycle?
+Der Duty Cycle beschreibt das Verhältnis der Einschaltdauer zur gesamten Periodendauer eines PWM-Signals und wird in Prozent angegeben:
 
-<details>
-<summary><strong>4–7: PWM, SPI, Display</strong></summary>
+$$\text{Duty Cycle} = \frac{t_{\text{on}}}{t_{\text{per}}} \cdot 100\% $$
 
-### 4. [PWM und Aktorik](Kapitel_04_PWM_Aktorik/README.md)
-- PWM mit TimerA1
-- Ansteuerung von Servo & ESC
-- Driver Layer für Lenkung und Gas
+Beispiel: Bei einer Periode von 20 ms und einem High-Signal von 1.5 ms ergibt sich ein Duty Cycle von 7.5 %.
 
-### 5. [SPI-Kommunikation](Kapitel_05_SPI/README.md)
-- USCI_B1 SPI-Konfiguration
-- Interruptgesteuerte Übertragung
-- CS-Signal Handling
+### Standard-Servo-Signal im Modellbau
+Modellbau-Servos erwarten typischerweise ein PWM-Signal mit einer Frequenz von 50–60 Hz. Die Steuerung erfolgt durch die Pulsbreite:
 
-### 6. [LC-Display Ansteuerung](Kapitel_06_LCD/README.md)
-- Displayinitialisierung (ST7565)
-- Zeichenausgabe, Cursorpositionierung
-- Zeichentabelle und Clear-Routinen
+- 1.0 ms → maximale Auslenkung in eine Richtung
+- 1.5 ms → Mittelstellung
+- 2.0 ms → maximale Auslenkung in die andere Richtung
 
-### 7. [SPI / LCD-Integration](Kapitel_07_SPI_LCD/README.md)
-- Kopplung von Displayfunktionen und SPI
-- Aufbau einer robusten Textausgabe
-- Test aller Pixel (Vollbildtest)
-
-</details>
-
-<details>
-<summary><strong>8–10: ADC, DMA, Sensorik</strong></summary>
-
-### 8. [ADC-Konfiguration](Kapitel_08_ADC/README.md)
-- Einrichtung des ADC12_A
-- Timer-gesteuerte Abtastung (120 Hz)
-- Zwischenspeicherung in Datenstruktur
-
-### 9. [ADC mit DMA](Kapitel_09_ADC_DMA/README.md)
-- DMA0 für automatischen Speichertransfer
-- Status-Flag Handling
-
-### 10. [Sharp Abstandssensoren](Kapitel_10_Abstandssensoren/README.md)
-- Messung und Darstellung der Sensor-Kennlinie
-- Linearisierung: Lookup-Table vs. Approximation
-- Filterung (Moving Average)
-
-</details>
-
-<details>
-<summary><strong>11: Fahralgorithmen</strong></summary>
-
-### 11. [Fahralgorithmen](Kapitel_11_Fahralgorithmen/README.md)
-- Zustandsautomat: Links / Mitte / Rechts
-- Regler (z. B. PID) für Lenkung und Geschwindigkeit
-- Umsetzung einfacher Fahrstrategien:
-  - Bandeverfolgung
-  - Spurmitte halten
-  - Kurvenkompensation
-- Nutzung aller verfügbaren Sensoren
-
-</details>
+Die restliche Zeit innerhalb der 20 ms Periode ist das Signal Low. Die Genauigkeit der Ansteuerung hängt von der Auflösung des Timers ab.
 
 ---
 
-## Ziele
+## Timer A1 – PWM-Erzeugung
 
-- Modularisierung der Embedded Software (Layerstruktur)
-- Verständnis für low-level Hardwareansteuerung
-- Entwicklung von Steuerungs- und Regelalgorithmen
-- Erweiterung um zusätzliche Peripherie und Sensordatenverarbeitung
-- Umsetzung eines lauffähigen autonomen Systems auf Mikrocontroller-Basis
+Ein PWM-Signal (Pulsweitenmodulation) soll mittels Timer A1 erzeugt werden, um das Lenkservo und den Fahrtenregler (ESC) anzusteuern. Die PWM-Frequenz soll 60 Hz betragen. Die Pulsbreite (ca. 1 ms bis 2 ms) steuert die Position des Servos bzw. die Motordrehzahl.
+
+**Achtung:** Das Servo darf sich mechanisch nicht überdrehen!
+
+**Faustregel:**
+- 1 ms ≈ ganz links/rechts
+- 1.5 ms ≈ Mitte
+- 2 ms ≈ ganz rechts/links
+
+### [AUFGABE] Durchzuführende Arbeit & Dokumentation für die Meilensteinüberprüfung
+
+1. Erstellen Sie das HAL-Modul `hal_timerA1.c/.h` mit der Funktion `hal_TimerA1Init()`. Diese wird in `hal_Init()` eingebunden.
+
+2. Konfigurieren Sie den Timer für **2 PWM-Kanäle**, 60 Hz:
+   - Wählen Sie eine passende Eingangstaktfrequenz, sodass die PWM-Pulsbreite (z. B. 1.0–2.0 ms) eine feine Auflösung (z. B. 100 Schritte) erlaubt.
+   - Wählen Sie den richtigen `OUTMOD` im zugehörigen `TAxCCTLn`. (vgl. Family Guide Kapitel 17)
+
+3. Startbedingung: Nach `hal_Init()` soll **kein Puls erzeugt werden** (d. h. Duty Cycle = 0 %). Die Initialisierung des PWM-Werts erfolgt später in `DL_Init()`.
+
+4. Konfigurieren Sie die verwendeten GPIO-Pins für PWM-Ausgabe (Port-Funktion freischalten, Pin-Direction setzen).
+
+> **Hinweis:** Beachten Sie die korrekte Beschaltung der Ausgänge!
+
+<p align="center">
+  <img src="./media/TimerAUPOut.png" alt="Include Options">
+</p>
+
+### Servo anschließen
+
+5. Schließen Sie das Servo am Crazy Car Controller an. Die Versorgung erfolgt über den ESC. Akku anschließen, ESC einschalten.
+
+**Wichtig:** Fahrzeug muss sicher aufgebockt sein – bei Fehlkonfiguration kann es zu plötzlichen Bewegungen kommen!
+
+6. Ermitteln Sie per Debugger die Registerwerte für:
+   - Mittelstellung
+   - Max. Links
+   - Max. Rechts
+
+7. Speichern Sie diese Werte als `#define` im Headerfile ab (z. B. `#define SERVO_CENTER 1500`).
 
 ---
 
-## Projektstruktur
+## Driver Layer – Aktorik
 
-Die Projektstruktur folgt dem klassischen Layer-Prinzip:
+Für die Abstraktion der Hardwarezugriffe wird ein Driver Layer (DL) eingeführt. Dieser Layer definiert eine Softwareschnittstelle zur Aktorik, die in der Applikation verwendet werden kann und **nicht** mehr geändert werden soll.
 
-- HAL          – Hardware Abstraction Layer (Registerzugriff)
-- DL           – Driver Layer (Komponentensteuerung)
-- AL           – Application Layer (Applikationslogik, Statemachine)
-- main.c       – Einstiegspunkt, Systeminitialisierung
-- include      – Globale Header und Definitionen
+### [AUFGABE] Durchzuführende Arbeit & Dokumentation für die Meilensteinüberprüfung
+
+1. Legen Sie einen neuen Ordner `DL` im Projekt an.
+
+2. Erstellen Sie `dl_General.c/.h`:
+   - Funktion `dl_Init(void)` programmieren, die alle DL-Module initialisiert (vgl. Basisprojekt).
+
+3. Erstellen Sie `dl_Aktorik.c/.h`
+
+4. Programmieren Sie:
+   - `dl_SetSteering(int8_t iValue)` → z. B. Bereich -100 (links) bis +100 (rechts), 0 = Mitte
+   - Die Funktion soll den Eingabewert auf die PWM-Registerwerte umrechnen und setzen
+
+5. Programmieren Sie `dl_SteeringInit()` → Setzt das Servo auf Mittelstellung. Diese wird innerhalb von `dl_Init()` aufgerufen.
+
+<p align="center">
+  <img src="./media/escPWM.png" alt="Include Options">
+</p>
+
+6. Programmieren Sie `dl_SetThrottle(int8_t iValue)`
+   - Umrechnung wie bei `SetSteering`
+   - PWM-Registerwerte innerhalb spezifizierter Pulsbreiten setzen
+
+7. Programmieren Sie `dl_ThrottleInit()` bzw. `dl_ESCInit()`
+   - Initialisierung nach Setup-Vorgabe
+   - Wartezeiten via CCR0-Interrupt oder `__delay_cycles()`
+   - Aufruf in `dl_Init()`
 
 ---
 
-## Verwendete Tools
+## [AUFGABE] Drehzahlmessung (Komplett Eigenständig)
 
-- Mikrocontroller: MSP430F5335 (Texas Instruments)
-- Entwicklungsumgebung: Code Composer Studio (TI)
-- Debugger: Spy-by-Wire / JTAG
-- Dokumentation: TI User Guide, Schaltpläne, Datenblätter
-- Versionsverwaltung (optional empfohlen): GitLab, GitHub, Git
+Die Drehzahlmessung erfolgt mittels Capture-Funktion des Timers.
 
----
 
-## Voraussetzungen
-
-- Grundkenntnisse in C (Bitmasken, Pointer, Headerstrukturen)
-- Verständnis für Mikrocontroller-Peripherie
-- Umgang mit Code Composer Studio und Debugging-Werkzeugen
-
----
-
-## Git / Versionierung
-
-Es wird empfohlen, das Projekt versionsverwaltet in einem GitLab- oder GitHub-Repository zu entwickeln. Ein typischer Initialisierungsvorgang:
-
-```bash
-git init
-git remote add origin https://gitlab.com/<benutzer>/<projekt>.git
-git add .
-git commit -m "Initial commit"
-git push -u origin master
+[⬆ Zurück zum Hauptverzeichnis](../README.md#kapitelübersicht--aufgabenstellungen)
