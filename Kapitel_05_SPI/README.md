@@ -26,7 +26,7 @@
 > **VORSICHT:** Die Aufschrift MOSI und CLK am Displayboard sind vertauscht.
 
 **Video**
- - [Einführungsvideo - Einheit 5](https://youtu.be/OJhuOfwQRsg?si=YxCrUnW_ZD87oew3)
+ - [Einführungsvideo - Einheit 5](https://youtu.be/q_kA9L3taqE?si=FuuGbJwFVF0v3IEW)
 
 ### Durchzuführende Aufgaben
 - [[AUFGABE] USCI B1 – Konfiguration](#durchzuführende-arbeit--dokumentation-für-die-überprüfung-der-meilensteine)
@@ -73,10 +73,10 @@ Die Kombination aus CPOL und CPHA ergibt vier SPI-Modi:
 
 | SPI-Modus | CPOL | CPHA | Beschreibung                             |
 |-----------|------|------|------------------------------------------|
-| Mode 0    |  0   |  0   | Takt ruht LOW, Daten bei steigender Flanke übernehmen |
-| Mode 1    |  0   |  1   | Takt ruht LOW, Daten bei fallender Flanke übernehmen |
-| Mode 2    |  1   |  0   | Takt ruht HIGH, Daten bei fallender Flanke übernehmen |
-| Mode 3    |  1   |  1   | Takt ruht HIGH, Daten bei steigender Flanke übernehmen |
+| Mode 0    |  0   |  0   | Takt idle LOW, Daten bei steigender Flanke übernehmen |
+| Mode 1    |  0   |  1   | Takt ilde LOW, Daten bei fallender Flanke übernehmen |
+| Mode 2    |  1   |  0   | Takt ilde HIGH, Daten bei fallender Flanke übernehmen |
+| Mode 3    |  1   |  1   | Takt idle HIGH, Daten bei steigender Flanke übernehmen |
 
 <p align="center">
   <img src="./media/CLKCyclesPol0.png" alt="Include Options">

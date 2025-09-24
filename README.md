@@ -44,7 +44,7 @@ Die Übung vermittelt praxisnah:
 </details>
 
 <details>
-<summary><strong>4–7: PWM, SPI, Display</strong></summary>
+<summary><strong>4–6: PWM, SPI, Display</strong></summary>
 
 ### 4. [PWM und Aktorik](Kapitel_04_PWM_Aktorik/README.md)
 - PWM mit TimerA1
@@ -61,26 +61,21 @@ Die Übung vermittelt praxisnah:
 - Zeichenausgabe, Cursorpositionierung
 - Zeichentabelle und Clear-Routinen
 
-### 7. [SPI / LCD-Integration](Kapitel_07_SPI_LCD/README.md)
-- Kopplung von Displayfunktionen und SPI
-- Aufbau einer robusten Textausgabe
-- Test aller Pixel (Vollbildtest)
-
 </details>
 
 <details>
-<summary><strong>8–10: ADC, DMA, Sensorik</strong></summary>
+<summary><strong>7-9: ADC, DMA, Sensorik</strong></summary>
 
-### 8. [ADC-Konfiguration](Kapitel_08_ADC/README.md)
+### 7. [ADC-Konfiguration](Kapitel_08_ADC/README.md)
 - Einrichtung des ADC12_A
 - Timer-gesteuerte Abtastung (120 Hz)
 - Zwischenspeicherung in Datenstruktur
 
-### 9. [ADC mit DMA](Kapitel_09_ADC_DMA/README.md)
+### 8. [ADC mit DMA](Kapitel_09_ADC_DMA/README.md)
 - DMA0 für automatischen Speichertransfer
 - Status-Flag Handling
 
-### 10. [Sharp Abstandssensoren](Kapitel_10_Abstandssensoren/README.md)
+### 9. [Sharp Abstandssensoren](Kapitel_10_Abstandssensoren/README.md)
 - Messung und Darstellung der Sensor-Kennlinie
 - Linearisierung: Lookup-Table vs. Approximation
 - Filterung (Moving Average)
@@ -88,9 +83,9 @@ Die Übung vermittelt praxisnah:
 </details>
 
 <details>
-<summary><strong>11: Fahralgorithmen</strong></summary>
+<summary><strong>10: Fahralgorithmen</strong></summary>
 
-### 11. [Fahralgorithmen](Kapitel_11_Fahralgorithmen/README.md)
+### 10. [Fahralgorithmen](Kapitel_11_Fahralgorithmen/README.md)
 - Zustandsautomat: Links / Mitte / Rechts
 - Regler (z. B. PID) für Lenkung und Geschwindigkeit
 - Umsetzung einfacher Fahrstrategien:
