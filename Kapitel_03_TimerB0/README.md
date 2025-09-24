@@ -159,5 +159,14 @@ Interrupt Vector: `TIMERB0_VECTOR` (für CCR0)
 ---
 
 Falls im späteren Verlauf PWM, ADC-Trigger oder Watchdog-Funktionalitäten benötigt werden, sollten die vorhandenen Timerkanäle effizient verwaltet werden.
+## Referenzen
+
+- **MSP430x5xx and MSP430x6xx Family User Guide**, Texas Instruments, Literature Number: SLAU208O, Rev. O, April 2019.  
+  Verfügbar unter: [https://www.ti.com/lit/pdf/slau208](https://www.ti.com/lit/pdf/slau208)
+
+- **MSP430F5335 Datasheet**, Texas Instruments, Document Number: SLAS590N, Rev. N, October 2018.  
+  Verfügbar unter: [https://www.ti.com/lit/gpn/msp430f5335](https://www.ti.com/lit/gpn/msp430f5335)
+
+- John H. Davies, **MSP430 Microcontroller Basics**, Newnes/Elsevier, ISBN 978‑0‑7506‑8276‑3.  
 
 [⬆ Zurück zum Hauptverzeichnis](../README.md#kapitelübersicht--aufgabenstellungen)

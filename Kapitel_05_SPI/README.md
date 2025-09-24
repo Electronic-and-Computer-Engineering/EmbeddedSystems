@@ -1,149 +1,210 @@
-# EmbeddedSystems
+[⬅ Zurück zur Kapitelübersicht](../README.md#kapitelübersicht--aufgabenstellungen)
 
-Layerbasierte Embedded-Systems-Laborübung mit MSP430F5335 und Crazy Car Plattform. Ziel ist die Entwicklung eines autonomen Mini-Fahrzeugs inkl. GPIO, Timer, PWM, ADC (DMA), SPI-Display, Sensorik und Regelalgorithmen in C. Projektstruktur mit HAL, DL, AL. Entwicklung mit Code Composer Studio.
+# SPI
 
-## Laborübersicht
+## Inhalt
 
-Dieses Repository begleitet die Embedded-Systems-Laborreihe im Studiengang Elektronik und Computer Engineering (FH JOANNEUM). Im Zentrum steht die systematische Entwicklung eines autonomen Fahrzeugs (Crazy Car) auf Basis des MSP430F5335-Mikrocontrollers.
+**Laborübung**
 
-Die Übung vermittelt praxisnah:
-- Hardwarenahe C-Programmierung
-- Strukturierte Layer-Architektur (HAL / DL / AL)
-- Debugging, Registerzugriffe, ISR
-- Modularisierung und Wiederverwendbarkeit von Komponenten
----
+- *MSP430x5xx and MSP430x6xx Family User Guide Rev. O* – Texas Instruments
+  - Kapitel 37: [USCI – SPI Mode](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=968) SPI: Signale, Aufbau und Funktionsweise
 
-## Kapitelübersicht & Aufgabenstellungen
+- Crazy Car Controller FHJ Schaltplan [Crazy Car Schematic](https://fhjoanneum-my.sharepoint.com/:b:/g/personal/florian_mayer_fh-joanneum_at/EfXYu-rqsLRErJbybsbN4AEB_RUMizJhwpb5D_ysimZehA?e=Ti7PtO)
 
-<details>
-<summary><strong>1–3: Einführung, GPIO, Timer</strong></summary>
+**Wissensüberprüfung**
 
-### 1. [Einführung und Projektstruktur](Kapitel_01_Einfuehrung/README.md)
-- Überblick zur Crazy Car Platine
-- Softwarearchitektur: HAL, DL, AL
-- Projektstruktur in CCS
-- Git-Versionierung & Setup
+- Recherche:
+  - SPI: Signal, Beschreibung und Funktionsweise, schematischer Busaufbau (als Skizze)
+- MSP430x5xx and MSP430x6xx Family User Guide Rev. O – Texas Instruments
+  - Kapitel 37.1: [USCI Overview](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=969)
+  - Kapitel 37.2: [USCI Introduction – SPI Mode + Block Diagram](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=970)
+  - Kapitel 37.3: USCI Operation Mode – Signalbeschreibungen ohne UCxSTE](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=972)
+  - Kapitel 37.3.3: [Master Mode](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=973)
+  - Kapitel 37.5.7: [UCBxRXBUF – Registerbeschreibung](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=991)
+  - Kapitel 37.5.8: [UCBxTXBUF – Registerbeschreibung](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=991)
 
-### 2. [Digitale Ein-/Ausgabe](Kapitel_02_GPIO/README.md)
-- GPIO-Initialisierung
-- Interruptgesteuerte Tasterauswertung
-- Performancevergleich: Integer vs. Float
-- Debugging (Breakpoints, Register, Expressions)
+> **VORSICHT:** Die Aufschrift MOSI und CLK am Displayboard sind vertauscht.
 
-### 3. [Clock System und Timer B0](Kapitel_03_TimerB0/README.md)
-- Unified Clock System (UCS)
-- TimerB0: ISR-basierte LED/PWM-Steuerung
-- Frequenzmessung per Oszilloskop
+**Video**
+ - [Einführungsvideo - Einheit 5](https://youtu.be/OJhuOfwQRsg?si=YxCrUnW_ZD87oew3)
 
-</details>
-
-<details>
-<summary><strong>4–7: PWM, SPI, Display</strong></summary>
-
-### 4. [PWM und Aktorik](Kapitel_04_PWM_Aktorik/README.md)
-- PWM mit TimerA1
-- Ansteuerung von Servo & ESC
-- Driver Layer für Lenkung und Gas
-
-### 5. [SPI-Kommunikation](Kapitel_05_SPI/README.md)
-- USCI_B1 SPI-Konfiguration
-- Interruptgesteuerte Übertragung
-- CS-Signal Handling
-
-### 6. [LC-Display Ansteuerung](Kapitel_06_LCD/README.md)
-- Displayinitialisierung (ST7565)
-- Zeichenausgabe, Cursorpositionierung
-- Zeichentabelle und Clear-Routinen
-
-### 7. [SPI / LCD-Integration](Kapitel_07_SPI_LCD/README.md)
-- Kopplung von Displayfunktionen und SPI
-- Aufbau einer robusten Textausgabe
-- Test aller Pixel (Vollbildtest)
-
-</details>
-
-<details>
-<summary><strong>8–10: ADC, DMA, Sensorik</strong></summary>
-
-### 8. [ADC-Konfiguration](Kapitel_08_ADC/README.md)
-- Einrichtung des ADC12_A
-- Timer-gesteuerte Abtastung (120 Hz)
-- Zwischenspeicherung in Datenstruktur
-
-### 9. [ADC mit DMA](Kapitel_09_ADC_DMA/README.md)
-- DMA0 für automatischen Speichertransfer
-- Status-Flag Handling
-
-### 10. [Sharp Abstandssensoren](Kapitel_10_Abstandssensoren/README.md)
-- Messung und Darstellung der Sensor-Kennlinie
-- Linearisierung: Lookup-Table vs. Approximation
-- Filterung (Moving Average)
-
-</details>
-
-<details>
-<summary><strong>11: Fahralgorithmen</strong></summary>
-
-### 11. [Fahralgorithmen](Kapitel_11_Fahralgorithmen/README.md)
-- Zustandsautomat: Links / Mitte / Rechts
-- Regler (z. B. PID) für Lenkung und Geschwindigkeit
-- Umsetzung einfacher Fahrstrategien:
-  - Bandeverfolgung
-  - Spurmitte halten
-  - Kurvenkompensation
-- Nutzung aller verfügbaren Sensoren
-
-</details>
+### Durchzuführende Aufgaben
+- [[AUFGABE] USCI B1 – Konfiguration](#durchzuführende-arbeit--dokumentation-für-die-überprüfung-der-meilensteine)
 
 ---
 
-## Ziele
+## SPI-Kommunikation – Grundlagen
 
-- Modularisierung der Embedded Software (Layerstruktur)
-- Verständnis für low-level Hardwareansteuerung
-- Entwicklung von Steuerungs- und Regelalgorithmen
-- Erweiterung um zusätzliche Peripherie und Sensordatenverarbeitung
-- Umsetzung eines lauffähigen autonomen Systems auf Mikrocontroller-Basis
+SPI (Serial Peripheral Interface) ist ein synchrones serielles Kommunikationsprotokoll, das für den schnellen Datenaustausch zwischen einem Master (z. B. Mikrocontroller) und einem oder mehreren Slave-Geräten (z. B. Sensoren, Displays, Speicherbausteinen) verwendet wird. Die Kommunikation erfolgt über ein fest definiertes Leitungsschema und basiert auf einem gemeinsamen Takt.
 
----
+### Leitungen im SPI-Bus
 
-## Projektstruktur
+Der SPI-Bus verwendet typischerweise vier dedizierte Signalleitungen:
 
-Die Projektstruktur folgt dem klassischen Layer-Prinzip:
+- **MOSI (Master Out, Slave In)** – Datenleitung vom Master zum Slave
+- **MISO (Master In, Slave Out)** – Datenleitung vom Slave zum Master
+- **SCLK (Serial Clock)** – vom Master erzeugter Takt
+- **CS/SS (Chip Select / Slave Select)** – Auswahl des gewünschten Slave-Geräts (aktiv LOW)
+<p align="center">
+  <img src="./media/ShiftRegister.png" alt="Include Options">
+</p>
 
-- HAL          – Hardware Abstraction Layer (Registerzugriff)
-- DL           – Driver Layer (Komponentensteuerung)
-- AL           – Application Layer (Applikationslogik, Statemachine)
-- main.c       – Einstiegspunkt, Systeminitialisierung
-- include      – Globale Header und Definitionen
+- Der **Master** steuert den Takt (SCLK) und kontrolliert über **CS/SS** die Aktivierung eines Slaves.
+- Daten werden gleichzeitig (synchron) über MOSI und MISO übertragen: Bei jedem Taktimpuls wird ein Bit gleichzeitig gesendet und empfangen.
+- SPI ist **vollduplexfähig**, d. h., Senden und Empfangen erfolgen simultan.
 
----
-
-## Verwendete Tools
-
-- Mikrocontroller: MSP430F5335 (Texas Instruments)
-- Entwicklungsumgebung: Code Composer Studio (TI)
-- Debugger: Spy-by-Wire / JTAG
-- Dokumentation: TI User Guide, Schaltpläne, Datenblätter
-- Versionsverwaltung (optional empfohlen): GitLab, GitHub, Git
+> **Hinweis:** Der SPI-Bus erlaubt auch die Anbindung mehrerer Slaves – dann benötigt jedes Slave-Gerät eine eigene CS-Leitung vom Master.
 
 ---
 
-## Voraussetzungen
+### Taktphasen und Polarität (CPOL, CPHA)
 
-- Grundkenntnisse in C (Bitmasken, Pointer, Headerstrukturen)
-- Verständnis für Mikrocontroller-Peripherie
-- Umgang mit Code Composer Studio und Debugging-Werkzeugen
+Das SPI-Protokoll definiert vier mögliche Modi, abhängig von zwei Parametern:
+
+- **CPOL (Clock Polarity)**:
+  - `CPOL = 0`: Takt ruht im LOW-Zustand
+  - `CPOL = 1`: Takt ruht im HIGH-Zustand
+
+- **CPHA (Clock Phase)**:
+  - `CPHA = 0`: Daten werden an der ersten Flanke (erste Taktkante) übernommen
+  - `CPHA = 1`: Daten werden an der zweiten Flanke (zweite Taktkante) übernommen
+
+Die Kombination aus CPOL und CPHA ergibt vier SPI-Modi:
+
+| SPI-Modus | CPOL | CPHA | Beschreibung                             |
+|-----------|------|------|------------------------------------------|
+| Mode 0    |  0   |  0   | Takt ruht LOW, Daten bei steigender Flanke übernehmen |
+| Mode 1    |  0   |  1   | Takt ruht LOW, Daten bei fallender Flanke übernehmen |
+| Mode 2    |  1   |  0   | Takt ruht HIGH, Daten bei fallender Flanke übernehmen |
+| Mode 3    |  1   |  1   | Takt ruht HIGH, Daten bei steigender Flanke übernehmen |
+
+<p align="center">
+  <img src="./media/CLKCyclesPol0.png" alt="Include Options">
+</p>
+
+> Die meisten SPI-Peripheriegeräte spezifizieren in ihrem Datenblatt, in welchem SPI-Modus sie betrieben werden müssen.
 
 ---
 
-## Git / Versionierung
+### SPI-Datenübertragung – Shift Register
 
-Es wird empfohlen, das Projekt versionsverwaltet in einem GitLab- oder GitHub-Repository zu entwickeln. Ein typischer Initialisierungsvorgang:
+Sowohl Master als auch Slave verfügen über ein internes Schieberegister (Shift Register), über das die Bits sequentiell übertragen werden. Pro Taktzyklus wird:
 
-```bash
-git init
-git remote add origin https://gitlab.com/<benutzer>/<projekt>.git
-git add .
-git commit -m "Initial commit"
-git push -u origin master
+- Ein Bit aus dem Master-Schieberegister auf MOSI gelegt
+- Gleichzeitig ein Bit vom Slave über MISO zurückgeschoben
+- Nach 8 Taktzyklen ist ein vollständiges Byte übertragen worden
+
+> Der SPI-Takt muss so gewählt werden, dass er den Spezifikationen des Slave-Geräts entspricht. Typische Frequenzen liegen im Bereich von wenigen 100 kHz bis mehreren MHz.
+
+---
+
+### Datenfluss beim MSP430 – Register- und Schieberegister-Logik
+
+Der MSP430 verwendet zur SPI-Kommunikation folgende Elemente:
+
+- **UCxTXBUF (Transmit Buffer)**: Dieses Register wird vom Anwender (z. B. durch `hal_USCIB1Transmit()`) mit einem Byte beschrieben. Ist das interne **TX-Shift-Register** leer, wird das Byte automatisch übernommen.
+- **TX-Shift-Register**: Wandelt das Byte in eine bitweise Übertragung um und legt es taktgesteuert auf die MOSI-Leitung.
+- **MISO-Empfang**: Parallel zur Übertragung empfängt der MSP430 über UCxSOMI ein Bit pro Taktflanke, welches im internen **RX-Shift-Register** gesammelt wird.
+- **UCxRXBUF (Receive Buffer)**: Sobald ein Byte vollständig empfangen wurde, wird es automatisch in dieses Register übertragen.
+
+Der vollständige Ablauf:
+
+1. **TX-Pfad:**
+   - Byte in `UCxTXBUF` schreiben
+   - Byte wird in das **TX-Shift-Register** übernommen (wenn leer)
+   - Übertragung beginnt synchron mit Takt
+
+2. **RX-Pfad:**
+   - Empfangene Bits gelangen ins **RX-Shift-Register**
+   - Nach 8 Bits → automatischer Transfer nach `UCxRXBUF`
+   - Löst RX-Interrupt aus (wenn aktiviert)
+
+> Diese Architektur erlaubt es, das Senden und Empfangen vollständig interruptgesteuert umzusetzen, ohne ständiges Polling.
+
+**Wichtig:** Die Übertragung ist immer gekoppelt – ein Sendevorgang erfordert gleichzeitig ein Empfangsregister. Um beispielsweise nur zu senden, wird typischerweise ein Dummy-Byte empfangen und verworfen.
+
+---
+
+## USCI B1 – Konfiguration
+
+Das LC-Display des Crazy Car Controllers wird über die SPI-Schnittstelle USCI_B1 angesteuert. Dazu müssen sowohl die I/O-Pins als auch das USCI-Modul korrekt initialisiert werden. Die Datenübertragung erfolgt interruptgesteuert, um die CPU zu entlasten.
+
+### [AUFGABE] Durchzuführende Arbeit & Dokumentation für die Überprüfung der Meilensteine
+
+1. **HAL-Modul anlegen:** `hal_usciB1.c` und `hal_usciB1.h`
+
+2. **Funktion `hal_USCIB1Init(void)` programmieren:**
+   - SPI-Master-Mode
+   - Taktfrequenz: 100 kHz (als `#define` im Header)
+   - 8 Bit, MSB first
+   - CPOL = 1, CPHA = 0
+   - RX-Interrupt aktivieren
+   - Softwarereset vor/nach Konfiguration setzen (UCB1CTL1)
+   - Register: UCB1CTL0, UCB1BRx, UCB1IE
+
+3. **GPIO-Konfiguration anpassen** (Pin-Multiplexing für USCI_B1 aktivieren)
+
+4. **Datenstruktur definieren (in `hal_usciB1.h`):**
+```c
+typedef struct {
+  struct {
+    unsigned char TxSuc;   // 1 = Übertragung abgeschlossen
+  } Status;
+
+  struct {
+    unsigned char len;     // Anzahl zu übertragender Bytes
+    unsigned char cnt;     // Aktueller Index
+    unsigned char Data[256]; // Tx-Array
+  } TxData;
+
+  struct {
+    unsigned char len;     // Anzahl empfangener Bytes
+    unsigned char Data[256]; // Rx-Array
+  } RxData;
+} USCIB1_SPICom;
+```
+
+5. **Globale Variable vom Typ `USCIB1_SPICom` in `hal_general.c` deklarieren**
+6. **Als `extern` in `main.c` und `hal_usciB1.c` deklarieren**
+
+7. **Funktion `hal_USCIB1Transmit()` schreiben:**
+   - Erstes Byte in TXBUF schreiben
+   - `TxSuc` auf 0 setzen
+   - ISR übernimmt weitere Übertragung
+
+8. **ISR-Funktion (RX-Interrupt) programmieren:**
+   - TX nur möglich nach RX-Ereignis
+   - Bei Erreichen von `TxData.len`:
+     - `TxSuc = 1` setzen
+   - Empfangene Bytes in `RxData.Data[]` schreiben
+
+9. **Chip Select (CS) einbinden:**
+   - Vor Übertragung: `CS_LOW`
+   - Nach Übertragung: `CS_HIGH`
+   - z. B. per Makro
+
+10. **Signale mit Oszilloskop kontrollieren:**
+    - Mind. 2-Byte-Übertragung sichtbar machen
+
+> **VORSICHT:** Die Aufschrift MOSI und CLK am Displayboard sind vertauscht.
+
+## USCI A0 – UART-Konfiguration (optional)
+
+Das On-PCB-Debugtool bietet neben dem Debuginterface auch eine virtuelle COM-Schnittstelle. Damit kann über USB mit dem Controller kommuniziert werden (z. B. via Hterm).
+
+**Einstellungen:**
+
+- Übertragungsrate: 9600 Baud
+- 1 Stop Bit
+- 8 Datenbits
+## Referenzen
+
+- **MSP430x5xx and MSP430x6xx Family User Guide**, Texas Instruments, Literature Number: SLAU208O, Rev. O, April 2019.  
+  Verfügbar unter: [https://www.ti.com/lit/pdf/slau208](https://www.ti.com/lit/pdf/slau208)
+
+- **MSP430F5335 Datasheet**, Texas Instruments, Document Number: SLAS590N, Rev. N, October 2018.  
+  Verfügbar unter: [https://www.ti.com/lit/gpn/msp430f5335](https://www.ti.com/lit/gpn/msp430f5335)
+
+- John H. Davies, **MSP430 Microcontroller Basics**, Newnes/Elsevier, ISBN 978‑0‑7506‑8276‑3.  
+
+[⬆ Zurück zum Hauptverzeichnis](../README.md#kapitelübersicht--aufgabenstellungen)
