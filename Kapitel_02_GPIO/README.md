@@ -6,13 +6,10 @@
 - [Rechendauer-Performance-Test](#rechendauer-performance-test)
 - [Einführung in die Interrupt-Konfiguration (MSP430)](#einführung-in-die-interrupt-konfiguration-msp430)
 - [Schritte zur Konfiguration eines Port-Interrupts](#schritte-zur-konfiguration-eines-port-interrupts)
-- [Beispiel – Konfiguration des Port 1 Interrupts (P1.3)](#beispiel--konfiguration-des-port-1-interrupts-p13)
+- [Beispiel – Konfiguration des Port 1 Interrupts (P1.3)](#beispiel-konfiguration-des-port-1-interrupts-p13)
 - [Erstellung einer ISR für Port1](#erstellung-einer-isr-für-port1)
 - [Aufbau einer Port1-ISR (P1)](#aufbau-einer-port1-isr-p1)
-- [Erklärung](#erklärung)
 - [Allgemeine I/O-Interruptsteuerung](#allgemeine-io-interruptsteuerung)
-- [Interrupts](#interrupts)
-- [Debugging-Übung](#debugging-übung)
 
 **Laborübung**
 
@@ -94,7 +91,6 @@ __interrupt void Port_1(void)
     }
 }
 ```
-
 ### Erklärung
 
 - `#pragma vector=PORT1_VECTOR`: Gibt dem Compiler an, dass die folgende Funktion die ISR für Port 1 ist.
