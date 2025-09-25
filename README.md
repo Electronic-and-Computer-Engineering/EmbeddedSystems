@@ -66,16 +66,16 @@ Die Übung vermittelt praxisnah:
 <details>
 <summary><strong>7-9: ADC, DMA, Sensorik</strong></summary>
 
-### 7. [ADC-Konfiguration](Kapitel_08_ADC/README.md)
+### 7. [ADC-Konfiguration](Kapitel_07_ADC/README.md)
 - Einrichtung des ADC12_A
 - Timer-gesteuerte Abtastung (120 Hz)
 - Zwischenspeicherung in Datenstruktur
 
-### 8. [ADC mit DMA](Kapitel_09_ADC_DMA/README.md)
+### 8. [ADC mit DMA](Kapitel_08_ADC_DMA/README.md)
 - DMA0 für automatischen Speichertransfer
 - Status-Flag Handling
 
-### 9. [Sharp Abstandssensoren](Kapitel_10_Abstandssensoren/README.md)
+### 9. [Sharp Abstandssensoren](Kapitel_9_Abstandssensoren/README.md)
 - Messung und Darstellung der Sensor-Kennlinie
 - Linearisierung: Lookup-Table vs. Approximation
 - Filterung (Moving Average)
