@@ -2,6 +2,12 @@
 # PWM-Erzeugung, Aktorik
 
 ## Inhalt
+  - [Grundlagen: PWM beim MSP430](#grundlagen-pwm-beim-msp430)
+  - [Was ist ein PWM-Signal?](#was-ist-ein-pwm-signal)
+  - [Was ist der Duty Cycle?](#was-ist-der-duty-cycle)
+  - [Standard-Servo-Signal im Modellbau](#standard-servo-signal-im-modellbau)
+  - [Timer A1 – PWM-Erzeugung](#timer-a1-pwm-erzeugung)
+  - [Driver Layer – Aktorik](#driver-layer-aktorik)
 
 **Laborübung**
 
@@ -69,7 +75,7 @@ Die restliche Zeit innerhalb der 20 ms Periode ist das Signal Low. Die Genauig
 
 ---
 
-## Timer A1 – PWM-Erzeugung
+## Timer A1, PWM-Erzeugung
 
 Ein PWM-Signal (Pulsweitenmodulation) soll mittels Timer A1 erzeugt werden, um das Lenkservo und den Fahrtenregler (ESC) anzusteuern. Die PWM-Frequenz soll 60 Hz betragen. Die Pulsbreite (ca. 1 ms bis 2 ms) steuert die Position des Servos bzw. die Motordrehzahl.
 
@@ -113,7 +119,7 @@ Ein PWM-Signal (Pulsweitenmodulation) soll mittels Timer A1 erzeugt werden, um d
 
 ---
 
-## Driver Layer – Aktorik
+## Driver Layer, Aktorik
 
 Für die Abstraktion der Hardwarezugriffe wird ein Driver Layer (DL) eingeführt. Dieser Layer definiert eine Softwareschnittstelle zur Aktorik, die in der Applikation verwendet werden kann und **nicht** mehr geändert werden soll.
 

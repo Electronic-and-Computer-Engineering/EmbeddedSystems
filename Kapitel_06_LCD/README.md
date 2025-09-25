@@ -1,6 +1,9 @@
 [⬅ Zurück zur Kapitelübersicht](../README.md#kapitelübersicht--aufgabenstellungen)
 
 ## Inhalt
+- [Funktionen des Displays](#funktionen-des-displays)
+- [Display Driver](#display-driver)
+- [Fast Display Driver (optional)](#fast-display-driver-optional)
 
 **Laborübung**
 
@@ -84,7 +87,7 @@ Im Folgenden sind die Low-Level-Treiberfunktionen beschrieben, die mindestens er
 2. **Funktion `dl_LCDWriteCommand()` implementieren:**
 
 ```c
-void Driver_LCD_WriteCommand(unsigned char *data , unsigned char data_length)
+void dl_LCDWriteCommand(unsigned char *data , unsigned char data_length)
 {
     unsigned char i;
     while(LCD_Data.Status.B.TxSuc == 0);
@@ -98,7 +101,7 @@ void Driver_LCD_WriteCommand(unsigned char *data , unsigned char data_length)
 
     LCD_Data.TxData.len = data_length;
     LCD_Data.TxData.cnt = 0;
-    HAL_USCIB1_Transmit();
+    hal_USCIB1Transmit();
 }
 ```
 

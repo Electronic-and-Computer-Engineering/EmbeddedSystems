@@ -11,7 +11,7 @@
 - [Schnittstellen zwischen Softwaremodulen](#schnittstellen-zwischen-softwaremodulen)
 - [IO Port Konfiguration](#io-port-konfiguration)
 ### Durchzuführende Aufgaben
-- [[AUFGABE] Anlegen eines Basis Projektes](#anlegen-eines-basis-projektes)
+- [[AUFGABE] Anlegen eines Basis Projektes](#aufgabe-anlegen-eines-basis-projektes)
 - [[AUFGABE] Grundkonfiguration der GPIOs](#aufgabe-grundkonfiguration-der-gpio)
 
 ### Unterlagen

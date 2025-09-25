@@ -3,6 +3,16 @@
 # Digitale Ein-/Ausgabe
 
 ## Inhalt
+- [Rechendauer-Performance-Test](#rechendauer-performance-test)
+- [Einführung in die Interrupt-Konfiguration (MSP430)](#einführung-in-die-interrupt-konfiguration-msp430)
+- [Schritte zur Konfiguration eines Port-Interrupts](#schritte-zur-konfiguration-eines-port-interrupts)
+- [Beispiel – Konfiguration des Port 1 Interrupts (P1.3)](#beispiel--konfiguration-des-port-1-interrupts-p13)
+- [Erstellung einer ISR für Port1](#erstellung-einer-isr-für-port1)
+- [Aufbau einer Port1-ISR (P1)](#aufbau-einer-port1-isr-p1)
+- [Erklärung](#erklärung)
+- [Allgemeine I/O-Interruptsteuerung](#allgemeine-io-interruptsteuerung)
+- [Interrupts](#interrupts)
+- [Debugging-Übung](#debugging-übung)
 
 **Laborübung**
 
@@ -52,7 +62,7 @@ Bevor Interrupts verwendet werden können, müssen sie korrekt eingerichtet werd
 5. **GIE (Global Interrupt Enable)**: Ermöglicht globale Interruptverarbeitung (`__enable_interrupt();`).
 6. **ISR schreiben**: Für jeden Port gibt es eine zugehörige Interrupt-Service-Routine (z. B. `#pragma vector=PORT1_VECTOR`).
 
-### Beispiel – Konfiguration des Port 1 Interrupts (P1.3)
+### Beispiel: Konfiguration des Port 1 Interrupts (P1.3)
 ```c
 P1DIR &= ~BIT3;      // P1.3 als Eingang
 P1REN |= BIT3;       // Pull-Up/Down aktivieren

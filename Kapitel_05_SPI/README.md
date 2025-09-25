@@ -3,6 +3,14 @@
 # SPI
 
 ## Inhalt
+- [SPI – Inhalt](#spi)
+- [SPI-Kommunikation – Grundlagen](#spi-kommunikation-grundlagen)
+  - [Leitungen im SPI-Bus](#leitungen-im-spi-bus)
+  - [Taktphasen und Polarität (CPOL, CPHA)](#taktphasen-und-polarität-cpol-cpha) 
+  - [SPI-Datenübertragung – Shift Register](#spi-datenübertragung-shift-register)
+  - [Datenfluss beim MSP430](#datenfluss-beim-msp430-register-und-schieberegister-logik)
+- [USCI B1 – Konfiguration](#usci-b1konfiguration)
+- [USCI A0 – UART-Konfiguration (optional)](#uart-konfiguration-optional)
 
 **Laborübung**
 
@@ -33,7 +41,7 @@
 
 ---
 
-## SPI-Kommunikation – Grundlagen
+## SPI-Kommunikation Grundlagen
 
 SPI (Serial Peripheral Interface) ist ein synchrones serielles Kommunikationsprotokoll, das für den schnellen Datenaustausch zwischen einem Master (z. B. Mikrocontroller) und einem oder mehreren Slave-Geräten (z. B. Sensoren, Displays, Speicherbausteinen) verwendet wird. Die Kommunikation erfolgt über ein fest definiertes Leitungsschema und basiert auf einem gemeinsamen Takt.
 
@@ -86,7 +94,7 @@ Die Kombination aus CPOL und CPHA ergibt vier SPI-Modi:
 
 ---
 
-### SPI-Datenübertragung – Shift Register
+### SPI-Datenübertragung Shift Register
 
 Sowohl Master als auch Slave verfügen über ein internes Schieberegister (Shift Register), über das die Bits sequentiell übertragen werden. Pro Taktzyklus wird:
 
@@ -98,7 +106,7 @@ Sowohl Master als auch Slave verfügen über ein internes Schieberegister (Shift
 
 ---
 
-### Datenfluss beim MSP430 – Register- und Schieberegister-Logik
+### Datenfluss beim MSP430 Register und Schieberegister-Logik
 
 Der MSP430 verwendet zur SPI-Kommunikation folgende Elemente:
 
@@ -125,7 +133,7 @@ Der vollständige Ablauf:
 
 ---
 
-## USCI B1 – Konfiguration
+## USCI B1–Konfiguration
 
 Das LC-Display des Crazy Car Controllers wird über die SPI-Schnittstelle USCI_B1 angesteuert. Dazu müssen sowohl die I/O-Pins als auch das USCI-Modul korrekt initialisiert werden. Die Datenübertragung erfolgt interruptgesteuert, um die CPU zu entlasten.
 
@@ -188,7 +196,7 @@ typedef struct {
 
 > **VORSICHT:** Die Aufschrift MOSI und CLK am Displayboard sind vertauscht.
 
-## USCI A0 – UART-Konfiguration (optional)
+## UART-Konfiguration (optional)
 
 Das On-PCB-Debugtool bietet neben dem Debuginterface auch eine virtuelle COM-Schnittstelle. Damit kann über USB mit dem Controller kommuniziert werden (z. B. via Hterm).
 
