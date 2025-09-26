@@ -17,6 +17,11 @@
 ### Unterlagen
 - [Family Guide - Digital I/O Ports Chapter 12](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=408)
 
+### Grundlegendes - Videos
+- [Code Composer Basics - Projects](https://youtu.be/DIkQaNBwspo?si=LmN9qGZYQwnxywni)
+- [Code Composer Basics - Debugger](https://www.youtube.com/watch?v=BvRv3tO5Kd4&t=1s)
+- [Digilent Scope / Waveforms](https://youtu.be/eUOFmPMJk18?si=pilhvG0IRg6HJkWf)
+
 ## Crazy Car Platine
 
 - MSP430F5335
@@ -31,7 +36,6 @@
 <p align="center">
   <img src="./media/CCPlatine2.png" alt="Include Options">
 </p>
-
 ---
 
 ## Softwarestruktur

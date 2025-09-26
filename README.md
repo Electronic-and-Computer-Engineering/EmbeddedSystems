@@ -78,14 +78,13 @@ Die Übung vermittelt praxisnah:
 ### 9. [Sharp Abstandssensoren](Kapitel_9_Abstandssensoren/README.md)
 - Messung und Darstellung der Sensor-Kennlinie
 - Linearisierung: Lookup-Table vs. Approximation
-- Filterung (Moving Average)
-
+- Filterung
 </details>
 
 <details>
 <summary><strong>10: Fahralgorithmen</strong></summary>
 
-### 10. [Fahralgorithmen](Kapitel_11_Fahralgorithmen/README.md)
+### 10. [Fahralgorithmen](Kapitel_10_Fahralgorithmen/README.md)
 - Zustandsautomat: Links / Mitte / Rechts
 - Regler (z. B. PID) für Lenkung und Geschwindigkeit
 - Umsetzung einfacher Fahrstrategien:

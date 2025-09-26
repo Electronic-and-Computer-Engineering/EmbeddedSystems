@@ -1,149 +1,193 @@
-# EmbeddedSystems
+[⬅ Zurück zur Kapitelübersicht](../README.md#kapitelübersicht--aufgabenstellungen)
 
-Layerbasierte Embedded-Systems-Laborübung mit MSP430F5335 und Crazy Car Plattform. Ziel ist die Entwicklung eines autonomen Mini-Fahrzeugs inkl. GPIO, Timer, PWM, ADC (DMA), SPI-Display, Sensorik und Regelalgorithmen in C. Projektstruktur mit HAL, DL, AL. Entwicklung mit Code Composer Studio.
+# Sharp Abstandssensoren
 
-## Laborübersicht
+## Inhaltsverzeichnis
+* [Funktionsprinzip: Triangulation bei Sharp-Sensoren](#funktionsprinzip-triangulation-bei-sharp-sensoren)
+* [Sensor-Kennlinie](#sensor-kennlinie)
+* [Messung der Ausgangskennlinie](#messung-der-ausgangskennlinie)
+* [Analyse mit dem Oszilloskop](#analyse-mit-dem-oszilloskop)
+* [Linearisierung](#linearisierung)
+  * [1) Mathematische Annäherung](#1-mathematische-annäherung)
+  * [2) Lookup Table](#2-lookup-table)
+* [Globale Speicherung der Werte](#globale-speicherung-der-werte)
 
-Dieses Repository begleitet die Embedded-Systems-Laborreihe im Studiengang Elektronik und Computer Engineering (FH JOANNEUM). Im Zentrum steht die systematische Entwicklung eines autonomen Fahrzeugs (Crazy Car) auf Basis des MSP430F5335-Mikrocontrollers.
+## Inhalt
 
-Die Übung vermittelt praxisnah:
-- Hardwarenahe C-Programmierung
-- Strukturierte Layer-Architektur (HAL / DL / AL)
-- Debugging, Registerzugriffe, ISR
-- Modularisierung und Wiederverwendbarkeit von Komponenten
----
+**Laborübung**
 
-## Kapitelübersicht & Aufgabenstellungen
+* [Sharp GP2Y0A02YK0F Datasheet](./GP2Y0A02YK0F.pdf)
+* Crazy Car Controller FHJ Schaltplan
 
-<details>
-<summary><strong>1–3: Einführung, GPIO, Timer</strong></summary>
+**Wissensüberprüfung**
+- Triangulation 
+- Velocity (Physics) 
 
-### 1. [Einführung und Projektstruktur](Kapitel_01_Einfuehrung/README.md)
-- Überblick zur Crazy Car Platine
-- Softwarearchitektur: HAL, DL, AL
-- Projektstruktur in CCS
-- Git-Versionierung & Setup
+* [Application Note](./GP2Y0A02YK0F.pdf#page=1)
+  * [Timing Chart (Sample Time vs. Output Stability)](./GP2Y0A02YK0F.pdf#page=4)
+  * [Distance Characteristics](./GP2Y0A02YK0F.pdf#page=4)
 
-### 2. [Digitale Ein-/Ausgabe](Kapitel_02_GPIO/README.md)
-- GPIO-Initialisierung
-- Interruptgesteuerte Tasterauswertung
-- Performancevergleich: Integer vs. Float
-- Debugging (Breakpoints, Register, Expressions)
+> Tipp: Multimeter, Oszilloskop und Taschenrechner bereithalten.
 
-### 3. [Clock System und Timer B0](Kapitel_03_TimerB0/README.md)
-- Unified Clock System (UCS)
-- TimerB0: ISR-basierte LED/PWM-Steuerung
-- Frequenzmessung per Oszilloskop
-
-</details>
-
-<details>
-<summary><strong>4–7: PWM, SPI, Display</strong></summary>
-
-### 4. [PWM und Aktorik](Kapitel_04_PWM_Aktorik/README.md)
-- PWM mit TimerA1
-- Ansteuerung von Servo & ESC
-- Driver Layer für Lenkung und Gas
-
-### 5. [SPI-Kommunikation](Kapitel_05_SPI/README.md)
-- USCI_B1 SPI-Konfiguration
-- Interruptgesteuerte Übertragung
-- CS-Signal Handling
-
-### 6. [LC-Display Ansteuerung](Kapitel_06_LCD/README.md)
-- Displayinitialisierung (ST7565)
-- Zeichenausgabe, Cursorpositionierung
-- Zeichentabelle und Clear-Routinen
-
-### 7. [SPI / LCD-Integration](Kapitel_07_SPI_LCD/README.md)
-- Kopplung von Displayfunktionen und SPI
-- Aufbau einer robusten Textausgabe
-- Test aller Pixel (Vollbildtest)
-
-</details>
-
-<details>
-<summary><strong>8–10: ADC, DMA, Sensorik</strong></summary>
-
-### 8. [ADC-Konfiguration](Kapitel_08_ADC/README.md)
-- Einrichtung des ADC12_A
-- Timer-gesteuerte Abtastung (120 Hz)
-- Zwischenspeicherung in Datenstruktur
-
-### 9. [ADC mit DMA](Kapitel_09_ADC_DMA/README.md)
-- DMA0 für automatischen Speichertransfer
-- Status-Flag Handling
-
-### 10. [Sharp Abstandssensoren](Kapitel_10_Abstandssensoren/README.md)
-- Messung und Darstellung der Sensor-Kennlinie
-- Linearisierung: Lookup-Table vs. Approximation
-- Filterung (Moving Average)
-
-</details>
-
-<details>
-<summary><strong>11: Fahralgorithmen</strong></summary>
-
-### 11. [Fahralgorithmen](Kapitel_11_Fahralgorithmen/README.md)
-- Zustandsautomat: Links / Mitte / Rechts
-- Regler (z. B. PID) für Lenkung und Geschwindigkeit
-- Umsetzung einfacher Fahrstrategien:
-  - Bandeverfolgung
-  - Spurmitte halten
-  - Kurvenkompensation
-- Nutzung aller verfügbaren Sensoren
-
-</details>
+### Durchzuführende Aufgaben
+[[AUFGABE] Implementierung Distanzmessung](#aufgabe-durchzuführende-arbeiten--dokumentation-für-die-meilensteinüberprüfung)
 
 ---
 
-## Ziele
+## Funktionsprinzip: Triangulation bei Sharp-Sensoren
 
-- Modularisierung der Embedded Software (Layerstruktur)
-- Verständnis für low-level Hardwareansteuerung
-- Entwicklung von Steuerungs- und Regelalgorithmen
-- Erweiterung um zusätzliche Peripherie und Sensordatenverarbeitung
-- Umsetzung eines lauffähigen autonomen Systems auf Mikrocontroller-Basis
+Sharp-IR-Sensoren arbeiten nach dem **Prinzip der optischen Triangulation**. Sie enthalten:
 
----
+* Eine **Infrarot-LED**, die einen Strahl aussendet
+* Einen **Position Sensitive Detector (PSD)** mit einer Linse
+* Eine interne Analogschaltung zur Umrechnung
 
-## Projektstruktur
+### Grundidee:
 
-Die Projektstruktur folgt dem klassischen Layer-Prinzip:
+Der reflektierte IR-Strahl trifft je nach Abstand an einer unterschiedlichen Position auf den PSD.
+Daraus ergibt sich eine **nichtlineare, umgekehrt proportionale** Beziehung zwischen der **Ausgangsspannung** und dem **Abstand zum Objekt**.
 
-- HAL          – Hardware Abstraction Layer (Registerzugriff)
-- DL           – Driver Layer (Komponentensteuerung)
-- AL           – Application Layer (Applikationslogik, Statemachine)
-- main.c       – Einstiegspunkt, Systeminitialisierung
-- include      – Globale Header und Definitionen
+<p align="center">
+  <img src="./media/triangulation.png" alt="Measuring Principle – Sharp Sensor" width="500">
+</p>
 
----
+> **Der Sensor funktioniert nur korrekt bei diffus reflektierenden Objekten!**
 
-## Verwendete Tools
+## Sensor-Kennlinie
 
-- Mikrocontroller: MSP430F5335 (Texas Instruments)
-- Entwicklungsumgebung: Code Composer Studio (TI)
-- Debugger: Spy-by-Wire / JTAG
-- Dokumentation: TI User Guide, Schaltpläne, Datenblätter
-- Versionsverwaltung (optional empfohlen): GitLab, GitHub, Git
+Vor dem Einsatz im Regelkreis muss die **Sensorcharakteristik** getestet werden:
+
+* Versorgungsspannung: 5 V
+* Ausgangsspannung: 0.4–2.8 V (typisch)
+* Abstand: 10–80 cm (modellabhängig)
+* Frequenz: ~25–40 Hz (Signalstabilität)
 
 ---
 
-## Voraussetzungen
+## Messung der Ausgangskennlinie
 
-- Grundkenntnisse in C (Bitmasken, Pointer, Headerstrukturen)
-- Verständnis für Mikrocontroller-Peripherie
-- Umgang mit Code Composer Studio und Debugging-Werkzeugen
+1. **Abstand vs. Spannung messen**
+
+   * Multimeter verwenden
+   * Abstand in 5 cm-Schritten erhöhen
+   * Ausgangsspannung notieren
+
+2. **Kennlinie grafisch darstellen**
+
+   * X-Achse: Abstand (mm)
+   * Y-Achse: Ausgangsspannung (mV)
+   * Vergleich mit:
+
+<p align="center">
+  <img src="./media/kennlinie.png" alt="Measuring Principle – Sharp Sensor" width="500">
+</p>
+
+## Analyse mit dem Oszilloskop
+
+* Ausgangssignal ist **analog**, aber **nicht stabil** bei hohen Frequenzen.
+* Überprüfen Sie:
+
+  * Störspannungen
+  * Wiederholrate des Signals
+  * Stabilität über Zeit
+
+> Ergebnis: **Keine echte Linearität**, aber deterministische Kennlinie.
 
 ---
 
-## Git / Versionierung
+## Linearisierung
 
-Es wird empfohlen, das Projekt versionsverwaltet in einem GitLab- oder GitHub-Repository zu entwickeln. Ein typischer Initialisierungsvorgang:
+Ein linearer Zusammenhang ist essenziell für gleichmäßige Steuerung.
+Zwei etablierte Methoden:
 
-```bash
-git init
-git remote add origin https://gitlab.com/<benutzer>/<projekt>.git
-git add .
-git commit -m "Initial commit"
-git push -u origin master
+### 1) Mathematische Annäherung
+
+* Invers-polynomiale oder exponentielle Approximation
+* Basierend auf Fit der empirischen Kennlinie
+
+```c
+// Beispiel: Näherungsfunktion
+uint16_t convertIR(uint16_t adcVal) {
+    float voltage = (adcVal / 4095.0f) * 3.3f;
+    float dist_cm = 4800.0f / (voltage * 1000.0f);
+    return (uint16_t)(dist_cm * 10); // Rückgabe in mm
+}
+```
+
+> Für präzisere Ergebnisse: **Polynomanpassung (polyfit, MATLAB)**
+
+* Betrachten Sie das bereitgestellte MATLAB-Skript:
+`polynomial_ES.m` (im Ordner)
+
+---
+
+### 2) Lookup Table
+
+* Vorteil: Keine Berechnung zur Laufzeit
+* Aufbau: `adcValue` → `Distance_mm`
+* Reduktion durch Shift: z. B. `adc >> 3` bei 512-Einträgen
+
+```c
+#define ADC_RESOLUTION 4096
+#define LUT_SIZE 512
+
+const uint16_t distTableFront[LUT_SIZE] = { /* aus Interpolation */ };
+
+uint16_t getDistanceFront(uint16_t adcVal) {
+    return distTableFront[adcVal >> 3];
+}
+```
+
+* Interpolation zur Tabellen-Erstellung:
+Nutzen Sie `polynomial_ES.m` mit ADC-Werten und gemessenen Distanzen.
+Exportiere das Ergebnis als C-Array.
+
+---
+
+## Globale Speicherung der Werte
+
+Erstellen Sie ein separates **DL-Modul**, z. B. `dl_ir.c`.
+Dieses übernimmt die Abfrage des ADCs und speichert die linearisierte Distanz:
+
+```c
+typedef struct {
+    uint16_t Front_mm;
+    uint16_t Side_mm;
+} irData_t;
+
+extern irData_t g_irData;
+```
+
+## [AUFGABE] Durchzuführende Arbeiten & Dokumentation für die Meilensteinüberprüfung
+
+1. **Grundlagenstudium**
+   - Lesen Sie die Application Note und das Datasheet (`GP2Y0A02YK0F.pdf`)
+   - Verstehen des Triangulationsprinzips 
+
+2. **Kennlinienerfassung**
+   - Messen Sie die Ausgangsspannung des IR-Sensors in Abhängigkeit vom Abstand (10 cm bis 80 cm in 5 cm-Schritten)
+   - Stellen Sie die gemessene Kennlinie grafisch dar
+   - Vergleichen Sie Ihre Ergebnisse mit dem Diagramm auf Seite 5 des Datenblattes
+
+3. **Analyse mit dem Oszilloskop**
+   - Untersuchen Sie das Sensorsignal auf Schwankungen, Frequenz und Stabilität
+   - Dokumentieren Sie Auffälligkeiten und Frequenzverhalten
+
+4. **Linearisierung der Kennlinie**
+   - Erstellen Sie eine mathematische Näherung (z. B. polynomiell) oder nutzen Sie eine Lookup-Tabelle
+   - Wenn Sie die Lookup-Tabelle verwenden, wählen Sie eine sinnvolle Auflösung (zB. 512 Einträge → `adc >> 3`)
+   - Verweisen Sie auf den MATLAB-Code `polynomial_ES.m` zur Interpolation
+
+5. **Implementierung im Code**
+   - Erstellen Sie ein neues Modul `dl_ir.c` im Driver Layer
+   - Erfassen Sie die ADC-Werte und wandeln Sie diese in Millimeterwerte um
+   - Speichern Sie die linearen Werte in einer globalen Struktur wie `g_irData`
+
+## Referenzen
+
+* **GP2Y0A02YK0F Datasheet**, Sharp Corp.
+  (Datei: `GP2Y0A02YK0F.pdf`)
+* **MSP430x5xx and MSP430x6xx Family User Guide**, TI, SLAU208O
+  [https://www.ti.com/lit/pdf/slau208](https://www.ti.com/lit/pdf/slau208)
+
+[⬆ Zurück zum Hauptverzeichnis](../README.md#kapitelübersicht--aufgabenstellungen)

@@ -1,149 +1,165 @@
-# EmbeddedSystems
+[⬅ Zurück zur Kapitelübersicht](../README.md#kapitelübersicht--aufgabenstellungen)
 
-Layerbasierte Embedded-Systems-Laborübung mit MSP430F5335 und Crazy Car Plattform. Ziel ist die Entwicklung eines autonomen Mini-Fahrzeugs inkl. GPIO, Timer, PWM, ADC (DMA), SPI-Display, Sensorik und Regelalgorithmen in C. Projektstruktur mit HAL, DL, AL. Entwicklung mit Code Composer Studio.
+# DMA – Direktes Speicherzugriffsmodul (MSP430)
 
-## Laborübersicht
+## Inhalt
+- [Theorie: DMA – Direktzugriffsmodul (MSP430)](#theorie-dma--direktzugriffsmodul-msp430)
+- [Grundprinzip](#grundprinzip)
+- [Transfer Modes](#transfer-modes)
+- [Addressing Modes](#addressing-modes)
+- [Weitere zentrale DMA-Register (pro Kanal)](#weitere-zentrale-dma-register-pro-kanal)
+- [DMA Konfiguration](#dma-konfiguration)
+- [Optional: Erweiterungsideen](#optional-erweiterungsideen)
 
-Dieses Repository begleitet die Embedded-Systems-Laborreihe im Studiengang Elektronik und Computer Engineering (FH JOANNEUM). Im Zentrum steht die systematische Entwicklung eines autonomen Fahrzeugs (Crazy Car) auf Basis des MSP430F5335-Mikrocontrollers.
+**Laborübung**
 
-Die Übung vermittelt praxisnah:
-- Hardwarenahe C-Programmierung
-- Strukturierte Layer-Architektur (HAL / DL / AL)
-- Debugging, Registerzugriffe, ISR
-- Modularisierung und Wiederverwendbarkeit von Komponenten
----
+- *MSP430x5xx and MSP430x6xx Family User Guide Rev. O* – Texas Instruments  
+  - Kapitel 11.1: [Introduction](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=381)  
+    - Beschreibung  
+    - Figure 11-1: DMA Controller Block Diagram  
+  - Kapitel 11.2.1: [Addressing Modes](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=383)  
+  - Kapitel 11.2.2: [Transfer Modes](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=385)   
 
-## Kapitelübersicht & Aufgabenstellungen
+**Wissensüberprüfung**
 
-<details>
-<summary><strong>1–3: Einführung, GPIO, Timer</strong></summary>
+- Was ist DMA und wozu wird es verwendet?
+- Wie unterscheiden sich die verschiedenen Adressierungs- und Transfermodi?
+- Warum ist DMA ressourcenschonender als CPU-gesteuerter Speichertransfer?
 
-### 1. [Einführung und Projektstruktur](Kapitel_01_Einfuehrung/README.md)
-- Überblick zur Crazy Car Platine
-- Softwarearchitektur: HAL, DL, AL
-- Projektstruktur in CCS
-- Git-Versionierung & Setup
-
-### 2. [Digitale Ein-/Ausgabe](Kapitel_02_GPIO/README.md)
-- GPIO-Initialisierung
-- Interruptgesteuerte Tasterauswertung
-- Performancevergleich: Integer vs. Float
-- Debugging (Breakpoints, Register, Expressions)
-
-### 3. [Clock System und Timer B0](Kapitel_03_TimerB0/README.md)
-- Unified Clock System (UCS)
-- TimerB0: ISR-basierte LED/PWM-Steuerung
-- Frequenzmessung per Oszilloskop
-
-</details>
-
-<details>
-<summary><strong>4–7: PWM, SPI, Display</strong></summary>
-
-### 4. [PWM und Aktorik](Kapitel_04_PWM_Aktorik/README.md)
-- PWM mit TimerA1
-- Ansteuerung von Servo & ESC
-- Driver Layer für Lenkung und Gas
-
-### 5. [SPI-Kommunikation](Kapitel_05_SPI/README.md)
-- USCI_B1 SPI-Konfiguration
-- Interruptgesteuerte Übertragung
-- CS-Signal Handling
-
-### 6. [LC-Display Ansteuerung](Kapitel_06_LCD/README.md)
-- Displayinitialisierung (ST7565)
-- Zeichenausgabe, Cursorpositionierung
-- Zeichentabelle und Clear-Routinen
-
-### 7. [SPI / LCD-Integration](Kapitel_07_SPI_LCD/README.md)
-- Kopplung von Displayfunktionen und SPI
-- Aufbau einer robusten Textausgabe
-- Test aller Pixel (Vollbildtest)
-
-</details>
-
-<details>
-<summary><strong>8–10: ADC, DMA, Sensorik</strong></summary>
-
-### 8. [ADC-Konfiguration](Kapitel_08_ADC/README.md)
-- Einrichtung des ADC12_A
-- Timer-gesteuerte Abtastung (120 Hz)
-- Zwischenspeicherung in Datenstruktur
-
-### 9. [ADC mit DMA](Kapitel_09_ADC_DMA/README.md)
-- DMA0 für automatischen Speichertransfer
-- Status-Flag Handling
-
-### 10. [Sharp Abstandssensoren](Kapitel_10_Abstandssensoren/README.md)
-- Messung und Darstellung der Sensor-Kennlinie
-- Linearisierung: Lookup-Table vs. Approximation
-- Filterung (Moving Average)
-
-</details>
-
-<details>
-<summary><strong>11: Fahralgorithmen</strong></summary>
-
-### 11. [Fahralgorithmen](Kapitel_11_Fahralgorithmen/README.md)
-- Zustandsautomat: Links / Mitte / Rechts
-- Regler (z. B. PID) für Lenkung und Geschwindigkeit
-- Umsetzung einfacher Fahrstrategien:
-  - Bandeverfolgung
-  - Spurmitte halten
-  - Kurvenkompensation
-- Nutzung aller verfügbaren Sensoren
-
-</details>
+**Video**  
+- [Einführungsvideo – Einheit 8](https://youtu.be/qNMKzkcaDQw?si=dnp_B49QR75IQHAJ)
 
 ---
+## Theorie: DMA – Direktzugriffsmodul (MSP430)
 
-## Ziele
+DMA steht für *Direct Memory Access* und ermöglicht es, Daten zwischen Peripheriegeräten (z. B. ADC12MEMx) und dem RAM zu übertragen, **ohne dass die CPU aktiv eingreift**. Dadurch kann der Mikrocontroller effizient im Low-Power-Modus verbleiben und Rechenzeit einsparen.
+Der **DMA-Controller** im MSP430F5335 besitzt **6 unabhängige Kanäle** (DMA0 bis DMA5), die jeweils über eigene Konfigurationsregister verfügen und unterschiedliche Aufgaben parallel ausführen können.
 
-- Modularisierung der Embedded Software (Layerstruktur)
-- Verständnis für low-level Hardwareansteuerung
-- Entwicklung von Steuerungs- und Regelalgorithmen
-- Erweiterung um zusätzliche Peripherie und Sensordatenverarbeitung
-- Umsetzung eines lauffähigen autonomen Systems auf Mikrocontroller-Basis
+### Grundprinzip
 
+Ein DMA-Transfer läuft schematisch wie folgt ab:
+
+1. **Trigger-Ereignis** (z.B. ADC12IFG, DMAREQ, Timer, UART RX)
+2. **Quelladresse** (z.B. ADC12MEM0)
+3. **Zieladresse** (z.B. ADC12Com.ADCBuffer oder einzelne Elemene im Struct, wichtig ist dabei zu bedenken wo / wie die einzelnen Elemente im Speicher abgelegt sind.)
+4. **Transfergröße & Modus**
+5. **DMA erledigt Transfer autonom** → ISR optional (z. B. zur Setzung eines Ready-Flags)
 ---
 
-## Projektstruktur
+### Transfer Modes
 
-Die Projektstruktur folgt dem klassischen Layer-Prinzip:
+Die Transfermodi legen fest, wie und wann Daten vom Quell- zum Zielbereich übertragen werden. Sie werden im **`DMAxCTL`**-Register (x = 0..5) konfiguriert:
 
-- HAL          – Hardware Abstraction Layer (Registerzugriff)
-- DL           – Driver Layer (Komponentensteuerung)
-- AL           – Application Layer (Applikationslogik, Statemachine)
-- main.c       – Einstiegspunkt, Systeminitialisierung
-- include      – Globale Header und Definitionen
+#### `DMAxCTL` – Bitfelder:
 
+- **DMADTx (Bits 1–3)**: Transfer-Modus
+- **DMAEN (Bit 0)**: DMA aktivieren
+- **DMAIFG (Bit 0)**: Interrupt-Flag
+- **DMAIE (Bit 4)**: Interrupt aktivieren
+
+#### Übersicht der Modi:
+
+| Modus | Kürzel  | Beschreibung                            |
+|-------|---------|-----------------------------------------|
+| `000` | Single Transfer     | Ein Transfer pro Trigger-Ereignis          |
+| `001` | Block Transfer      | Mehrere Transfers pro Trigger              |
+| `010`,`010` | Burst Block Transfer        | Schnelle Blockübertragung in einem Burst, blockiert CPU|
+| `100` | Repeated Single     | Kontinuierlich Einzelübertragungen         |
+| `101` | Repeated Block      | Kontinuierlich Blockübertragungen          |
+| `101`,`111` | Repeated burst-block transfer | Schnelle Blockübertragung in einem Burst, blockiert CPU                                   |
+
+```c
+DMA0CTL = DMADT_4 | DMAEN | DMAIE;  // Repeated Block, DMA aktiv, Interrupt aktiv
+```
 ---
 
-## Verwendete Tools
+### Addressing Modes
 
-- Mikrocontroller: MSP430F5335 (Texas Instruments)
-- Entwicklungsumgebung: Code Composer Studio (TI)
-- Debugger: Spy-by-Wire / JTAG
-- Dokumentation: TI User Guide, Schaltpläne, Datenblätter
-- Versionsverwaltung (optional empfohlen): GitLab, GitHub, Git
+DMA kann entweder mit **fixen Adressen** (z. B. Peripherieregister) oder **inkrementierenden Speicheradressen** (z. B. Arrays) arbeiten. Die Modi werden über folgende Bits im `DMAxCTL`-Register gesetzt:
+
+- **DMASRCINCR**: Quelladressierung
+- **DMADSTINCR**: Zieladressierung
+
+### Optionen:
+| Bits     | Modus               | Beschreibung                                   |
+|----------|---------------------|------------------------------------------------|
+| `00`     | Static              | Adresse bleibt konstant                        |
+| `01`     | Incremented         | Adresse wird nach jedem Transfer erhöht        |
+| `10`     | Decremented         | Adresse wird reduziert                         |
+| `11`     | Unchanged           | Reserviert oder nicht unterstützt              |
+
+### Weitere zentrale DMA-Register (pro Kanal)
+
+| Register        | Funktion                             |
+|-----------------|--------------------------------------|
+| `DMAxCTL`       | Konfiguration (Enable, Modus, IRQ)   |
+| `DMAxSA`        | Source Address (z. B. ADC12MEM0)     |
+| `DMAxDA`        | Destination Address (z. B. RAM)      |
+| `DMAxSZ`        | Transfergröße (z. B. 4 Words)        |
+| `DMACTL0`–`2`   | Triggerquellen pro Kanal             |
 
 ---
+### Beispiel: DMA für ADC12
 
-## Voraussetzungen
+```c
+// Quelladresse: Start ADC Speicher
+// Zieladresse: Globaler RAM-Buffer
+// 4 Transfers (z. B. 3 Sensoren + VBAT)
 
-- Grundkenntnisse in C (Bitmasken, Pointer, Headerstrukturen)
-- Verständnis für Mikrocontroller-Peripherie
-- Umgang mit Code Composer Studio und Debugging-Werkzeugen
+// Repeated Block Mode
+// Zieladresse auto-increment
+// Quelladresse fix
+// Interrupt aktivieren
+// DMA aktivieren
+```
+---
+### Hinweis
+
+- **DMA interrupt** (z. B. `DMA0_VECTOR`) kann genutzt werden, um nach erfolgreichem Transfer ein Flag zu setzen (`ADCrdy = 1`).
+- **DMA kann auch mit Timer, UART, SPI oder externen Triggern** verwendet werden.
 
 ---
+## DMA Konfiguration
 
-## Git / Versionierung
+Um die CPU bei der Datenübertragung vom ADC zu entlasten, wird ein DMA-Kanal (z. B. DMA0) eingesetzt. Dieser übernimmt nach Abschluss der Sample-Sequenz automatisch den Transfer der ADC-Daten in eine globale Speicherstruktur.
 
-Es wird empfohlen, das Projekt versionsverwaltet in einem GitLab- oder GitHub-Repository zu entwickeln. Ein typischer Initialisierungsvorgang:
+---
+## [AUFGABE] Durchzuführende Arbeit & Dokumentation für die Meilensteinüberprüfung
 
-```bash
-git init
-git remote add origin https://gitlab.com/<benutzer>/<projekt>.git
-git add .
-git commit -m "Initial commit"
-git push -u origin master
+1. **Neues HAL-Modul erstellen**  
+   - `hal_dma.c` und `hal_dma.h`  
+   - Struktur analog zu anderen HAL-Modulen
+
+2. **Funktion `hal_Init()` implementieren**  
+   - Konfigurieren Sie DMA0 für die Zusammenarbeit mit dem ADC  
+   - Alternativ kann dies innerhalb der ADC-Initialisierung erfolgen – **Sehr empfehlenswert** ist es jedoch ein separates Modul, um den Verwendungszweck klar zu trennen
+
+3. **ADC-Konfiguration anpassen**  
+   - Ändern Sie `hal_ADCInit()` so, dass am Ende der Sample-Sequenz automatisch ein DMA-Transfer ausgelöst wird
+
+4. **Status-Rückmeldung implementieren**  
+   - Sobald der DMA den Transfer abgeschlossen hat, soll das globale Flag `ADCrdy` gesetzt werden  
+   - Dieses Flag wird in der `main()`-Schleife abgefragt, um zu erkennen, ob neue Daten vorliegen
+
+5. **Globale Speicherstruktur anlegen**  
+   - Beispiel: Ringpuffer oder Array `adcResult[NUM_CHANNELS]`  
+   - Zieladresse im DMA-Kanal entsprechend setzen
+
+6. **Test & Dokumentation**
+   - Nach erfolgreichem Übertragen soll wieder das `ADCrdy`-Flag gesetzt werden, um der main Funktion mitzuteilen, dass neue Sensorwerte eingelesen wurden.
+   - Überprüfen Sie mit Breakpoints oder Speicheransicht die Aktualisierung der Zielstruktur
+---
+
+## Optional: Erweiterungsideen
+- Mehrere DMA-Kanäle parallel nutzen (z. B. für UART oder SPI)
+- DMA-Trigger auf Timer- oder Comparator-Events setzen (je nach Anwendungsfall)
+---
+## Referenzen
+
+- **MSP430x5xx and MSP430x6xx Family User Guide**, Texas Instruments, Literature Number: SLAU208O, Rev. O, April 2019.  
+  Verfügbar unter: [https://www.ti.com/lit/pdf/slau208](https://www.ti.com/lit/pdf/slau208)
+
+- **MSP430F5335 Datasheet**, Texas Instruments, Document Number: SLAS590N, Rev. N, October 2018.  
+  Verfügbar unter: [https://www.ti.com/lit/gpn/msp430f5335](https://www.ti.com/lit/gpn/msp430f5335)
+
+[⬆ Zurück zum Hauptverzeichnis](../README.md#kapitelübersicht--aufgabenstellungen)
