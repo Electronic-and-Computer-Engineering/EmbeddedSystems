@@ -195,16 +195,25 @@ Der **Register-Viewer** erlaubt das Live-Ändern und Einsehen von Registerinhalt
 
 ### Schritte
 
-1. Neues CCS-Projekt anlegen (z. B. `Laboruebung_1`)
-2. Ordnerstruktur erstellen: HAL, DL, AL
-3. Optimizer deaktivieren
-4. Endlosschleife in `main()` einfügen
-5. Projekt builden
-6. Dateien `hal_pmm.c/.h` in Projektordner kopieren
-7. Neue Datei `hal_general.c/.h` erstellen
-8. Funktion `hal_Init()` schreiben und aufrufen
-9. Watchdog-Konfiguration: `hal_wdt.c/.h`, `hal_WdtInit()`
-10. Aufruf aller Init-Funktionen in `hal_Init()`
+1. Legen Sie ein neues Projekt für den verwendeten Mikrokontroller an, z. B. `Laboruebung_1`.
+2. Erstellen Sie die Layer-Ordner und fügen Sie die Include-Pfade hinzu.
+3. Schalten Sie den Optimizer aus.
+4. Fügen Sie eine Endlosschleife in die `main`-Funktion ein und tauschen Sie `int` gegen `void` aus.
+5. Builden Sie das Programm.
+6. Kopieren Sie die Dateien `hal_pmm.c` und `hal_pmm.h` in die Projektordner-Struktur im Windows Explorer.  
+   Die Dateien erscheinen anschließend automatisch im *Project Explorer*.
+7. Erstellen Sie eine neue C- und H-Datei: `hal_general.c`, `hal_general.h`.  
+   - Vergessen Sie nicht, in der Headerdatei die `#ifndef`-Abfrage anzugeben.  
+   - Inkludieren Sie die Headerdatei in der C-Datei.
+8. Erstellen Sie in der `hal_general.c` eine Funktion `hal_Init` ohne Übergabeparameter.  
+   Schreiben Sie den Funktionsprototypen in die `hal_general.h`.
+9. Inkludieren Sie die `hal_pmm.h` in der `hal_general.c`.
+10. Rufen Sie in der Funktion `hal_Init` die Funktion `HAL_PMM_Init()` auf.
+11. Inkludieren Sie die `hal_general.h` in der `main.c` und rufen Sie in der `main`-Funktion die Funktion `hal_Init()` auf.
+12. Erstellen Sie für die Konfiguration des Watchdog-Timers ein eigenes Modul (`hal_wdt.c`, `hal_wdt.h`)  
+    und implementieren Sie eine Funktion `hal_WdtInit()`.  
+    Diese wird ebenfalls in der `hal_Init`-Funktion aufgerufen, **bevor** das PMM-Modul initialisiert wird.
+
 
 ## IO Port Konfiguration
 
