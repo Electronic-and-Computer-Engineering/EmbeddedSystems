@@ -16,6 +16,7 @@
 
 ### Unterlagen
 - [Family Guide - Digital I/O Ports Chapter 12](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=408)
+- [Crazy Car Schematic](https://fhjoanneum-my.sharepoint.com/:b:/g/personal/florian_mayer_fh-joanneum_at/EfXYu-rqsLRErJbybsbN4AEB_RUMizJhwpb5D_ysimZehA?e=Ti7PtO)
 
 ### Grundlegendes - Videos
 - [Code Composer Basics - Projects](https://youtu.be/DIkQaNBwspo?si=LmN9qGZYQwnxywni)
