@@ -118,7 +118,7 @@ Wenn ein Interrupt ausgelöst wird, springt das Programm zur zugehörigen Interr
 
 ### [Implementierung] Durchzuführende Arbeit & Dokumentation für die Meilensteinüberprüfung
 
-1. Schreiben Sie eine ISR für den Port-Vektor. Die korrekte ISR-Syntax entnehmen Sie einem Beispiel im *Resource Explorer*.
+1. Schreiben Sie eine ISR für den Port-Vektor. Die korrekte ISR-Syntax entnehmen Sie bitte der vorbereiteten [ISR-Liste](../ISR_VectorList.md).
 2. Aktivieren Sie das GIE-Bit am Ende der `HAL_GPIO_Init`-Funktion mit:
    ```c
    __enable_interrupt();
