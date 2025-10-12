@@ -152,6 +152,7 @@ Interrupt Vector: `TIMERB0_VECTOR` (für CCR0)
 2. Konfigurieren Sie den Timer entsprechend der Vorgaben. Schalten Sie die Hintergrundbeleuchtung des Displays mittels Makros in der ISR des Timers ein bzw. aus. **Tipp:** Toggle I/O Pin.
 
 3. Verwenden Sie für die Berechnung des Timer-Werts die im UCS-Modul definierten Werte. Definieren Sie auch die Ausgangsfrequenz des Timers mittels `#define`.
+`TimerB0` soll so konfiguriert werden, dass die Hintergrundbeleuchtung des Displays im 2Hz Takt blinkt.
 
 4. Fragen Sie in der ISR das richtige Interrupt-Flag des Timers ab.
 
