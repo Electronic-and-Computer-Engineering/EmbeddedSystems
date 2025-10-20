@@ -91,7 +91,7 @@ Ein PWM-Signal (Pulsweitenmodulation) soll mittels Timer A1 erzeugt werden, um d
 1. Erstellen Sie das HAL-Modul `hal_timerA1.c/.h` mit der Funktion `hal_TimerA1Init()`. Diese wird in `hal_Init()` eingebunden.
 
 2. Konfigurieren Sie den Timer für **2 PWM-Kanäle**, 60 Hz:
-   - Wählen Sie eine passende Eingangstaktfrequenz, sodass die PWM-Pulsbreite (z. B. 1.0–2.0 ms) eine feine Auflösung (z. B. 100 Schritte) erlaubt.
+   - Wählen Sie eine passende Eingangstaktfrequenz, sodass die PWM-Pulsbreite (z. B. 1.0–2.0 ms) eine feine Auflösung (z. B. 100 Schritte) erlaubt. Dabei soll eine geeignet große Timer Eingangsfrequenz gewählt werden, um eine ausreichend genaue Auflösung der einzelnen Bereiche zu erreichen. Je größer desto feiner ist die Auflösung. 
    - Wählen Sie den richtigen `OUTMOD` im zugehörigen `TAxCCTLn`. (vgl. Family Guide Kapitel 17)
 
 3. Startbedingung: Nach `hal_Init()` soll **kein Puls erzeugt werden** (d. h. Duty Cycle = 0 %). Die Initialisierung des PWM-Werts erfolgt später in `DL_Init()`.
@@ -106,7 +106,7 @@ Ein PWM-Signal (Pulsweitenmodulation) soll mittels Timer A1 erzeugt werden, um d
 
 ### Servo anschließen
 
-5. Schließen Sie das Servo am Crazy Car Controller an. Die Versorgung erfolgt über den ESC. Akku anschließen, ESC einschalten.
+5. Schließen Sie das Servo am Crazy Car Controller an. Die Versorgung erfolgt über den ESC. Akku anschließen, ESC einschalten. (Schalter am Heck des Fahrzeuges)
 
 **Wichtig:** Fahrzeug muss sicher aufgebockt sein – bei Fehlkonfiguration kann es zu plötzlichen Bewegungen kommen!
 
@@ -114,8 +114,9 @@ Ein PWM-Signal (Pulsweitenmodulation) soll mittels Timer A1 erzeugt werden, um d
    - Mittelstellung
    - Max. Links
    - Max. Rechts
+   Ermitteln sie die Position und Registerwerte für: Mittelstellung, max. Links und max. Rechts, in dem sie im Debugger die Werte der einzelnen PWM Kanal Register ändern.
 
-7. Speichern Sie diese Werte als `#define` im Headerfile ab (z. B. `#define SERVO_CENTER 1500`).
+7. Speichern Sie diese Werte als `#define` im Headerfile ab (z.B. `#define SERVO_CENTER 1500`). 
 
 ---
 
@@ -125,18 +126,19 @@ Für die Abstraktion der Hardwarezugriffe wird ein Driver Layer (DL) eingeführt
 
 ### [AUFGABE] Durchzuführende Arbeit & Dokumentation für die Meilensteinüberprüfung
 
-1. Legen Sie einen neuen Ordner `DL` im Projekt an.
+1. Legen Sie einen neuen Ordner `DL` im Projekt an. (Wenn nicht schon bereits gemacht)
 
 2. Erstellen Sie `dl_General.c/.h`:
    - Funktion `dl_Init(void)` programmieren, die alle DL-Module initialisiert (vgl. Basisprojekt).
 
-3. Erstellen Sie `dl_Aktorik.c/.h`
+3. Erstellen Sie ein neues Modul `dl_Aktorik.c/.h`
 
 4. Programmieren Sie:
    - `dl_SetSteering(int8_t iValue)` → z. B. Bereich -100 (links) bis +100 (rechts), 0 = Mitte
+   - Als Übergabeparameter soll ein Wertebereich gewählt werden, der einfacher verwendbar, lesbar und unabhängig von den daraus resultierenden Registerwerten ist.
    - Die Funktion soll den Eingabewert auf die PWM-Registerwerte umrechnen und setzen
 
-5. Programmieren Sie `dl_SteeringInit()` → Setzt das Servo auf Mittelstellung. Diese wird innerhalb von `dl_Init()` aufgerufen.
+5. Programmieren Sie `dl_SteeringInit()` → Setzt das Servo auf Mittelstellung. (Es darf aber auch `dl_SetSteering(0)` logischerweise verwendet werden) Diese wird innerhalb von `dl_Init()` aufgerufen.
 
 <p align="center">
   <img src="./media/escPWM.png" alt="Include Options">
@@ -147,10 +149,9 @@ Für die Abstraktion der Hardwarezugriffe wird ein Driver Layer (DL) eingeführt
    - PWM-Registerwerte innerhalb spezifizierter Pulsbreiten setzen
 
 7. Programmieren Sie `dl_ThrottleInit()` bzw. `dl_ESCInit()`
-   - Initialisierung nach Setup-Vorgabe
-   - Wartezeiten via CCR0-Interrupt oder `__delay_cycles()`
+   - Initialisierung nach Setup-Vorgabe aus der PPT-Räsentation
+   - Wartezeiten via CCR0-Interrupt ermitteln (gewünschte Lösung) oder `__delay_cycles()` (Alternative Warte- und CPU beslastende Lösung)
    - Aufruf in `dl_Init()`
-
 ---
 
 ## [AUFGABE] Drehzahlmessung (Komplett Eigenständig)

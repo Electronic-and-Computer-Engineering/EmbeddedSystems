@@ -109,7 +109,7 @@ Ist ein Quarz angeschlossen, so muss dieser per Pinmux freigeschaltet und das UC
            SFRIFG1 &= ~OFIFG;
        }
 
-       UCSCTL6 &= ~(XT2DRIVE_3);       // Drive-Strength reduzieren (nach Anlauf)
+       UCSCTL6 &= ~(XT2DRIVE_1);       // Drive-Strength reduzieren (nach Anlauf)
        UCSCTL4 |= SELS_5 + SELM_5;     // SMCLK und MCLK = XT2
        UCSCTL5 |= DIVS_3;              // SMCLK Divider setzen (z. B. /8)
    }
