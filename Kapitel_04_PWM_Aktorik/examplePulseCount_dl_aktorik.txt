@@ -1,0 +1,27 @@
+void driver_ESCinit(void)
+{
+
+
+    createPulses(MaxRPW,131);
+    createPulses(MinRPW,128);
+    createPulses(MinFPW,128);
+    createPulses(MaxFPW,128);
+
+    createPulses(MaxBreak, 30);
+}
+
+void createPulses(int pwm, int pulseDuration)
+{
+    speed_controller_impuls = 0;
+    TA1CCR1 = pwm;
+    while(speed_controller_impuls <= pulseDuration)
+    {
+        
+    }
+}
+
+# pragma vector = TIMER1_A0_VECTOR; // pending , when TA1R counts to
+__interrupt void TimerA (void)
+{
+    speed_controller_impuls ++;
+}
