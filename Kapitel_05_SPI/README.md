@@ -141,16 +141,16 @@ Das LC-Display des Crazy Car Controllers wird über die SPI-Schnittstelle USCI_B
 
 1. **HAL-Modul anlegen:** `hal_usciB1.c` und `hal_usciB1.h`
 
-2. **Funktion `hal_USCIB1Init(void)` programmieren:**
+2. **Funktion `hal_USCIB1Init(void)` erstellen:**
    - SPI-Master-Mode
    - Taktfrequenz: 100 kHz (als `#define` im Header)
    - 8 Bit, MSB first
    - CPOL = 1, CPHA = 0
    - RX-Interrupt aktivieren
    - Softwarereset vor/nach Konfiguration setzen (UCB1CTL1)
-   - Register: UCB1CTL0, UCB1BRx, UCB1IE
+   - wichtige Register: UCB1CTL0, UCB1BRx, UCB1IE
 
-3. **GPIO-Konfiguration anpassen** (Pin-Multiplexing für USCI_B1 aktivieren)
+3. **GPIO-Konfiguration anpassen**
 
 4. **Datenstruktur definieren (in `hal_usciB1.h`):**
 ```c
@@ -179,12 +179,18 @@ typedef struct {
    - Erstes Byte in TXBUF schreiben
    - `TxSuc` auf 0 setzen
    - ISR übernimmt weitere Übertragung
+   Programmieren sie eine Funktion HAL_USCIB1_Transmit. Diese Funktion soll das erste Byte in den TXBUF schreiben. 
+   Alle weiteren Bytes werden von der ISR in den TXBUF geschrieben, bis die Länge **len** erreicht wird. Bei Aufruf dieser Funktion, soll das `TxSuc` Bit auf 0 gesetzt werden.
 
 8. **ISR-Funktion (RX-Interrupt) programmieren:**
    - TX nur möglich nach RX-Ereignis
    - Bei Erreichen von `TxData.len`:
-     - `TxSuc = 1` setzen
+   - `TxSuc = 1` setzen
    - Empfangene Bytes in `RxData.Data[]` schreiben
+
+   Programmieren Sie eine ISR-Funktion, welche das RX-Interrupt dazu benutzt, um ein weiteres Byte zu senden. Es muss das RX-Interrupt abgefragt werden, weil eine 1 Byte SPI Übertragung erst nach dem Empfang des Bytes abgeschlossen ist.
+   Dabei ist die Abbruchbedingung der Vergleich zwischen der Länge der Daten und der Wert in der Cnt Variable in der TxData Struktur. 
+   Ist eine SPI-Übertragung vollständig abgeschlossen, setzen sie das `TxSuc` Bit auf 1. Dieses Bit wird im Programmablauf dazu verwendet, um eventuell abzuwarten, bis die SPI-Übertragung vollständig ausgeführt worden ist, z.B. Initialisierung des Displays.
 
 9. **Chip Select (CS) einbinden:**
    - Vor Übertragung: `CS_LOW`
@@ -192,7 +198,7 @@ typedef struct {
    - z. B. per Makro
 
 10. **Signale mit Oszilloskop kontrollieren:**
-    - Mind. 2-Byte-Übertragung sichtbar machen
+    - Mind. 2-Byte-Übertragung sichtbar machen (oder eben dauerhaft in der While-Schleife in der main())
 
 > **VORSICHT:** Die Aufschrift MOSI und CLK am Displayboard sind vertauscht.
 
