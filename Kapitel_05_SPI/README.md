@@ -37,7 +37,7 @@
  - [Einführungsvideo - Einheit 5](https://youtu.be/q_kA9L3taqE?si=FuuGbJwFVF0v3IEW)
 
 ### Durchzuführende Aufgaben
-- [[AUFGABE] USCI B1 – Konfiguration](#durchzuführende-arbeit--dokumentation-für-die-überprüfung-der-meilensteine)
+- [[AUFGABE] USCI B1 – Konfiguration](#aufgabe-durchzuführende-arbeit--dokumentation-für-die-überprüfung-der-meilensteine)
 
 ---
 
