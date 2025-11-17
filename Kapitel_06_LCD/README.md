@@ -205,7 +205,26 @@ const unsigned char font_table[128][5] = {
 8. **Funktion `dl_LCDWriteUInt()` programmieren:**
 
   Diese Funktion soll ähnlich wie `dl_LCDWriteText()` arbeiten. Hierzu muss die positive Integer-Zahl zuerst in einen Text umgewandelt werden, bevor sie an das Display gesendet wird. Die `dl_LCDWriteText()`-Funktion kann dabei wiederverwendet werden.
+  ```c
+  void Driver_LCD_WriteUInt(unsigned int number, int page, int col)
+  {
+      char text[11];                // Initialisierte Länge des Arrays
+      int pos = 10;                 // letzte Position im Buffer
 
+      pos--;
+
+      while (number > 0) {
+          text[pos] = (number % 10) + '0';   // Ziffer extrahieren und ASCII-kodieren
+          number /= 10;                      // Restzahl reduzieren
+          pos--;
+      }
+
+      // Der gültige String beginnt bei pos+1
+      Driver_LCD_WriteText(text, 11, page, col);
+  }
+  ```
+  Durch den Modulo-Operator lässt sich jede Dezimalstelle der unsigned int-Zahl number einzeln extrahieren. Die Addition von '0' erfolgt, um den jeweiligen Ziffernwert korrekt in den ASCII-Code zu überführen.
+  Für den gesamten Darstellungsbereich wird ein fester Puffer verwendet, dessen Inhalt bei jeder Ausgabe vollständig überschrieben wird. Dadurch bleiben keine Fragmente vorheriger Zahlenwerte erhalten, die sonst zu fehlerhaften Darstellungen führen würden.
 ---
 
 ## Fast Display Driver (optional)
