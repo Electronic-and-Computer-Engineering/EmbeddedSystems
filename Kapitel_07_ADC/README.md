@@ -80,7 +80,7 @@ unsigned short vbat         = ADC12MEM3;
 
 4. **Funktion `hal_ADC12Init(void)` programmieren**:
 
-- `ADC12CTL0`: Aktivieren des ADC, Wahl der Sample-&-Hold-Zeit (z. B. `SHT0_8`) und Multiplexer-Steuerung
+- `ADC12CTL0`: Aktivieren des ADC, Wahl der Sample-&-Hold-Zeit (z. B. `ADC12SHT0_7`) und Multiplexer-Steuerung
 - `ADC12CTL1`: Taktquelle (`ADC12SSELx`), Taktteilungsfaktor (`ADC12DIVx`), Wandlungsmodus (z. B. `ADC12CONSEQ_1` für Sequenz)
 - `ADC12CTL2`: Auflösung (`ADC12RES_2` für 12 Bit)
 - `ADC12MCTLx`: Kanal- und Referenzspannungseinstellung (z. B. `ADC12INCH_0`, `VR+ = AVCC`, `VR- = AVSS`)
