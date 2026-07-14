@@ -1,150 +1,82 @@
-# EmbeddedSystems
+# Embedded Systems Labor – Konzept
 
-Layerbasierte Embedded-Systems-Laborübung mit MSP430F5335 und Crazy Car Plattform. Ziel ist die Entwicklung eines autonomen Mini-Fahrzeugs inkl. GPIO, Timer, PWM, ADC (DMA), SPI-Display, Sensorik und Regelalgorithmen in C. Projektstruktur mit HAL, DL, AL. Entwicklung mit Code Composer Studio.
-
-## Laborübersicht
-
-Dieses Repository begleitet die Embedded-Systems-Laborreihe im Studiengang Elektronik und Computer Engineering (FH JOANNEUM). Im Zentrum steht die systematische Entwicklung eines autonomen Fahrzeugs (Crazy Car) auf Basis des MSP430F5335-Mikrocontrollers.
-
-Die Übung vermittelt praxisnah:
-- Hardwarenahe C-Programmierung
-- Strukturierte Layer-Architektur (HAL / DL / AL)
-- Debugging, Registerzugriffe, ISR
-- Modularisierung und Wiederverwendbarkeit von Komponenten
----
-
-## Unterlagen
-- [Crazy Car Schematic](https://fhjoanneum-my.sharepoint.com/:b:/g/personal/florian_mayer_fh-joanneum_at/EfXYu-rqsLRErJbybsbN4AEB_RUMizJhwpb5D_ysimZehA?e=Ti7PtO)
-- [MSP430f5335-Datasheet](https://www.ti.com/lit/ds/symlink/msp430f5335.pdf)
-- [MSP430x5xx and MSP430x6xx Family Guide](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf)
-- [ISR-Vector List](ISR_VectorList.md)
-
-
-## Kapitelübersicht & Aufgabenstellungen
-
-<details>
-<summary><strong>1–3: Einführung, GPIO, Timer</strong></summary>
-
-### 1. [Einführung und Projektstruktur](Kapitel_01_Einfuehrung/README.md)
-- Überblick zur Crazy Car Platine
-- Softwarearchitektur: HAL, DL, AL
-- Projektstruktur in CCS
-- Git-Versionierung & Setup
-
-### 2. [Digitale Ein-/Ausgabe](Kapitel_02_GPIO/README.md)
-- GPIO-Initialisierung
-- Interruptgesteuerte Tasterauswertung
-- Performancevergleich: Integer vs. Float
-- Debugging (Breakpoints, Register, Expressions)
-
-### 3. [Clock System und Timer B0](Kapitel_03_TimerB0/README.md)
-- Unified Clock System (UCS)
-- TimerB0: ISR-basierte LED/PWM-Steuerung
-- Frequenzmessung per Oszilloskop
-
-</details>
-
-<details>
-<summary><strong>4–6: PWM, SPI, Display</strong></summary>
-
-### 4. [PWM und Aktorik](Kapitel_04_PWM_Aktorik/README.md)
-- PWM mit TimerA1
-- Ansteuerung von Servo & ESC
-- Driver Layer für Lenkung und Gas
-
-### 5. [SPI-Kommunikation](Kapitel_05_SPI/README.md)
-- USCI_B1 SPI-Konfiguration
-- Interruptgesteuerte Übertragung
-- CS-Signal Handling
-
-### 6. [LC-Display Ansteuerung](Kapitel_06_LCD/README.md)
-- Displayinitialisierung (ST7565)
-- Zeichenausgabe, Cursorpositionierung
-- Zeichentabelle und Clear-Routinen
-
-</details>
-
-<details>
-<summary><strong>7-9: ADC, DMA, Sensorik</strong></summary>
-
-### 7. [ADC-Konfiguration](Kapitel_07_ADC/README.md)
-- Einrichtung des ADC12_A
-- Timer-gesteuerte Abtastung (120 Hz)
-- Zwischenspeicherung in Datenstruktur
-
-### 8. [ADC mit DMA](Kapitel_08_ADC_DMA/README.md)
-- DMA0 für automatischen Speichertransfer
-- Status-Flag Handling
-
-### 9. [Sharp Abstandssensoren](Kapitel_9_Abstandssensoren/README.md)
-- Messung und Darstellung der Sensor-Kennlinie
-- Linearisierung: Lookup-Table vs. Approximation
-- Filterung
-</details>
-
-<details>
-<summary><strong>10: Fahralgorithmen</strong></summary>
-
-### 10. [Fahralgorithmen](Kapitel_10_Fahralgorithmen/README.md)
-- Zustandsautomat: Links / Mitte / Rechts
-- Regler (z. B. PID) für Lenkung und Geschwindigkeit
-- Umsetzung einfacher Fahrstrategien:
-  - Bandeverfolgung
-  - Spurmitte halten
-  - Kurvenkompensation
-- Nutzung aller verfügbaren Sensoren
-
-</details>
+*Zielplattform: MSP430F5335 · 15 Laboreinheiten · Einheiten 1–11 geführt, 12–15 frei*
 
 ---
 
-## Ziele
+## Übersicht
 
-- Modularisierung der Embedded Software (Layerstruktur)
-- Verständnis für low-level Hardwareansteuerung
-- Entwicklung von Steuerungs- und Regelalgorithmen
-- Erweiterung um zusätzliche Peripherie und Sensordatenverarbeitung
-- Umsetzung eines lauffähigen autonomen Systems auf Mikrocontroller-Basis
-
----
-
-## Projektstruktur
-
-Die Projektstruktur folgt dem klassischen Layer-Prinzip:
-
-- HAL          – Hardware Abstraction Layer (Registerzugriff)
-- DL           – Driver Layer (Komponentensteuerung)
-- AL           – Application Layer (Applikationslogik, Statemachine)
-- main.c       – Einstiegspunkt, Systeminitialisierung
-- include      – Globale Header und Definitionen
+| # | Einheit | Implementierung | Testverantwortung | FreeRTOS |
+|---|---|---|---|---|
+| 1 | Grundlagen, Werkzeuge, Registereinstieg (GPIOs) | Register | bereitgestellt | – |
+| 2 | Rechendauer, Interrupts, ISRs | Register | bereitgestellt | – |
+| 3 | SystemClock, TimerB | Register oder Bibliothek (datenblattbasiert) | Gerüst | – |
+| 4 | TimerA, PWM | Register oder Bibliothek | Gerüst | – |
+| 5 | SPI/I2C-Schnittstelle (Messungen) | Register oder Bibliothek | überwiegend eigenständig | – |
+| 6 | SPI (Display), I2C (Abstandssensoren) | Register oder Bibliothek | eigenständig | – |
+| 7 | ADC-Konfiguration, Batteriemessung | Register oder Bibliothek | eigenständig | – |
+| 8 | Direct Memory Access | Bibliothek | eigenständig, Regressionsnachweis Einheit 7 | – |
+| 9 | FreeRTOS-Aufsetzen, Scheduling | Bibliothek (FreeRTOS) | Konsolidierung 1–8, danach neue Kategorie | ab hier aktiv |
+| 10 | Fahralgorithmus (Zustandsautomat) | reine Logik | eigenständig | aktiv |
+| 11 | Regelungsprozess (PID) | reine Logik | eigenständig | aktiv |
+| 12–15 | Freies Üben | frei gewählt | vollständige Suite bleibt verpflichtend | aktiv |
 
 ---
 
-## Verwendete Tools
+## Einheit 1 – Grundlagen, Werkzeuge, Registereinstieg (GPIOs)
 
-- Mikrocontroller: MSP430F5335 (Texas Instruments)
-- Entwicklungsumgebung: Code Composer Studio (TI)
-- Debugger: Spy-by-Wire / JTAG
-- Dokumentation: TI User Guide, Schaltpläne, Datenblätter
-- Versionsverwaltung (optional empfohlen): GitLab, GitHub, Git
+Die erste Einheit dient dem Einstieg in Projekt, Werkzeug und Zielarchitektur. Die relevanten Datenblätter – Controller sowie die eingesetzten Fahrzeugkomponenten – werden gemeinsam durchgearbeitet. Das Fahrzeug wird als Gesamtsystem vorgestellt: Aufbau, verbaute Sensorik und Aktorik, Zielarchitektur des gesamten Kurses.
+
+Code Composer Studio wird aufgesetzt: Projektanlage, Toolchain-Konfiguration, Verbindung zum Debugger. Für sämtliche beschalteten Pins des Controllers wird eine Header-Datei mit sprechenden Bezeichnungen angelegt – die Pin-Dokumentation ist das erste Artefakt des Projekts und wird in den Folgeeinheiten weiterverwendet.
+
+Anschließend erfolgt die klassische Einführung in die Registerebene: Adressraum, Memory-Mapped I/O, Aufbau eines Konfigurationsregisters anhand des Datenblatts. Der Registerzugriff wird auch im Code eingeführt – anhand konkreter Zuweisungen und Bitmasken, nicht nur theoretisch.
+
+Als praktische Anwendung wird ein Pin per Software geschaltet; Frequenz und Pulsbreite der resultierenden Toggle-Schleife werden am Logic-Analyzer erfasst. Flankensteilheit (Schaltzeiten im engeren Sinn) ist mit einem Logic-Analyzer nicht sinnvoll erfassbar und bleibt daher ausgeklammert. Die HAL-Tests zu dieser Einheit werden als vollständige Vorlage bereitgestellt, damit ein Referenzstandard für gute Tests vorliegt.
+
+## Einheit 2 – Rechendauer, Interrupts, ISRs
+
+Weiterhin Registerebene. Ein Taster löst über einen Portinterrupt eine ISR aus; die Latenz zwischen Ereignis und Reaktion wird gemessen. Da diese Einheit explizit die Rechendauer thematisiert, wird zusätzlich ein direkter Vergleich durchgeführt: dieselbe Berechnung wird einmal in Fließkomma- und einmal in Ganzzahlarithmetik ausgeführt, die jeweilige Rechendauer gemessen. Auf einem Controller ohne Fließkommaeinheit ergibt sich hier ein deutlich messbarer Unterschied. Die zugehörigen Tests werden weiterhin als vollständige Vorlage bereitgestellt.
+
+## Einheit 3 – SystemClock, TimerB
+
+Ab dieser Einheit ist die Verwendung von Bibliotheken zulässig – selbst erstellte ebenso wie bereitgestellte. Die Konfiguration erfolgt in jedem Fall datenblattbasiert: unabhängig davon, ob über Register oder über eine Bibliotheksfunktion konfiguriert wird, müssen die verwendeten Werte aus dem Datenblatt begründet werden können. Gemessen wird die tatsächliche gegenüber der konfigurierten Taktfrequenz am Oszilloskop. Die Testverantwortung verschiebt sich auf ein vorgegebenes Gerüst, das um Grenzfälle zu ergänzen ist.
+
+## Einheit 4 – TimerA, PWM
+
+Gleiches Prinzip wie in Einheit 3. Signalform und Duty-Cycle werden am Oszilloskop verifiziert, unabhängig vom gewählten Implementierungsweg. Die Umrechnung von Lenkwinkel zu Duty-Cycle bleibt in jedem Fall eine eigenständige, host-testbare Funktion.
+
+## Einheit 5 – SPI/I2C-Schnittstelle (Messungen)
+
+Auch hier ist die Konfiguration über Register oder Bibliothek möglich. Der Schwerpunkt der Einheit liegt auf der messtechnischen Verifikation: Timing und Protokollverlauf werden am Logic-Analyzer gegen die Spezifikation geprüft, unabhängig von der gewählten Implementierung. Die Tests werden ab dieser Einheit überwiegend eigenständig geschrieben, vorgegeben sind nur noch die Anforderungen.
+
+## Einheit 6 – SPI (Display), I2C (Abstandssensoren)
+
+Aufbauend auf der Schnittstellenkonfiguration aus Einheit 5 entstehen die konkreten Gerätetreiber. Die DL-Tests werden mit einer Fake-HAL vollständig eigenständig erstellt; erstmals kommt eine kleine Anwendung der AL-Schicht hinzu (Statusanzeige).
+
+## Einheit 7 – ADC-Konfiguration, Batteriemessung
+
+Der gemessene Rohwert wird gegen eine Referenzmessung mit dem Multimeter gehalten. Die Umrechnungslogik ist eine eigenständige DL-Funktion und wird vollständig eigenständig getestet.
+
+## Einheit 8 – Direct Memory Access
+
+In dieser Einheit wird in der Praxis überwiegend die Bibliotheksvariante gewählt, da eine vollständige Registerkonfiguration des DMA-Controllers hohen Aufwand bei vergleichsweise geringem zusätzlichem Lernertrag bedeutet. Die dadurch gewonnene Zeit fließt vollständig in die Messung: Der Rechenzeitvergleich zwischen Polling und DMA wird mit derselben Sorgfalt durchgeführt wie in den vorangegangenen Einheiten. Die DL-Tests aus Einheit 7 müssen unverändert bestehen – dies dient als Nachweis, dass sich an der nach außen sichtbaren Schnittstelle nichts geändert hat.
+
+## Einheit 9 – FreeRTOS-Aufsetzen, Scheduling
+
+Zu Beginn der Einheit werden sämtliche offenen Tests aus den Einheiten 1–8 fertiggestellt; die gesamte bisherige Testsuite muss vollständig bestehen, bevor mit neuem Inhalt begonnen wird. Anschließend wird FreeRTOS als Bibliothek eingebunden. Aufgebaut wird die Architektur *Fetch Sensor Data → Process Sensor Data → Make Decisions* als Task-Pipeline: Eine Task ruft die bestehenden DL-Funktionen zur Datenerfassung auf, eine zweite verarbeitet die Werte, eine dritte trifft Entscheidungen – letztere zunächst als Platzhalter, inhaltlich gefüllt in den Einheiten 10 und 11. Gemessen wird das Timing zwischen den Tasks (Latenz, Jitter). Es entsteht eine neue Testkategorie; die bestehenden HAL- und DL-Tests bleiben davon unberührt.
+
+## Einheit 10 – Fahralgorithmus (Zustandsautomat)
+
+Der Zustandsautomat füllt die Decision-Stufe aus Einheit 9 inhaltlich. Die Verifikation erfolgt auf drei Ebenen: Host-Tests wie bisher, eine Überprüfung des Fahrverhaltens im CrazyCar-Simulator unter kontrollierten Bedingungen, sowie abschließend ein Nachweis am realen Fahrzeug, bei dem ein Zustandswechsel gezielt provoziert und dokumentiert wird.
+
+## Einheit 11 – Regelungsprozess (PID)
+
+Eine systematische Variation einzelner Reglerparameter ist am realen Fahrzeug nur eingeschränkt reproduzierbar, da Randbedingungen wie Batteriestand oder Bodenhaftung nicht konstant gehalten werden können. Für diesen Zweck eignet sich der CrazyCar-Simulator besser: Einzelne Parameter lassen sich dort unter gleichbleibenden Bedingungen gezielt variieren. Am realen Fahrzeug erfolgt anschließend die Feinabstimmung sowie der Nachweis, dass die Regelung unter realen Bedingungen funktioniert. Die AL-Tests erreichen in dieser Einheit den größten Umfang im gesamten Kurs.
+
+## Einheit 12–15 – Freies Üben
+
+Systemintegration, individuelle Erweiterung, Optimierung und Vorbereitung der Abschlussdemonstration. Der Inhalt ist frei wählbar, der Nachweis über die weiterhin vollständige Testsuite bleibt verpflichtend.
 
 ---
 
-## Voraussetzungen
-
-- Grundkenntnisse in C (Bitmasken, Pointer, Headerstrukturen)
-- Verständnis für Mikrocontroller-Peripherie
-- Umgang mit Code Composer Studio und Debugging-Werkzeugen
-
----
-
-## Git / Versionierung
-
-Es wird empfohlen, das Projekt versionsverwaltet in einem GitLab- oder GitHub-Repository zu entwickeln. Ein typischer Initialisierungsvorgang:
-
-```bash
-git init
-git remote add origin https://gitlab.com/<benutzer>/<projekt>.git
-git add .
-git commit -m "Initial commit"
-git push -u origin master
+*Konzeptentwurf, Stand Juli 2026*
