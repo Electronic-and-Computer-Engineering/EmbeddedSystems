@@ -103,8 +103,8 @@ typedef struct {
   union {
     unsigned short ADCBuffer[4];
     struct {
-      unsigned short SensorLeft;
       unsigned short SensorRight;
+      unsigned short SensorLeft;
       unsigned short SensorFront;
       unsigned short VBat;
     } Sensor;
