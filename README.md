@@ -5,16 +5,17 @@
 ---
 ## TODOs
 
-- [ ] Einheit 7: Verweis "Schnittstellenkonfiguration aus Einheit 7" (zweimal) auf Einheit 6 korrigieren
 - [ ] Einheit 5 (Nachholeinheit): Text/Refinement ergänzen, aktuell nur Überschrift
 - [ ] Finale Übersichtstabelle mit allen Einheiten gegen die Fließtexte gegenprüfen
 - [ ] Implementierung aller Einheiten, bzw. refactoring der bestehenden Einheiten
-- [ ] Theorie (LV) auch für diese Inhalte nachziehen
+- [ ] (LV) auch für die neuen Inhalte des LABs nachziehen
 
-## Grundsätzliche Frage
-- [ ] Wann führen wir explizit FreeRTOS ein? Früher? Besten Zeitpunkt während der Aufbereitung erfassen. 
-- [ ] Mocking Layers Aufbereiten
-- [ ] Mocking Idee für Regelparameter entwerfen
+## Grundsätzliche Fragen die sich während der Aufbereitung
+- [ ] Wann führen wir explizit FreeRTOS ein? Eher noch etwas früher? Besten Zeitpunkt während der Aufbereitung erfassen. 
+- [ ] Möglicher Passender FreeRTOS-Einstieg nach Einheit 5? (also vor SPI I2C) Scheduler könnte dann später direkt für Display-Messages bzw. "Fetching" der Sensorwerte verwendet werden. 
+- [ ] Layer-Mocking aufbereiten 
+- [ ] Mocking Idee für Regelparameter entwerfen, Simulator? (Python Portierung des Matlabsimulators)
+- [ ] Hardware in the Loop, Fahrzeugsimulator kommuniziert mit Fahrzeug
 
 ## Übersicht
 
@@ -37,13 +38,13 @@
 
 ## Einheit 1 – Grundlagen, Werkzeuge, Registereinstieg (GPIOs)
 
-Die erste Einheit dient dem Einstieg ins Projekt, Werkzeug und Zielarchitektur. (HAL, DL, AL) Die relevanten Datenblätter – Controller sowie die eingesetzten Fahrzeugkomponenten – werden präsentiert. Das Fahrzeug wird als Gesamtsystem vorgestellt: Aufbau, verbaute Sensorik und Aktorik, Zielarchitektur des gesamten Kurses.
+Die erste Einheit dient dem Einstieg, in die einzelnen Tools und in die Zielarchitektur (HAL, DL, AL). Die relevanten Datenblätter, Controller sowie eingesetzte Fahrzeugkomponenten, werden präsentiert. Das Fahrzeug wird als Gesamtsystem vorgestellt: Aufbau, verbaute Sensorik und Aktorik, Zielarchitektur des gesamten Kurses.
 
-Code Composer Studio wird aufgesetzt: Projektanlage, Toolchain-Konfiguration, Verbindung zum Debugger. Für sämtliche beschalteten Pins des Controllers wird eine Header-Datei mit sprechenden Bezeichnungen angelegt – die Pin-Dokumentation des Projekts wird in den Folgeeinheiten weiterverwendet.
+Code Composer Studio wird aufgesetzt: Projektanlage, Toolchain-Konfiguration, Verbindung zum Debugger. Für sämtliche beschalteten Pins des Controllers legen die Studierenden eine Header-Datei mit sprechenden Bezeichnungen an. Diese Pin-Dokumentation wird in den Folgeeinheiten weiterverwendet.
 
-Anschließend erfolgt die klassische Einführung in die Registerebene: Adressraum, Memory-Mapped I/O anhand des Datenblatts. Der Registerzugriff wird auch im Code eingeführt – anhand konkreter Zuweisungen und Bitmasken, nicht nur theoretisch. (Setzen von Aus- und Eingängen, Pull-Ups bzw. einer Funktion die die Logik-schaltung der jeweiligen PINS am HAL setzt) je nachdem was man mit den PINs machen möchte. Diese "GPIO-Config"-Funktion wird über die ersten Einheiten hinweg erweitert.
+Anschließend erfolgt die klassische Einführung in die Registerebene: Adressraum, Memory-Mapped I/O, anhand des Datenblatts. Der Registerzugriff wird auch im Code eingeführt, anhand konkreter Zuweisungen und Bitmasken, nicht nur theoretisch (Setzen von Aus- und Eingängen, Pull-Ups bzw. einer Funktion, die die Logikschaltung der jeweiligen Pins am HAL setzt, je nachdem was man mit den Pins machen möchte). Eine "GPIO-Config"-Funktion wird erstellt und über die ersten Einheiten hinweg erweitert.
 
-Die Unity Tests für den HAL zu dieser Einheit werden als vollständige Vorlage bereitgestellt, damit ein Referenzstandard vorliegt und Studierende sich hier auf die Einführung, Datenblätter sowie GPIO-Beschaltungen, Umgang mit Code Composer konzentrieren können.
+Die Unity-Tests für den HAL zu dieser Einheit werden als vollständige Vorlage bereitgestellt. So liegt ein Referenzstandard vor, und Studierende können sich auf Einführung, Datenblätter, GPIO-Beschaltungen und den Umgang mit Code Composer konzentrieren.
 
 **Wesentliche Arbeitsschritte:**
 - Projekt- und Zielarchitektur-Überblick (HAL, DL, AL)
@@ -62,14 +63,14 @@ Gemessen wird die Rechendauer einzelner Rechenoperationen, abhängig von der Arc
 
 Die bestehenden HAL-Funktionen werden erweitert: Interruptfähigkeit, Pull-Up, Pull-Down usw. – weiterhin auf Registerebene, ausschließlich für die GPIO-Abstraktion. Ein Taster löst über einen Portinterrupt eine ISR aus; mithilfe der ISR wird das Backlight des CrazyCars getoggelt.
 
-Studierende messen den Unterschied zwischen Polling und Delay hinsichtlich ihrer zeitlichen Zuverlässigkeit. Anschließend erfolgt eine Diskussion Polling vs. ISR.
+Studierende realisieren den Unterschied zwischen Polling und Delay hinsichtlich ihrer zeitlichen Zuverlässigkeit (Timings). Individuelle Diskussion mit den Studierenden. 
 
 Die zugehörigen Unity-Tests werden weiterhin als vollständige Vorlage bereitgestellt.
 
 **Wesentliche Arbeitsschritte:**
 - Rechendauer einzelner Operationen messen: int vs. float (architekturabhängig)
 - Bestehende HAL-Funktionen erweitern: Interruptfähigkeit, Pull-Up, Pull-Down (weiterhin Registerebene, reine GPIO-Abstraktion)
-- Taster löst über Portinterrupt eine ISR aus
+- Taster löst über Portinterrupt eine ISR aus (Fokus auf Entprellen richten)
 - ISR toggelt das Backlight des CrazyCars
 - Polling vs. Delay messen – zeitliche Zuverlässigkeit vergleichen
 - Diskussion: Polling vs. ISR
@@ -77,9 +78,9 @@ Die zugehörigen Unity-Tests werden weiterhin als vollständige Vorlage bereitge
 
 ## Einheit 3 – SystemClock, TimerB
 
-Ab dieser Einheit werden zur Verfügung gestellte Libraries verwendet und die System Clock sowie der Timer werden anhand dieser Libraries konfiguriert.
+Ab dieser Einheit werden zur Verfügung gestellte Libraries verwendet und die System Clock sowie der Timer werden anhand dieser Libraries und den Datenblättern konfiguriert.
 
-Die Konfiguration erfolgt in jedem Fall datenblattbasiert: unabhängig davon, ob über Register oder über eine Bibliotheksfunktion konfiguriert wird, müssen die verwendeten Werte aus dem Datenblatt begründet werden können. Gemessen wird die tatsächliche gegenüber der konfigurierten Taktfrequenz am Oszilloskop. Die Testverantwortung verschiebt sich auf ein vorgegebenes Gerüst, das um Grenzfälle zu ergänzen ist.
+Die Konfiguration erfolgt in jedem Fall datenblattbasiert: unabhängig davon, ob über Register oder über eine Bibliotheksfunktion konfiguriert wird, müssen die verwendeten Werte aus dem Datenblatt begründet werden können. Die Taktrequenz wird konfiguriert und durch eine Messung am PIN überprüft. (Übung Oszilloskop). Die Testverantwortung verschiebt sich auf ein vorgegebenes Gerüst, das um Grenzfälle ergänzt wird.
 
 **Wesentliche Arbeitsschritte:**
 - Einführung bereitgestellter Libraries ab dieser Einheit
@@ -93,12 +94,12 @@ Die Konfiguration erfolgt in jedem Fall datenblattbasiert: unabhängig davon, ob
 
 Gleiches Prinzip wie in Einheit 3. Timer A wird für die spätere Verwendung der Aktorik aufgesetzt. Signalform und Duty-Cycle werden am Oszilloskop verifiziert, unabhängig vom gewählten Implementierungsweg. Die Umrechnung von Lenkwinkel zu Duty-Cycle bleibt in jedem Fall eine eigenständige, host-testbare Funktion.
 
-Hier wird der Driver Layer für die Umrechnung des gegebenen Lenkwinkels "eingeführt". Die Studierenden sollen einen sauberen Übergang zwischen HAL und DL schaffen. An dieser Stelle wird zum Test des Driver Layers ein MockHAL eingeführt, welcher verwendet werden kann.
+Hier wird der Driver Layer für die Umrechnung des gegebenen Lenkwinkels "eingeführt". Die Studierenden sollen einen sauberen Übergang zwischen HAL und DL schaffen. (Wenn bisher noch nicht gemacht). An dieser Stelle wird zum Test des Driver Layers ein MockHAL eingeführt, welches für die Unity Tests verwendet werden soll.
 
 **Wesentliche Arbeitsschritte:**
 - TimerA für spätere Aktorik-Nutzung aufsetzen (gleiches Prinzip wie Einheit 3)
 - Signalform und Duty-Cycle am Oszilloskop verifizieren, unabhängig vom Implementierungsweg
-- Umrechnung Lenkwinkel → Duty-Cycle als eigenständige, host-testbare Funktion umsetzen
+- Umrechnung Lenkwinkel → Duty-Cycle als eigenständige, testbare Funktion umsetzen
 - Messung der Drehzahl mittels Timer A, Ermittlung der Geschwindigkeit (mm/s) sowie des zurückgelegten Weges
 - Driver Layer (DL) für diese Umrechnung einführen
 - Sauberen Übergang zwischen HAL und DL schaffen
@@ -109,7 +110,7 @@ Hier wird der Driver Layer für die Umrechnung des gegebenen Lenkwinkels "eingef
 
 ## Einheit 6 – SPI/I2C-Schnittstelle (Messungen)
 
-Auch hier ist die Konfiguration über Register oder Bibliothek möglich. Der Schwerpunkt der Einheit liegt auf der messtechnischen Verifikation: Timing und Protokollverlauf werden am Logic-Analyzer gegen die Spezifikation geprüft, unabhängig von der gewählten Implementierung. Die Tests werden ab dieser Einheit überwiegend eigenständig geschrieben, vorgegeben sind nur noch die Anforderungen.
+ Der Schwerpunkt der Einheit liegt auf der Verifikation. Beide Schnittstellen werden konfiguriert, Timing und Protokollverlauf werden am Logic-Analyzer geprüft. Die Tests werden ab dieser Einheit überwiegend eigenständig geschrieben, vorgegeben sind nur noch die Anforderungen an die Tests. 
 
 Wichtig ist dabei, die einzelnen Schnittstellen – SPI und I2C – mit dem zur Verfügung gestellten Analyzer zu messen und zu dekodieren. Die Verifizierung, dass die Schnittstellen sowie die einzelnen Serviceroutinen korrekt aufgesetzt wurden, ist notwendig.
 
@@ -123,44 +124,42 @@ Wichtig ist dabei, die einzelnen Schnittstellen – SPI und I2C – mit dem zur 
 
 ## Einheit 7 – SPI (Display), I2C (Abstandssensoren)
 
-Hier geht es darum, dass die einzelnen Sensoren eingelesen und richtig (laut Anleitung) konfiguriert werden. Driver-Layer-Funktionen sollen erstellt werden, um über I2C einzelne Sensorwerte auszulesen. Analog sollen über SPI Daten an das Display geschickt werden, auch hier über Funktionen aus dem Driver Layer.
+Die einzelnen Sensoren werden eingelesen und laut Anleitung / Datenblatt konfiguriert. Driver-Layer-Funktionen sollen erstellt werden, um über I2C einzelne Sensorwerte auszulesen. Analog sollen über SPI Daten an das Display geschickt werden, auch hier über Funktionen aus dem Driver Layer.
 
-Aufbauend auf der Schnittstellenkonfiguration aus Einheit 7 entstehen die konkreten Gerätetreiber. Die DL-Tests werden mit einer Mock-HAL vollständig eigenständig erstellt.
+Aufbauend auf der Schnittstellenkonfiguration aus Einheit 7 entstehen die konkreten Gerätetreiber. Die DL-Tests werden mit einer Mock-HAL eigenständig erstellt.
 
 **Wesentliche Arbeitsschritte:**
 - Sensoren gemäß Anleitung einlesen und korrekt konfigurieren
 - DL-Funktionen zum Auslesen einzelner Sensorwerte über I2C erstellen
 - DL-Funktionen zum Senden von Daten an das Display über SPI erstellen
 - Gerätetreiber auf der Schnittstellenkonfiguration aus Einheit 7 aufbauen
-- DL-Tests mit Mock-HAL vollständig eigenständig erstellen
+- DL-Tests mit Mock-HAL eigenständig erstellen
 
 ## Einheit 8 – ADC-Konfiguration, Batteriemessung, Direct Memory Access
 
-Diese Einheit verbindet ADC-Konfiguration und Direct Memory Access zu einem gemeinsamen Themenblock, da beide auf derselben Datenerfassung aufbauen.
+Diese Einheit verbindet ADC-Konfiguration und Direct Memory Access zu einem gemeinsamen Themenblock, da die eingelesenen ADC Daten für das (post-processing) automatisch weiterverarbeitet werden sollen. (Kann dann auch gleich für I2C Interrupts weiter adaptiert werden) Zunächst wird der ADC in Betrieb genommen. Die Batteriespannung wird gemessen; die Umrechnung des Rohwerts in einen aussagekräftigen Spannungswert (Oder Ladestatus) erfolgt über eine eigenständige DL-Funktion, die eigenständig getestet wird.
 
-Zunächst wird der ADC in Betrieb genommen. Die Batteriespannung wird gemessen; die Umrechnung des Rohwerts in einen aussagekräftigen Spannungswert erfolgt über eine eigenständige DL-Funktion, die vollständig eigenständig getestet wird. Eine Referenzmessung mit dem Multimeter ist dafür nicht vorgesehen.
-
-Die Distanzmessung der IR-Sensoren wird den Studierenden mitsamt Dokumentation zur Verfügung gestellt – die Umrechnung von Rohwert zu Distanz muss nicht selbst hergeleitet werden, sondern wird als fertiger, dokumentierter Baustein übernommen und in die DL-Schicht eingebunden.
-
-Im zweiten Teil wird die Datenerfassung – Batterie und IR-Sensoren – auf Direct Memory Access umgestellt. In der Praxis wird dabei überwiegend die Bibliotheksvariante gewählt, da eine vollständige Registerkonfiguration des DMA-Controllers hohen Aufwand bei vergleichsweise geringem zusätzlichem Lernertrag bedeutet. Die dadurch gewonnene Zeit fließt vollständig in die Messung: Der Rechenzeitvergleich zwischen Polling und DMA wird mit derselben Sorgfalt durchgeführt wie in den vorangegangenen Einheiten. Die im ersten Teil dieser Einheit entstandenen DL-Tests müssen nach der Umstellung unverändert bestehen – das dient als Nachweis, dass sich an der nach außen sichtbaren Schnittstelle nichts geändert hat.
+Die Distanzmessung der IR-Sensoren wird den Studierenden mitsamt Dokumentation zur Verfügung gestellt – die Umrechnung von Rohwert zu Distanz muss nicht selbst hergeleitet werden, sondern wird als fertiger, dokumentierter Baustein übernommen und in die DL-Schicht eingebunden. Ob Studierende Teile oder alle Elemente der Linearisierung selbst erledigen, wird in der Vorbereitung noch geklärt.
+In der Praxis wird dabei überwiegend die Bibliotheksvariante gewählt. Die im ersten Teil dieser Einheit entstandenen DL-Tests müssen nach der Umstellung unverändert bestehen – das dient als Nachweis, dass sich an der nach außen sichtbaren Schnittstelle nichts geändert hat.
 
 **Wesentliche Arbeitsschritte:**
 - ADC in Betrieb nehmen
-- Batterie messen, Umrechnung als eigenständige DL-Funktion erstellen und eigenständig testen (kein Multimeter-Abgleich)
+- Batterie messen, Umrechnung als eigenständige DL-Funktion erstellen und eigenständig testen 
 - Bereitgestellte, dokumentierte Distanzmessung der IR-Sensoren übernehmen und in DL einbinden
-- Datenerfassung (Batterie + Abstands-Sensoren) auf Direct Memory Access umstellen (überwiegend Bibliotheksvariante)
+- Datenerfassung (Batterie + Abstands-Sensoren) mit DMA-Zugriff umstellen (überwiegend Bibliotheksvariante)
 - Bestehende DL-Tests müssen nach der Umstellung unverändert bestehen
 
 ## Einheit 9 – FreeRTOS-Aufsetzen, Scheduling
 
-Zu Beginn der Einheit werden sämtliche offenen Tests aus den vorangegangenen Einheiten fertiggestellt; die gesamte bisherige Testsuite muss vollständig bestehen, bevor mit neuem Inhalt begonnen wird. Anschließend wird FreeRTOS als Bibliothek eingebunden. Aufgebaut wird die Architektur *Fetch Sensor Data → Process Sensor Data → Make Decisions* als Task-Pipeline: Eine Task ruft die bestehenden DL-Funktionen zur Datenerfassung auf, eine zweite verarbeitet die Werte, eine dritte trifft Entscheidungen – letztere zunächst als Platzhalter, inhaltlich gefüllt in Einheit 10. Gemessen wird das Timing zwischen den Tasks (Latenz, Jitter). Es entsteht eine neue Testkategorie; die bestehenden HAL- und DL-Tests bleiben davon unberührt.
+Zu Beginn der Einheit werden sämtliche offenen Tests aus den vorangegangenen Einheiten fertiggestellt; die gesamte bisherige Testsuite muss vollständig bestehen, bevor mit neuem Inhalt begonnen wird. Anschließend wird FreeRTOS als Bibliothek eingebunden. Aufgebaut wird die Architektur *Fetch Sensor Data → Process Sensor Data → Make Decisions* als Task-Pipeline. 
+Eine Task ruft die bestehenden DL-Funktionen zur Datenerfassung auf, eine zweite verarbeitet die Werte, eine dritte trifft Entscheidungen – letztere zunächst als Platzhalter, inhaltlich gefüllt ab Einheit 10. Es entsteht eine neue Testkategorie die bestehenden HAL- und DL-Tests bleiben davon unberührt. Mocking der Fahrzeugumgebung. 
 
 **Wesentliche Arbeitsschritte:**
 - Offene Tests aus den vorangegangenen Einheiten fertigstellen, gesamte Suite muss vollständig bestehen
 - FreeRTOS als Bibliothek einbinden
 - Task-Pipeline Fetch Sensor Data → Process Sensor Data → Make Decisions aufsetzen
 - Decision-Stufe zunächst als Platzhalter anlegen (inhaltlich gefüllt in Einheit 10)
-- Timing zwischen Tasks messen (Latenz, Jitter)
+- Timing zwischen Tasks messen bzw. verifizieren
 - Neue Testkategorie (Ablauf-/Scheduling-Tests); HAL- und DL-Tests bleiben unberührt
 
 ## Einheit 10 – Fahralgorithmus (Zustandsautomat)
@@ -188,7 +187,7 @@ Eine systematische Variation einzelner Reglerparameter ist am realen Fahrzeug nu
 
 ## Einheit 12–15 – Freies Üben
 
-Systemintegration, individuelle Erweiterung, Optimierung und Vorbereitung der Abschlussdemonstration. Der Inhalt ist frei wählbar, der Nachweis über die weiterhin vollständige Testsuite bleibt verpflichtend.
+Systemintegration, individuelle Erweiterung, Optimierung und Vorbereitung für das Crazy Car Event. Freies Training in einem dafür vorgesehenen Raum, innerhalb eingetragener Trainingsslots, für individuelle Betreuung.
 
 ---
 
