@@ -10,12 +10,13 @@
 - [ ] Implementierung aller Einheiten, bzw. refactoring der bestehenden Einheiten
 - [ ] (LV) auch für die neuen Inhalte des LABs nachziehen
 
-## Grundsätzliche Fragen die sich während der Aufbereitung
+## Grundsätzliche Fragen die sich während der Aufbereitung klären oder eben festgelegt werden müssen
 - [ ] Wann führen wir explizit FreeRTOS ein? Eher noch etwas früher? Besten Zeitpunkt während der Aufbereitung erfassen. 
 - [ ] Möglicher Passender FreeRTOS-Einstieg nach Einheit 5? (also vor SPI I2C) Scheduler könnte dann später direkt für Display-Messages bzw. "Fetching" der Sensorwerte verwendet werden. 
 - [ ] Layer-Mocking aufbereiten 
 - [ ] Mocking Idee für Regelparameter entwerfen, Simulator? (Python Portierung des Matlabsimulators)
 - [ ] Hardware in the Loop, Fahrzeugsimulator kommuniziert mit Fahrzeug
+- [ ] Einheit 10 und 11 könnte man auch noch zusätzlich zusammenfassen, damit könnte man noch eine "Nachholeinheit" im LAB-Verlauf einbauen um individuelle Probleme nachziehen zu können
 
 ## Übersicht
 
@@ -24,12 +25,12 @@
 | 1 | Grundlagen, Werkzeuge, Registereinstieg (GPIOs) | Register | HAL-Tests bereitgestellt | – (Fokus: Setup, Datenblätter, Registerverständnis) | – |
 | 2 | Rechendauer, Interrupts, ISRs | Register | Tests weiterhin bereitgestellt | Rechendauer int vs. float; Polling vs. Delay (zeitliche Zuverlässigkeit) | – |
 | 3 | SystemClock, TimerB | Register oder Bibliothek (datenblattbasiert) | Vorgegebenes Gerüst, Grenzfälle selbst ergänzen | Soll- vs. Ist-Taktfrequenz (Oszilloskop) | – |
-| 4 | TimerA, PWM | Register oder Bibliothek | Vorgegebenes Gerüst; MockHAL für DL-Tests eingeführt | Signalform, Duty-Cycle (Oszilloskop); Drehzahl, Geschwindigkeit, Weg über TimerA | – |
+| 4 | TimerA, PWM | Bibliothek | Vorgegebenes Gerüst; MockHAL für DL-Tests eingeführt | Signalform, Duty-Cycle (Oszilloskop); Drehzahl, Geschwindigkeit, Weg über TimerA | – |
 | 5 | Nachholeinheit | – | Konsolidierung offener Tests aus 1–4 | – | – |
-| 6 | SPI/I2C-Schnittstelle (Messungen) | Register oder Bibliothek | überwiegend eigenständig, nur Anforderungen vorgegeben | Timing/Protokollverlauf SPI & I2C messen und dekodieren (Logic-Analyzer); korrekter Aufbau der Serviceroutinen | – |
-| 7 | SPI (Display), I2C (Abstandssensoren) | Register oder Bibliothek | eigenständig, mit Mock-HAL | Sensoren korrekt eingelesen (laut Anleitung); Gerätetreiber funktional | – |
-| 8 | ADC-Konfiguration, Batteriemessung, Direct Memory Access | ADC: Register oder Bibliothek / DMA: Bibliothek | eigenständig; Regressionsnachweis der DL-Tests nach DMA-Umstellung | Batteriespannung (kein Multimeter-Abgleich); Rechenzeitvergleich Polling vs. DMA | – |
-| 9 | FreeRTOS-Aufsetzen, Scheduling | Bibliothek (FreeRTOS) | Konsolidierung 1–8 zu Beginn; danach neue Kategorie (Ablauf-/Scheduling-Tests) | Task-Timing: Latenz, Jitter | ab hier aktiv |
+| 6 | SPI/I2C-Schnittstelle (Messungen) | Bibliothek | überwiegend eigenständig, nur Anforderungen vorgegeben | Timing/Protokollverlauf SPI & I2C messen und dekodieren (Logic-Analyzer); korrekter Aufbau der Serviceroutinen | – |
+| 7 | SPI (Display), I2C (Abstandssensoren) | Bibliothek | eigenständig, mit Mock-HAL | Sensoren korrekt eingelesen (laut Anleitung); Gerätetreiber funktional | – |
+| 8 | ADC-Konfiguration, Batteriemessung, Direct Memory Access | ADC: Bibliothek / DMA: Bibliothek | eigenständig; Regressionsnachweis der DL-Tests nach DMA-Umstellung | Batteriespannung (Ladestatus); Rechenzeitvergleich, Timings | – |
+| 9 | FreeRTOS-Aufsetzen, Scheduling | Bibliothek (FreeRTOS) | Konsolidierung 1–8 zu Beginn; danach neue Kategorie (Ablauf-/Scheduling-Tests) | Task-Timing: Latenz | ab hier aktiv |
 | 10 | Fahralgorithmus (Zustandsautomat) | reine Logik | Host-Tests eigenständig; Mocking wird bereitgestellt und mit Studierenden besprochen | Host-Test, CrazyCar-Simulator, Nachweis am realen Fahrzeug (Zustandswechsel provoziert) | aktiv |
 | 11 | Regelungsprozess (PID) | reine Logik | AL-Unity-Tests, umfangreichste Suite; Mocking aller anderen Layer eingebunden | Reglerparameter im CrazyCar-Simulator variieren (bzw. gegebene Mocking-Szenarien); Feinabstimmung am realen Fahrzeug | aktiv |
 | 12–15 | Freies Üben | frei gewählt | vollständige Suite bleibt verpflichtend | Systemintegration, eigene Erweiterung, Optimierung, Abschlussdemonstration | aktiv |
