@@ -1,1 +1,36 @@
-**/.DS_Store
+# ============================================================
+# CCS 12.8 / MSP430 – Workspace = Git-Root
+# ============================================================
+
+# ---- Workspace-Ebene (nur im Root) -------------------------
+/.metadata/
+/RemoteSystemsTempFiles/
+/.jxbrowser.userdata/
+/.plugins/
+/.recommenders/
+/.mylyn/
+
+# ---- Build-Konfigurationen (in jedem Projekt) --------------
+Debug/
+Release/
+
+# ---- Build-Artefakte (falls außerhalb der Build-Ordner) ----
+*.obj
+*.out
+*.map
+*.pp
+*.d
+*_linkInfo.xml
+*.o
+*.elf
+*.hex
+*.bin
+
+# ---- Eclipse / CCS lokal -----------------------------------
+.launches/
+*.bak
+*~
+
+# ---- Betriebssystem ----------------------------------------
+Thumbs.db
+.DS_Store

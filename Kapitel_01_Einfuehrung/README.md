@@ -7,8 +7,6 @@
 - [Crazy Car Platine](#crazy-car-platine)
 - [Softwarestruktur](#softwarestruktur)
 - [Code Composer Studio](#code-composer-studio)
-- [Anlegen eines Basis Projektes](#anlegen-eines-basis-projektes)
-- [Schnittstellen zwischen Softwaremodulen](#schnittstellen-zwischen-softwaremodulen)
 - [IO Port Konfiguration](#io-port-konfiguration)
 ### Durchzuführende Aufgaben
 - [[AUFGABE] Anlegen eines Basis Projektes](#aufgabe-anlegen-eines-basis-projektes)
@@ -45,7 +43,7 @@ Die Software wird in Form eines klaren Layermodells entwickelt, das eine saubere
 
 Jede Schicht kommuniziert ausschließlich mit der direkt darunterliegenden Schicht. Direkte Zugriffe über mehrere Ebenen hinweg sind nicht zulässig. Dadurch entsteht eine stabile und erweiterbare Architektur, die unabhängig von konkreten Hardwaredetails bleibt und gleichzeitig die systematische Entwicklung unterstützt.
 
-**Vorteile dieser Layerstruktur:**
+**Vorteile dieser Layerstruktur:** 
 
 - Modularität: Jede Schicht kann unabhängig entwickelt oder ausgetauscht werden
 - Wartbarkeit: Fehler lassen sich klar eingrenzen und beheben
@@ -62,30 +60,29 @@ Die HAL-Schicht kommuniziert direkt mit der Hardware, indem sie Mikrocontroller-
 
 Typische Aufgaben im HAL:
 
-- Konfiguration der GPIO-Richtung über `PxDIR`
+- Konfiguration der Portrichtung über `PxDIR`
+- Lesen von Eingangspegeln über `PxIN`
 - Setzen/Rücksetzen von Ausgängen über `PxOUT`
-- Auswahl alternativer Funktionen über `PxSEL`, `PxSEL2`
-- Aktivierung interner Pull-Ups/-Downs über `PxREN`
-- Initialisierung von Timer, SPI, UART, ADC, DMA usw.
+- Aktivierung interner Pull-Ups/-Downs über `PxREN` in Verbindung mit `PxOUT`
+- Einstellen der Treiberstärke über `PxDS`
+- Auswahl alternativer Funktionen über `PxSEL`
+- Zuordnung mappbarer Peripherie zu einem Pin über den Port-Mapping-Controller (`PxMAP`)
+- Flankenauswahl und Freigabe der Port-Interrupts über `PxIES`, `PxIE`, `PxIFG`
+- Initialisierung von Timer, SPI, I2C, UART, ADC und DMA
+- Bereitstellen der Interrupt-Service-Routinen und Weitergabe der Ereignisse an die höheren Schichten
 
-#### Beispiel: GPIO auf High setzen
+#### Beispiel: GPIO auf High setzen 
+Funktionen im HAL sind für die mögliche Verwendung innerhalb des selben Layers, sowie zur multiplen Verwendung innerhalb der anderen übergeordneten Layer gedacht. 
 
 ```c
-void hal_GpioSetPin(uint8_t port, uint8_t pin)
-{
-    switch(port) {
-        case 8:
-            P8OUT |= (1 << pin);   // Setzt Bit im Ausgangsregister von Port 8
-            break;
-        case 1:
-            P1OUT |= (1 << pin);
-            break;
-        // ggf. weitere Ports
-    }
-}
+// Setze Bit 3 (z. B. als Ausgang):
+P1DIR |= RPM_SENSOR;
+// Lösche Bit 3 (z. B. als Eingang):
+P1DIR &= ~RPM_SENSOR;
 ```
 
 #### Beispiel: Makros für LCD-Backlight
+Diese Art von Makros sind für die Verwendung innerhalb des selben Layers gedacht. Wenn es nun vorkommt, dass ein übergeordneter Layer (in unserem Fall der Driver Layer) darauf zugreifen soll, würde sich ein Funktionsaufruf dafür besser eignen. 
 
 ```c
 #define LCD_BL             BIT2
@@ -98,8 +95,8 @@ void hal_GpioSetPin(uint8_t port, uint8_t pin)
 Der DL-Layer abstrahiert die HAL-Funktionen weiter, um komplexe Komponenten wie Sensoren oder Displays auf höherer Ebene nutzbar zu machen. Registerzugriffe sind hier nicht mehr erlaubt – es wird ausschließlich über HAL-Funktionen gearbeitet.
 
 ```c
-void dl_DisplayInit(void);
-void dl_DisplayWriteText(const char* str, uint8_t len);
+void dlDisplayInit(void);
+void dlDisplayWriteText(const char* str, uint8_t len);
 ```
 
 ### AL – Application Layer
@@ -108,8 +105,8 @@ Im AL-Layer liegt die Applikationslogik: Fahrverhalten, Steuerstrategien, Reakti
 
 ```c
 if (dist_cm < 20) {
-    dl_DisplayWriteText("STOP", 4);
-    dl_SetSteering(0);
+    dlDisplayWriteText("STOP", 4);
+    dlSetSteering(0);
 }
 ```
 
@@ -147,6 +144,11 @@ Um dies zu vereinfachen, empfiehlt es sich, die Include-Pfade in den Projekteins
 <p align="center">
   <img src="./media/wholeBoard.png" alt="">
 </p>
+
+Danach kann der Aufruf so erfolgen:
+```c
+#include "halUsciB1.h"
+```
 
 ### Debugger (In-Circuit Emulator)
 
@@ -196,24 +198,24 @@ Der **Register-Viewer** erlaubt das Live-Ändern und Einsehen von Registerinhalt
 
 ### Schritte
 
-1. Legen Sie ein neues Projekt für den verwendeten Mikrokontroller an, z. B. `Laboruebung_1`.
-2. Erstellen Sie die Layer-Ordner und fügen Sie die Include-Pfade hinzu.
+1. Legen Sie ein neues Projekt für den verwendeten Mikrokontroller an, z. B. `Laboruebung_1` oder `LAB_1`.
+2. Erstellen Sie die Layer-Ordner `HAL`, `DL`, `AL` und fügen Sie die Include-Pfade - wie oben beschrieben - hinzu.
 3. Schalten Sie den Optimizer aus.
 4. Fügen Sie eine Endlosschleife in die `main`-Funktion ein und tauschen Sie `int` gegen `void` aus.
 5. Builden Sie das Programm.
-6. Kopieren Sie die Dateien `hal_pmm.c` und `hal_pmm.h` in die Projektordner-Struktur im Windows Explorer.  
+6. Kopieren Sie die Dateien `halPmm.c` und `halPmm.h` in die Projektordner-Struktur im Windows Explorer.  
    Die Dateien erscheinen anschließend automatisch im *Project Explorer*.
-7. Erstellen Sie eine neue C- und H-Datei: `hal_general.c`, `hal_general.h`.  
+7. Erstellen Sie eine neue C- und H-Datei: `halGeneral.c`, `halGeneral.h`.  
    - Vergessen Sie nicht, in der Headerdatei die `#ifndef`-Abfrage anzugeben.  
    - Inkludieren Sie die Headerdatei in der C-Datei.
-8. Erstellen Sie in der `hal_general.c` eine Funktion `hal_Init` ohne Übergabeparameter.  
-   Schreiben Sie den Funktionsprototypen in die `hal_general.h`.
-9. Inkludieren Sie die `hal_pmm.h` in der `hal_general.c`.
-10. Rufen Sie in der Funktion `hal_Init` die Funktion `HAL_PMM_Init()` auf.
-11. Inkludieren Sie die `hal_general.h` in der `main.c` und rufen Sie in der `main`-Funktion die Funktion `hal_Init()` auf.
-12. Erstellen Sie für die Konfiguration des Watchdog-Timers ein eigenes Modul (`hal_wdt.c`, `hal_wdt.h`)  
-    und implementieren Sie eine Funktion `hal_WdtInit()`.  
-    Diese wird ebenfalls in der `hal_Init`-Funktion aufgerufen, **bevor** das PMM-Modul initialisiert wird.
+8. Erstellen Sie in der `halGeneral.c` eine Funktion `halInit` ohne Übergabeparameter.  
+   Schreiben Sie den Funktionsprototypen in die `halGeneral.h`.
+9. Inkludieren Sie die `halPmm.h` in der `halGeneral.c`.
+10. Rufen Sie in der Funktion `halInit` die Funktion `HAL_PMM_Init()` auf. (Nomenklatur im File bereits gegeben)
+11. Inkludieren Sie die `halGeneral.h` in der `main.c` und rufen Sie in der `main`-Funktion die Funktion `halInit()` auf.
+12. Erstellen Sie für die Konfiguration des Watchdog-Timers ein eigenes Modul (`halWdt.c`, `halWdt.h`) und implementieren Sie eine Funktion `halWdtInit()`.  
+
+    - Diese wird ebenfalls in der `halInit`-Funktion aufgerufen, **bevor** das PMM-Modul initialisiert wird.
 
 
 ## IO Port Konfiguration
@@ -244,11 +246,11 @@ Jede dieser Leitungen (z. B. P1.3 = TA0.2) kann als GPIO oder als Peripherieau
 
 ```c
 // ##### Port 1 #####
-#define RPM_SENSOR       BIT3   // IN
-#define RPM_SENSOR_DIR   BIT4   // IN
-#define I2C_INT_MOTION   BIT5   // OUT
-#define START_BUTTON     BIT6   // EN
-#define STOP_BUTTON      BIT7   // EN
+#define RPM_SENSOR       BIT3
+#define RPM_SENSOR_DIR   BIT4  
+#define I2C_INT_MOTION   BIT5 
+#define START_BUTTON     BIT6  
+#define STOP_BUTTON      BIT7  
 
 // Setze RPM_SENSOR als Eingang
 P1DIR &= ~RPM_SENSOR;
@@ -275,7 +277,7 @@ Dadurch werden gezielt einzelne Pins geändert, ohne andere Bits im Register zu 
 
 ### Makros und Lesbarkeit
 
-Zur besseren Lesbarkeit und Wartbarkeit empfiehlt es sich, sprechende Makros zu verwenden:
+Zur besseren Lesbarkeit und Wartbarkeit empfiehlt es sich,entsprechende Makros zu verwenden:
 
 ```c
 #define LCD_BL             BIT2
@@ -291,20 +293,21 @@ Nicht genutzte Pins sollten definiert konfiguriert werden (z. B. als Ausgang m
 
 ## [AUFGABE] Grundkonfiguration der GPIO
 
-In dieser Aufgabe geht es darum, die Beschaltung der Crazy-Car-Platine – wie sie im Schaltplan ersichtlich ist – systematisch im Code abzubilden. Alle relevanten Pins sollen im Rahmen eines hal_-GPIO-Moduls konfiguriert werden. Dabei werden die Pins je nach Funktion als Ein- oder Ausgang initialisiert. Die Namen und Registerkonfigurationen sollen so gewählt werden, dass eine klare Zuordnung zwischen physischer Schaltung und Software möglich ist. Ziel ist eine robuste, nachvollziehbare Pininitialisierung im hal_-Stil.
+In dieser Aufgabe geht es darum, die Beschaltung der Crazy-Car-Platine – wie sie im Schaltplan ersichtlich ist – systematisch im Code abzubilden. Alle relevanten Pins sollen im Rahmen eines hal_-GPIO-Moduls konfiguriert werden. Dabei werden die Pins je nach Funktion als Ein- oder Ausgang initialisiert. Die Namen und Registerkonfigurationen sollen so gewählt werden, dass eine klare Zuordnung zwischen physischer Schaltung und Software möglich ist. Ziel ist eine robuste, nachvollziehbare Pininitialisierung im HAL.
 
 ### Aufgaben:
 
-1. Modul `hal_gpio.c/.h` erstellen und in der Projektstruktur korrekt ablegen
-2. In `hal_gpio.h` alle verwendeten Pins als `#define` Makros mit sprechenden Namen deklarieren (z. B. `RPM_SENSOR`, `START_BUTTON`)
-3. Funktion `hal_GpioInit()` in `hal_gpio.c` implementieren
-4. Innerhalb von `hal_GpioInit()`:
+1. Modul `halGpio.c/.h` erstellen und in der Projektstruktur korrekt ablegen
+2. In `halGpio.h` alle verwendeten Pins als `#define` Makros mit sprechenden Namen deklarieren (z. B. `RPM_SENSOR`, `START_BUTTON`)
+3. Funktion `halGpioInit()` in `halGpio.c` implementieren
+4. Innerhalb von `halGpioInit()`:
    - Richtung aller beschalteten Pins gemäß ihrer Funktion setzen (`PxDIR`)
    - Optional: Ausgänge initial mit definiertem Pegel belegen (`PxOUT`)
    - Optional: Pull-Ups/-Downs für Eingänge aktivieren (`PxREN`, `PxOUT`)
 5. Unbenutzte Pins als digitale Ausgänge mit Low-Pegel konfigurieren (Floating vermeiden)
-6. `hal_GpioInit()` in `hal_Init()` aufrufen
-7. Funktionalität im Debugger überprüfen (z. B. Lesbarkeit der Inputs, korrekte OUT-Zustände)
+6. `halGpioInit()` in `halInit()` aufrufen
+7. **Unbedingt** Funktionalität im Debugger überprüfen (z. B. Lesbarkeit der Inputs, korrekte OUT-Zustände)
+8. [Meilensteinüberprüfung] Was passiert mit unbeschaltenen PINs ?
 
 ## Referenzen
 
