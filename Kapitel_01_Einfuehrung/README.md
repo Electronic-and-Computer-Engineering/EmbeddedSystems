@@ -30,7 +30,7 @@
 - Start/Stop-Taste
 - Ausgänge für Servo und Fahrtenregler
 - LC-Display
-- JTAG Spy-by-wire Interface
+- JTAG Spy-bi-wire Interface
 
 <p align="center">
   <img src="./media/CCPlatine2.png" alt="Include Options">
@@ -166,7 +166,7 @@ Der **Register-Viewer** erlaubt das Live-Ändern und Einsehen von Registerinhalt
 
 ## Code Composer Studio
 
-- CCS kompiliert, linkt und programmiert das System über JTAG (Spy-by-wire)
+- CCS kompiliert, linkt und programmiert das System über JTAG (Spy-bi-wire)
 - Projekte liegen in einem Workspace (lokal empfohlen)
 - Jedes Laborprojekt sollte als separates CCS-Projekt angelegt werden
 

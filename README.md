@@ -29,7 +29,7 @@ Die Übung vermittelt praxisnah:
 <details>
 <summary><strong>1–3: Einführung, Interrupts, Clock und Timer</strong></summary>
 
-### 1. [Grundlagen, Werkzeuge, Registereinstieg](Einheit_01_Grundlagen_GPIO/README.md)
+### 1. [Grundlagen, Werkzeuge, Registereinstieg](Kapitel_01_Einfuehrung/README.md)
 - Überblick zur Crazy Car Platine
 - Softwarearchitektur: HAL, DL, AL
 - Projektstruktur in CCS, Git-Versionierung
@@ -60,7 +60,7 @@ Die Übung vermittelt praxisnah:
 
 ### 5. [Schnittstellen: SPI, UART, I2C](Einheit_05_Schnittstellen/README.md)
 - SPI über USCI_B1 selbst konfigurieren, interruptgesteuerte Übertragung
-- UART und I2C als vorgegebene Module einbinden
+- UART und I2C als vorgegebene Module einbinden und erweitern
 - Alle drei Schnittstellen am Logic-Analyzer messen und dekodieren
 
 </details>
