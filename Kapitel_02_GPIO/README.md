@@ -198,6 +198,13 @@ Debugging ist von entscheidender Bedeutung, um Fehler in der Software zu finden 
    - In `halGpio.c`: Rechtsklick auf Breakpoint → "Breakpoint Properties"
    - Unter "Condition" eine Bedingung eingeben (z. B. `CCbutton.button == 1`), um nur bei gedrückter Starttaste zu stoppen.
 
+## Testing
+
+Ab dieser Einheit wird die Funktionalität zusätzlich automatisiert geprüft. Der Ordner `test`
+wird vollständig bereitgestellt, die Einrichtung ist in einer eigenen Anleitung beschrieben:
+
+➡ **[Testing – Ersteinrichtung](Testing/Testing.md)**
+
 ## Referenzen
 
 - **MSP430x5xx and MSP430x6xx Family User Guide**, Texas Instruments, Literature Number: SLAU208O, Rev. O, April 2019.  
