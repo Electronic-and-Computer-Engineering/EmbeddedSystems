@@ -41,7 +41,7 @@ Die Übung vermittelt praxisnah:
 - Polling vs. Delay: zeitliche Zuverlässigkeit
 - Debugging (Breakpoints, Register, Expressions)
 
-### 3. [SystemClock und TimerB](Einheit_03_Clock_TimerB/README.md)
+### 3. [SystemClock und TimerB](Kapitel_03_TimerB0/README.md)
 - Unified Clock System (UCS)
 - TimerB0-Konfiguration
 - Soll- vs. Ist-Taktfrequenz am Oszilloskop
