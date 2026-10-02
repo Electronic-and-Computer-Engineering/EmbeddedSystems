@@ -10,6 +10,7 @@
 - [Erstellung einer ISR für Port1](#erstellung-einer-isr-für-port1)
 - [Aufbau einer Port1-ISR (P1)](#aufbau-einer-port1-isr-p1)
 - [Allgemeine I/O-Interruptsteuerung](#allgemeine-io-interruptsteuerung)
+- []
 - [Debugging](#debugging-übung)
 - [Unity-Tests](#testing)
 
@@ -32,6 +33,7 @@
 - [[AUFGABE] Recherche Allgemeine Interruptsteuerung](#recherche-durchzuführende-arbeit--dokumentation-für-die-meilensteinüberprüfung)
 - [[AUFGABE] Implementierung Allgemeine Interruptsteuerung](#implementierung-durchzuführende-arbeit--dokumentation-für-die-meilensteinüberprüfung)
 - [[AUFGABE] Debugging Übung](#aufgaben)
+- [[Nützlich] Entprellen eines Tasters](#entprellen-ein-gedankenbeispiel)
 
 ## Rechendauer-Performance-Test
 
@@ -175,6 +177,29 @@ Wenn ein Interrupt ausgelöst wird, springt das Programm zur zugehörigen Interr
 10. Welche Interrupt-Priorität besitzt der verwendete Port?
 11. **Diskussion** Wie kann man Tasten entprellen? 
 ---
+
+### Taster-Entprellen (Ein Gedankenbeispiel)
+
+Ein mechanischer Taster prellt: Er springt beim Umschalten mehrfach zwischen den Pegeln
+hin und her. Für den Controller sind das mehrere Tastendrücke, die ISR läuft entsprechend
+oft an.
+
+**Messen Sie zuerst die Prellzeit Ihres Tasters am Oszilloskop.** Ohne diesen Wert ist jede
+Entprellung geraten.
+
+Umsetzen sollen Sie das Umschalten der Flanke: Nach dem Drücken ist der Taster erst wieder
+interessant, wenn er losgelassen wird. Dreht die ISR die erwartete Flanke um, laufen alle
+weiteren Prellimpulse ins Leere. `P1IES` dient dabei zugleich als Gedächtnis, eine
+zusätzliche Variable braucht es nicht.
+
+Das Interrupt-Flag muss **nach** dem Umschalten gelöscht werden – das Umschalten selbst
+kann es setzen.
+
+**Zu dokumentieren:**
+
+1. Gemessene Prellzeit
+2. Welche Flanke gehört zum Drücken, welche zum Loslassen? Begründung über die Beschaltung.
+3. Welcher Fall wird damit nicht abgefangen?
 
 ## Debugging-Übung
 
