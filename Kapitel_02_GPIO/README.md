@@ -35,11 +35,11 @@
 
 Nach Abschluss der I/O-Port-Konfiguration soll die Rechendauer einer Integer- bzw. einer Fließkommaoperation überprüft werden.
 
-### Durchzuführende Arbeit & Dokumentation für die Meilensteinüberprüfung
+### **Durchzuführende Arbeit & Dokumentation für die Meilensteinüberprüfung**
 
 1. Führen Sie jeweils eine Fließkommazahl- und eine Integer-Berechnung durch.
 2. Schalten Sie vor jeder Berechnung die Display-Hintergrundbeleuchtung ein und danach wieder aus.
-3. Messen und dokumentieren Sie die Rechendauer mithilfe eines Oszilloskops.
+3. Messen und dokumentieren Sie die Rechendauer mithilfe eines Oszilloskops (vorzugsweise am Backlight Test-PIN des CCDisplayboards -- BL)
 
 ---
 <p align="center">
@@ -180,8 +180,8 @@ Debugging ist von entscheidender Bedeutung, um Fehler in der Software zu finden 
 ### Aufgaben:
 
 1. Setzen Sie Breakpoints an folgenden Stellen:
-   - `main.c`: Nach der Abfrage `CCbutton.active`
-     - Beobachten Sie den Wert von `CCbutton.button`. Kann der Entscheidungsfluss im Debugger beeinflusst werden?
+   - `main.c`: Nach der Abfrage `CCButton.active`
+     - Beobachten Sie den Wert von `CCButton.button`. Kann der Entscheidungsfluss im Debugger beeinflusst werden?
    - `halGpio.c`: Vor der `switch`-Anweisung in der ISR
      - Beobachten Sie das Register `P1IFG`. Wurde das korrekte Interrupt-Flag gesetzt?
    - `halGeneral.c`: In der Funktion `halInit()`, vor und nach `halGPIOInit()`
@@ -191,12 +191,12 @@ Debugging ist von entscheidender Bedeutung, um Fehler in der Software zu finden 
    - Hinweis: Einige Register können im laufenden Betrieb nicht angezeigt oder verändert werden.
 
 3. Expression-Watch nutzen:
-   - Fügen Sie z. B. `CCbutton.active` zur Watch-Liste hinzu (Rechtsklick → "Add to Watch Expression").
+   - Fügen Sie z. B. `CCButton.active` zur Watch-Liste hinzu (Rechtsklick → "Add to Watch Expression").
    - Ändern Sie den Wert direkt und beobachten Sie die Auswirkung auf das Programm.
 
 4. Bedingte Breakpoints:
    - In `halGpio.c`: Rechtsklick auf Breakpoint → "Breakpoint Properties"
-   - Unter "Condition" eine Bedingung eingeben (z. B. `CCbutton.button == 1`), um nur bei gedrückter Starttaste zu stoppen.
+   - Unter "Condition" eine Bedingung eingeben (z. B. `CCButton.button == 1`), um nur bei gedrückter Starttaste zu stoppen.
 
 ## Testing
 
