@@ -1,4 +1,4 @@
-[⬅ Zurück zur Aufgabenstellung](README.md)
+[⬅ Zurück zur Aufgabenstellung](../README.md)
 
 # Testing – Ersteinrichtung
 
@@ -24,9 +24,9 @@ Eigene Testfälle schreiben Sie ab der nächsten Einheit.
 
 Eine Funktion im Debugger durchzusteppen zeigt, dass sie in **einem** Fall das Richtige tut. Ein Unit-Test prüft dasselbe automatisch, in Sekunden, und wiederholt es bei jedem Programmstart.
 
-Der eigentliche Nutzen zeigt sich später im Kurs: Wenn Sie in einer späteren Einheit die Datenerfassung auf DMA umstellen, müssen die Tests der vorherigen Einheit unverändert bestehen bleiben. Genau daran erkennen Sie, dass die Umstellung nichts zerstört hat.
+Der eigentliche Nutzen zeigt sich später im Kurs: Wenn Sie in späteren Laboreinheiten Änderungen vornehmen, müssen die Tests der vorherigen Einheit unverändert bestehen bleiben. Genau daran erkennen Sie, dass die Umstellung nichts zerstört hat.
 
-Die Tests laufen **direkt auf dem Controller**. Geprüft wird also die echte Hardware, keine Nachbildung am PC.
+Die Tests laufen (zumindest für HAL und DL) **direkt auf dem Controller**. 
 
 ---
 
@@ -41,15 +41,24 @@ test/
 │   └── unity_config.h          Anpassungen für den MSP430
 ├── tstHAL/
 │   ├── testHalGPIO.c           Testfälle für das GPIO-Modul
-│   └── testHalGPIO.h
-├── tstDL/                      noch leer, wird später gefüllt
+│   ├── testHalGPIO.h
+│   ├── testHalCleanUp.c        setzt die Zustände nach jedem Testfall zurück
+│   └── testHalCleanUp.h
+├── tstDL/                      noch leer, wird in späteren Einheiten gefüllt
 ├── testHalGeneral.c            ruft alle HAL-Testmodule auf
 └── testHalGeneral.h
 ```
 
-`testHalGeneral.c` ist das Gegenstück zu `halGeneral.c`: So wie dort pro HAL-Modul ein `halXxxInit()` steht, steht hier pro Testmodul ein `testXxxRun()`.
+`testHalGeneral.c` ist das Gegenstück zu `halGeneral.c`: So wie dort pro HAL-Modul ein `halXxxInit()` aufgerufen wird, steht hier pro Testmodul ein `testXxxRun()`.
 
 ```c
+void setUp(void)    { }
+
+void tearDown(void)
+{
+    testHalCleanupAll();
+}
+
 void halInitTest(void)
 {
     UNITY_BEGIN();
@@ -60,6 +69,8 @@ void halInitTest(void)
 }
 ```
 
+`setUp()` und `tearDown()` ruft Unity selbst auf — vor und nach **jedem einzelnen** Testfall. Deshalb darf es beide im gesamten Projekt nur einmal geben. `tearDown()` setzt über `testHalCleanupAll()` die Zustände zurück, damit jeder Testfall unter denselben Bedingungen startet und nach dem Durchlauf nichts hängen bleibt.
+
 Die Dateien `unity.c`, `unity.h` und `unity_internals.h` stammen von [ThrowTheSwitch/Unity](https://github.com/ThrowTheSwitch/Unity) und werden **nicht verändert**.
 
 ---
@@ -68,7 +79,7 @@ Die Dateien `unity.c`, `unity.h` und `unity_internals.h` stammen von [ThrowTheSw
 
 ### 1. Ordner ins Projekt kopieren
 
-Den bereitgestellten Ordner `test` im Windows Explorer in Ihr Projektverzeichnis kopieren — auf dieselbe Ebene wie `HAL` und `main.c`.
+Aus dem bereitgestellten Verzeichnis `Testing` den darin liegenden Ordner **`test`** in Ihr Projektverzeichnis kopieren — auf dieselbe Ebene wie `HAL` und `main.c`. Nicht den Ordner `Testing` selbst.
 
 Anschließend im *Project Explorer* das Projekt anklicken und **F5** drücken. Der Ordner erscheint im Projektbaum.
 
@@ -115,6 +126,8 @@ Die Voreinstellung eines neuen CCS-Projekts reicht für die Textausgabe nicht au
 
 ### 6. Schalter in `main.c` einbauen
 
+Ergänzen Sie Ihr bestehendes `main.c` um die markierten Zeilen. Der Code aus dieser Einheit bleibt dabei unverändert stehen.
+
 ```c
 #include <msp430.h>
 #include "halGeneral.h"
@@ -138,7 +151,7 @@ void main(void)
 
     while(1)
     {
-        // Normalbetrieb
+        // Ihre Tasterauswertung aus dieser Einheit
     }
 }
 ```
@@ -151,7 +164,7 @@ Die Tests laufen einmal beim Start, danach arbeitet das Programm normal weiter �
 
 1. Projekt bauen und über *Debug* auf den Controller laden.
 2. **Resume** drücken. Das Programm muss tatsächlich laufen — steht es an einem Breakpoint, erscheint keine Ausgabe.
-3. In der **Console**-View über das Symbol *Display Selected Console* auf den Eintrag **`2_LabTwo:CIO`** umschalten (Projektname plus `:CIO`).
+3. In der **Console**-View über das Symbol *Display Selected Console* auf den Eintrag **`<Projektname>:CIO`** umschalten.
 
 > **Hinweis:** Nach jedem Build wechselt CCS automatisch zurück auf die Build-Konsole. Sie müssen also erneut umschalten.
 
@@ -211,9 +224,11 @@ Zwei Punkte sind daran bemerkenswert:
 
 Das Interrupt-Flag wird **per Software** gesetzt. Für den Controller ist das nicht von einem echten Tastendruck zu unterscheiden — die ISR läuft genauso an. Deshalb lässt sich auch Interruptcode automatisiert prüfen, ohne dass jemand eine Taste drückt.
 
-Die Wartschleife bricht nach einer festen Zahl Durchläufe ab. Läuft die ISR nie an, schlägt der Test fehl, statt das Programm einzufrieren.
+Die Warteschleife bricht nach einer festen Zahl Durchläufe ab. Läuft die ISR nie an, schlägt der Test fehl, statt das Programm einzufrieren.
 
 Jeder Testfall folgt demselben Dreischritt: **Ausgangszustand herstellen**, **Ereignis auslösen**, **Ergebnis prüfen**. Und jeder prüft genau eine Aussage — schlägt ein Fall fehl, soll sofort klar sein, was nicht stimmt.
+
+Dass `triggerButton()` die Struktur zurücksetzt **und** `tearDown()` dasselbe nochmal tut, ist Absicht: Der Testfall sorgt für seinen eigenen Ausgangszustand, `tearDown()` dafür, dass nach dem Durchlauf nichts hängen bleibt.
 
 ---
 
@@ -258,6 +273,10 @@ Include-Pfade fehlen, siehe Schritt 2.
 
 Schreibweise der globalen Variablen stimmt zwischen Deklaration und Definition nicht überein. Groß- und Kleinschreibung beachten, und `volatile` muss an beiden Stellen gleich sein.
 
+**Alle Tests schlagen fehl**
+
+Prüfen Sie zuerst, ob die Interrupts überhaupt freigegeben sind: `__enable_interrupt()` muss am Ende von `halInit()` stehen. Ohne gesetztes GIE-Bit läuft keine ISR an, und jeder Testfall wartet vergeblich.
+
 ---
 
 ## [AUFGABE] Testsuite in Betrieb nehmen
@@ -272,4 +291,4 @@ Schreibweise der globalen Variablen stimmt zwischen Deklaration und Definition n
 
 In der nächsten Einheit schreiben Sie eigene Testfälle und ergänzen damit die bereitgestellte Suite.
 
-[⬆ Zurück zur Aufgabenstellung](README.md)
+[⬆ Zurück zur Aufgabenstellung](../README.md)
