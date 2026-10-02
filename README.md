@@ -35,7 +35,7 @@ Die Übung vermittelt praxisnah:
 - Projektstruktur in CCS, Git-Versionierung
 - Memory-Mapped I/O, Pin-Header, GPIO-Konfiguration
 
-### 2. [Rechendauer, Interrupts, ISRs](Einheit_02_GPIO/README.md)
+### 2. [Rechendauer, Interrupts, ISRs](Kapitel_02_GPIO/README.md)
 - Rechendauer: Integer vs. Float
 - Interruptgesteuerte Tasterauswertung, Entprellen
 - Polling vs. Delay: zeitliche Zuverlässigkeit
