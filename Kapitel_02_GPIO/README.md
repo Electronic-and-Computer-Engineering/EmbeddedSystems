@@ -1,0 +1,209 @@
+[⬅ Zurück zur Kapitelübersicht](../README.md#kapitelübersicht--aufgabenstellungen)
+
+# Digitale Ein-/Ausgabe
+
+## Inhalt
+- [Rechendauer-Performance-Test](#rechendauer-performance-test)
+- [Einführung in die Interrupt-Konfiguration (MSP430)](#einführung-in-die-interrupt-konfiguration-msp430)
+- [Schritte zur Konfiguration eines Port-Interrupts](#schritte-zur-konfiguration-eines-port-interrupts)
+- [Beispiel – Konfiguration des Port 1 Interrupts (P1.3)](#beispiel-konfiguration-des-port-1-interrupts-p13)
+- [Erstellung einer ISR für Port1](#erstellung-einer-isr-für-port1)
+- [Aufbau einer Port1-ISR (P1)](#aufbau-einer-port1-isr-p1)
+- [Allgemeine I/O-Interruptsteuerung](#allgemeine-io-interruptsteuerung)
+
+**Laborübung**
+
+- *MSP430x5xx and MSP430x6xx Family User Guide Rev. O* – Texas Instruments
+  - Kapitel 1.3: Interrupts [Family Guide - Interrupts 1.3](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=57)
+  - Kapitel 12: Digital I/O Module - [Family Guide - Digital I/O Ports Chapter 12](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=408)
+
+**Wissensüberprüfung**
+
+- Internet-Recherche: Was ist ein Interrupt in der Mikrocontroller-Technik?
+- Kapitel 12.2.7: Port Interrupts im User Guide [Family Guide - Digital I/O Ports Chapter 12](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/166/MSP430x6-Family-User-Guide.pdf#page=408)
+
+**Video**
+ - [Einführungsvideo - Einheit 2](https://www.youtube.com/watch?v=SLzDcItz5a0&list=PLE5VC62wmcV_2V82u8OShJfm6QY_ELb_5&index=3)
+---
+### Durchzuführende Aufgaben
+- [[AUFGABE] Rechendauer-Performance-Test](#durchzuführende-arbeit--dokumentation-für-die-meilensteinüberprüfung)
+- [[AUFGABE] Recherche Allgemeine Interruptsteuerung](#recherche-durchzuführende-arbeit--dokumentation-für-die-meilensteinüberprüfung)
+- [[AUFGABE] Implementierung Allgemeine Interruptsteuerung](#implementierung-durchzuführende-arbeit--dokumentation-für-die-meilensteinüberprüfung)
+- [[AUFGABE] Debugging Übung](#aufgaben)
+
+## Rechendauer-Performance-Test
+
+Nach Abschluss der I/O-Port-Konfiguration soll die Rechendauer einer Integer- bzw. einer Fließkommaoperation überprüft werden.
+
+### Durchzuführende Arbeit & Dokumentation für die Meilensteinüberprüfung
+
+1. Führen Sie jeweils eine Fließkommazahl- und eine Integer-Berechnung durch.
+2. Schalten Sie vor jeder Berechnung die Display-Hintergrundbeleuchtung ein und danach wieder aus.
+3. Messen und dokumentieren Sie die Rechendauer mithilfe eines Oszilloskops.
+
+---
+<p align="center">
+  <img src="./media/PortOne.png" alt="Include Options">
+</p>
+
+## Einführung in die Interrupt-Konfiguration (MSP430)
+
+Bevor Interrupts verwendet werden können, müssen sie korrekt eingerichtet werden. Beim MSP430 umfasst dies mehrere Schritte:
+
+### Schritte zur Konfiguration eines Port-Interrupts:
+
+1. **Pinrichtung (PxDIR)**: Der Pin muss als Eingang konfiguriert sein (PxDIR = 0).
+2. **Interrupt-Enable-Register (PxIE)**: Aktivieren Sie den Interrupt für den gewünschten Pin (z. B. `P1IE |= BIT3;`).
+3. **Interrupt Edge Select (PxIES)**: Wählen Sie steigende oder fallende Flanke (z. B. `P1IES &= ~BIT3;` für steigende Flanke).
+4. **Interrupt-Flag-Register (PxIFG)**: Das Flag wird durch das Ereignis gesetzt (z. B. `P1IFG & BIT3`). Es muss in der ISR gelöscht werden (`P1IFG &= ~BIT3;`).
+5. **GIE (Global Interrupt Enable)**: Ermöglicht globale Interruptverarbeitung (`__enable_interrupt();`).
+6. **ISR schreiben**: Für jeden Port gibt es eine zugehörige Interrupt-Service-Routine (z. B. `#pragma vector=PORT1_VECTOR`).
+
+### Beispiel: Konfiguration des Port 1 Interrupts (P1.3)
+```c
+P1DIR &= ~BIT3;      // P1.3 als Eingang
+P1REN |= BIT3;       // Pull-Up/Down aktivieren
+P1OUT |= BIT3;       // Pull-Up auswählen
+P1IES &= ~BIT3;      // Steigende Flanke
+P1IFG &= ~BIT3;      // Interrupt-Flag löschen
+P1IE  |= BIT3;       // Interrupt aktivieren
+```
+
+## Erstellung einer ISR für Port1
+
+Damit ein Interrupt korrekt verarbeitet wird, muss eine zugehörige **Interrupt Service Routine (ISR)** definiert werden. Diese Funktion wird automatisch aufgerufen, wenn das entsprechende Interrupt-Ereignis auftritt. Beim MSP430 wird die Zuordnung über den Interrupt-Vektor vorgenommen. Wird keine gültige ISR angegeben, springt der Program Counter an eine undefinierte Adresse – das System stürzt ab (z. B. ISR Fault Routine).
+
+### Aufbau einer Port1-ISR (P1)
+
+Für Port 1 lautet der zugehörige Vektorname `PORT1_VECTOR`. Die ISR wird in C mit einem `#pragma`-Makro deklariert:
+
+```c
+#pragma vector=PORT1_VECTOR
+__interrupt void Port_1(void)
+{
+    // Überprüfen, ob das erwartete Flag gesetzt ist
+    if (P1IFG & BIT3)
+    {
+        // → gewünschte Reaktion (z. B. Flag setzen, Aktion auslösen)
+
+        // Interrupt-Flag löschen
+        P1IFG &= ~BIT3;
+    }
+}
+```
+
+### Erklärung
+
+- `#pragma vector=PORT1_VECTOR`: Gibt dem Compiler an, dass die folgende Funktion die ISR für Port 1 ist.
+- `__interrupt`: Spezifiziert, dass es sich um eine ISR handelt.
+- Innerhalb der ISR muss **immer** das entsprechende Interrupt-Flag gelöscht werden, da sonst die ISR erneut ausgelöst wird.
+
+**Hinweis:** Ohne korrekte Löschung des Flags (`P1IFG`) bleibt das Interrupt-Flag aktiv und der Mikrocontroller führt die ISR beim nächsten freien Zyklus erneut aus – unabhängig von weiteren externen Ereignissen.
+
+### Alternative: Abfrage über das Vektorregister
+
+Ein Portvektor bedient alle acht Pins. Statt die Flags einzeln abzufragen, kann die Quelle auch über `P1IV` bestimmt werden:
+
+```c
+#pragma vector=PORT1_VECTOR
+__interrupt void Port_1(void)
+{
+    switch (P1IV)
+    {
+        case P1IV_P1IFG3:           // P1.3
+            break;
+
+        default:
+            break;
+    }
+}
+```
+`P1IV` liefert nicht die Bitmaske des Pins, sondern eine **Kennzahl** – für P1.3 also `P1IV_P1IFG3`, nicht `BIT3`. Beim Lesen wird das Flag automatisch gelöscht, allerdings nur das mit der höchsten Priorität. Das Register darf deshalb **nur einmal** gelesen werden; ein zwischengespeicherter Wert kostet Ereignisse.
+
+Dasselbe Muster findet sich bei `TA0IV`, `ADC12IV`, `DMAIV` und `UCB0IV` wieder.
+
+**Zur Diskussion:** Zwei Pins lösen gleichzeitig aus. Welche der beiden Varianten behandelt beide Ereignisse, welche nur eines?
+
+## Allgemeine I/O-Interruptsteuerung
+
+Das Programm soll das Drücken der Start- bzw. Stopptaste per Interrupt erkennen, nicht per Polling.
+
+### [Recherche] Durchzuführende Arbeit & Dokumentation für die Meilensteinüberprüfung
+
+1. Erweitern Sie Ihre I/O-Port-Konfiguration, sodass Interrupts für Start- und Stopptaste aktiviert sind.
+2. Stellen Sie die Flankenerkennung für die jeweiligen Pins ein.
+3. Was ist Kontaktprellen und wie kann es schaltungs- oder softwaretechnisch verhindert werden?
+4. Inwieweit beeinflusst ein Interrupt den zeitlichen Ablauf des Programms?
+5. Was versteht man unter *Interrupt Nesting*?
+---
+
+## Interrupts
+
+Wenn ein Interrupt ausgelöst wird, springt das Programm zur zugehörigen Interrupt Service Routine (ISR), deren Adresse im Interrupt-Vektor-Register gespeichert ist. Fehlt die ISR an dieser Stelle, sucht der Program Counter (PC) eine ungültige Adresse auf → Systemabsturz (z. B. ISR Fault Routine).
+
+### [Implementierung] Durchzuführende Arbeit & Dokumentation für die Meilensteinüberprüfung
+
+1. Schreiben Sie eine ISR für den Port-Vektor. Die korrekte ISR-Syntax entnehmen Sie bitte der vorbereiteten [ISR-Liste](../ISR_VectorList.md).
+2. Aktivieren Sie das GIE-Bit am Ende der übergeordneten `halInit`-Funktion mit:
+   ```c
+   __enable_interrupt();
+   ```
+3. Welche Funktion hat das GIE-Bit?
+4. Definieren Sie in `halGpio.h` eine Datenstruktur:
+   ```c
+   typedef struct {
+       unsigned char active; // TRUE = 1 / FALSE = 0
+       unsigned char button; // Button number
+   } ButtonCom;
+   ```
+5. Deklarieren Sie eine globale Variable `CCButton` vom Typ `ButtonCom` in `halGeneral.c`.
+   Beachten Sie das Schlüsselwort `volatile` – die Variable wird in der ISR beschrieben und
+   in der Hauptschleife gelesen. Ohne `volatile` darf der Compiler die Abfrage wegoptimieren.
+
+   ```c
+      volatile ButtonCom CCButton;
+   ```
+6. Deklarieren sie diese Variable vom Typ ButtonCom  in `main.c` und `halGpio.c` als `extern`, (als externe globale Variable).
+7. Bestimmen Sie in der ISR, welche Taste gedrückt wurde. Verwenden Sie dafür eine
+   der beiden oben gezeigten Varianten (`P1IFG` oder `P1IV`).
+8. Setzen Sie in der ISR das `active`-Flag und die `button`-Nummer.
+9. In der Endlosschleife von `main()` soll überprüft werden:
+   - Wenn Starttaste gedrückt: Hintergrundbeleuchtung einschalten
+   - Wenn Stopptaste gedrückt: Hintergrundbeleuchtung ausschalten
+10. Welche Interrupt-Priorität besitzt der verwendete Port?
+---
+
+## Debugging-Übung
+
+Debugging ist von entscheidender Bedeutung, um Fehler in der Software zu finden und zu beheben. Es stellt sicher, dass Anwendungen reibungslos laufen und die gewünschte Funktionalität bieten. Durch das Setzen von Breakpoints und das Überwachen von Variablenwerten werden potenzielle Probleme frühzeitig erkannt und behoben.
+
+### Aufgaben:
+
+1. Setzen Sie Breakpoints an folgenden Stellen:
+   - `main.c`: Nach der Abfrage `CCbutton.active`
+     - Beobachten Sie den Wert von `CCbutton.button`. Kann der Entscheidungsfluss im Debugger beeinflusst werden?
+   - `halGpio.c`: Vor der `switch`-Anweisung in der ISR
+     - Beobachten Sie das Register `P1IFG`. Wurde das korrekte Interrupt-Flag gesetzt?
+   - `halGeneral.c`: In der Funktion `halInit()`, vor und nach `halGPIOInit()`
+
+2. Registeransicht öffnen
+   - Überprüfen Sie live im Debugger die Register von `P1` und `P2`, speziell `P1IFG`.
+   - Hinweis: Einige Register können im laufenden Betrieb nicht angezeigt oder verändert werden.
+
+3. Expression-Watch nutzen:
+   - Fügen Sie z. B. `CCbutton.active` zur Watch-Liste hinzu (Rechtsklick → "Add to Watch Expression").
+   - Ändern Sie den Wert direkt und beobachten Sie die Auswirkung auf das Programm.
+
+4. Bedingte Breakpoints:
+   - In `halGpio.c`: Rechtsklick auf Breakpoint → "Breakpoint Properties"
+   - Unter "Condition" eine Bedingung eingeben (z. B. `CCbutton.button == 1`), um nur bei gedrückter Starttaste zu stoppen.
+
+## Referenzen
+
+- **MSP430x5xx and MSP430x6xx Family User Guide**, Texas Instruments, Literature Number: SLAU208O, Rev. O, April 2019.  
+  Verfügbar unter: [https://www.ti.com/lit/pdf/slau208](https://www.ti.com/lit/pdf/slau208)
+
+- **MSP430F5335 Datasheet**, Texas Instruments, Document Number: SLAS590N, Rev. N, October 2018.  
+  Verfügbar unter: [https://www.ti.com/lit/gpn/msp430f5335](https://www.ti.com/lit/gpn/msp430f5335)
+
+[⬆ Zurück zum Hauptverzeichnis](../README.md#kapitelübersicht--aufgabenstellungen)
