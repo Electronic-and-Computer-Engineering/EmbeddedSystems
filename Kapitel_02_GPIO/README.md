@@ -10,6 +10,8 @@
 - [Erstellung einer ISR für Port1](#erstellung-einer-isr-für-port1)
 - [Aufbau einer Port1-ISR (P1)](#aufbau-einer-port1-isr-p1)
 - [Allgemeine I/O-Interruptsteuerung](#allgemeine-io-interruptsteuerung)
+- [Debugging](#debugging-übung)
+- [Unity-Tests](#testing)
 
 **Laborübung**
 
@@ -149,7 +151,7 @@ Wenn ein Interrupt ausgelöst wird, springt das Programm zur zugehörigen Interr
    __enable_interrupt();
    ```
 3. Welche Funktion hat das GIE-Bit?
-4. Definieren Sie in `halGpio.h` eine Datenstruktur:
+4. Definieren Sie in `halGPIO.h` eine Datenstruktur:
    ```c
    typedef struct {
        unsigned char active; // TRUE = 1 / FALSE = 0
@@ -163,7 +165,7 @@ Wenn ein Interrupt ausgelöst wird, springt das Programm zur zugehörigen Interr
    ```c
       volatile ButtonCom CCButton;
    ```
-6. Deklarieren sie diese Variable vom Typ ButtonCom  in `main.c` und `halGpio.c` als `extern`, (als externe globale Variable).
+6. Deklarieren sie diese Variable vom Typ ButtonCom  in `main.c` und `halGPIO.c` als `extern`, (als externe globale Variable -- `volatile` nicht vergessen).
 7. Bestimmen Sie in der ISR, welche Taste gedrückt wurde. Verwenden Sie dafür eine
    der beiden oben gezeigten Varianten (`P1IFG` oder `P1IV`).
 8. Setzen Sie in der ISR das `active`-Flag und die `button`-Nummer.
@@ -171,6 +173,7 @@ Wenn ein Interrupt ausgelöst wird, springt das Programm zur zugehörigen Interr
    - Wenn Starttaste gedrückt: Hintergrundbeleuchtung einschalten
    - Wenn Stopptaste gedrückt: Hintergrundbeleuchtung ausschalten
 10. Welche Interrupt-Priorität besitzt der verwendete Port?
+11. **Diskussion** Wie kann man Tasten entprellen? 
 ---
 
 ## Debugging-Übung
@@ -182,7 +185,7 @@ Debugging ist von entscheidender Bedeutung, um Fehler in der Software zu finden 
 1. Setzen Sie Breakpoints an folgenden Stellen:
    - `main.c`: Nach der Abfrage `CCButton.active`
      - Beobachten Sie den Wert von `CCButton.button`. Kann der Entscheidungsfluss im Debugger beeinflusst werden?
-   - `halGpio.c`: Vor der `switch`-Anweisung in der ISR
+   - `halGPIO.c`: Vor der `switch`-Anweisung in der ISR
      - Beobachten Sie das Register `P1IFG`. Wurde das korrekte Interrupt-Flag gesetzt?
    - `halGeneral.c`: In der Funktion `halInit()`, vor und nach `halGPIOInit()`
 
@@ -195,7 +198,7 @@ Debugging ist von entscheidender Bedeutung, um Fehler in der Software zu finden 
    - Ändern Sie den Wert direkt und beobachten Sie die Auswirkung auf das Programm.
 
 4. Bedingte Breakpoints:
-   - In `halGpio.c`: Rechtsklick auf Breakpoint → "Breakpoint Properties"
+   - In `halGPIO.c`: Rechtsklick auf Breakpoint → "Breakpoint Properties"
    - Unter "Condition" eine Bedingung eingeben (z. B. `CCButton.button == 1`), um nur bei gedrückter Starttaste zu stoppen.
 
 ## Testing
@@ -204,6 +207,8 @@ Ab dieser Einheit wird die Funktionalität zusätzlich automatisiert geprüft. D
 wird vollständig bereitgestellt, die Einrichtung ist in einer eigenen Anleitung beschrieben:
 
 ➡ **[Testing – Ersteinrichtung](Testing/Testing.md)**
+
+**Die im Beispiel bereits eingearbeiteten Tests dienen als Vorschläge.**
 
 ## Referenzen
 
