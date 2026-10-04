@@ -52,13 +52,14 @@ Die Übung vermittelt praxisnah:
 <details>
 <summary><strong>4–5: PWM, Aktorik und Schnittstellen</strong></summary>
 
-### 4. [TimerA und PWM](Einheit_04_TimerA_PWM/README.md)
+### 4. [TimerA und PWM](Kapitel_04_PWM_Aktorik/README.md)
 - PWM mit TimerA1, Ansteuerung von Servo & ESC
 - Driver Layer für Lenkung und Beschleunigung
 - Drehzahl, Geschwindigkeit und Weg über TimerA
 - MockHAL für DL-Tests
 
-### 5. [Schnittstellen: SPI, UART, I2C](Einheit_05_Schnittstellen/README.md)
+### 5. [Schnittstellen: SPI, UART, I2C](misc/cUSoon.md)
+**Markdown Soon available**
 - SPI über USCI_B1 selbst konfigurieren, interruptgesteuerte Übertragung
 - UART und I2C als vorgegebene Module einbinden und erweitern
 - Alle drei Schnittstellen am Logic-Analyzer messen und dekodieren
@@ -68,13 +69,15 @@ Die Übung vermittelt praxisnah:
 <details>
 <summary><strong>6–7: Sensorik, Datenerfassung, Display</strong></summary>
 
-### 6. [Abstandssensoren, ADC und DMA](Einheit_06_Sensorik_ADC_DMA/README.md)
+### 6. [Abstandssensoren, ADC und DMA](misc/cUSoon.md)
+**Markdown Soon available**
 - ToF-Sensoren und API angeleitet einbinden, Adressvergabe über XSHUT
 - ADC12_A aufsetzen, timergesteuerte Abtastung, Batteriespannung
 - Erfassung auf DMA umstellen, DL-Tests müssen unverändert bestehen
 - Verifikation ausschließlich im Debugger
 
-### 7. [Display und Kommunikation](Einheit_07_Display_Kommunikation/README.md)
+### 7. [Display und Kommunikation](misc/cUSoon.md)
+**Markdown Soon available**
 - Displayinitialisierung (ST7565), Zeichenausgabe, Zeichentabelle
 - Rahmenformat und Serviceroutinen der Kommunikation vervollständigen
 - Sensorwerte am Display und am PC sichtbar machen
@@ -85,13 +88,15 @@ Die Übung vermittelt praxisnah:
 <details>
 <summary><strong>8–9: FreeRTOS und Fahralgorithmus</strong></summary>
 
-### 8. [FreeRTOS und Scheduling](Einheit_08_FreeRTOS/README.md)
+### 8. [FreeRTOS und Scheduling](misc/cUSoon.md)
+**Markdown Soon available**
 - Gesamte bisherige Testsuite fertigstellen
 - FreeRTOS einbinden, Task-Pipeline Fetch → Process → Decide
 - Task-Timing und Latenz über die Telemetrie verifizieren
 - Neue Testkategorie: Ablauf- und Scheduling-Tests
 
-### 9. [Fahralgorithmus](Einheit_09_Fahralgorithmus/README.md)
+### 9. [Fahralgorithmus](misc/cUSoon.md)
+**Markdown Soon available**
 - Zustandsautomat: Links / Mitte / Rechts
 - Regler für Lenkung und Geschwindigkeit
 - Host-Tests mit bereitgestelltem Mocking, Verifikation im CrazyCar-Simulator
