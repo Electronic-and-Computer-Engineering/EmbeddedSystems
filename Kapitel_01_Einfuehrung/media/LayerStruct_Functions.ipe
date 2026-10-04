@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<!DOCTYPE ipe SYSTEM "ipe.dtd">
+<ipe version="70218" creator="Ipe 7.2.26">
+<info created="D:20261004120000" modified="D:20261004100016"/>
+<ipestyle name="minimal">
+<symbol name="arrow/arc(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/farc(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<anglesize name="normal" value="45"/>
+<arrowsize name="large" value="10"/>
+<arrowsize name="normal" value="7"/>
+<arrowsize name="small" value="5"/>
+<color name="arrowfill" value="0.573 0.804 0.863"/>
+<color name="arrowline" value="0.361 0.592 0.651"/>
+<color name="black" value="0"/>
+<color name="darkgray" value="0.3"/>
+<color name="gray" value="0.5"/>
+<color name="hwgray" value="0.35"/>
+<color name="lightgray" value="0.827"/>
+<color name="teal" value="0.294 0.675 0.776"/>
+<color name="white" value="1"/>
+<dashstyle name="dashed" value="[4] 0"/>
+<dashstyle name="dotted" value="[1 3] 0"/>
+<gridsize name="10 pts" value="10"/>
+<gridsize name="4 pts" value="4"/>
+<opacity name="50%" value="0.5"/>
+<opacity name="opaque" value="1"/>
+<pen name="fat" value="1.2"/>
+<pen name="heavier" value="0.8"/>
+<pen name="normal" value="0.4"/>
+<pen name="thin" value="0.2"/>
+<symbolsize name="normal" value="3"/>
+<symbolsize name="small" value="2"/>
+<textsize name="Large" value="\Large"/>
+<textsize name="footnote" value="\footnotesize"/>
+<textsize name="large" value="\large"/>
+<textsize name="normal" value="\normalsize"/>
+<textsize name="small" value="\small"/>
+<textstyle name="normal" begin="" end=""/>
+<layout paper="595 842" origin="0 0" frame="535 782"/>
+<titlestyle pos="0 0" size="normal" color="black"  valign="baseline"/>
+</ipestyle>
+<page>
+<layer name="alpha"/>
+<view layers="alpha" active="alpha"/>
+<path layer="alpha" stroke="0" fill="0.776 0.894 0.925" pen="fat">
+40 700 m
+520 700 l
+520 740 l
+40 740 l
+h
+</path>
+<path matrix="0.666667 0 0 0.666667 28 237.333" stroke="0" fill="white" pen="heavier">
+75 700 m
+105 700 l
+105 658 l
+120 658 l
+90 630 l
+60 658 l
+75 658 l
+h
+</path>
+<path matrix="0.65745 0 0 0.699723 162.986 215.379" stroke="0" fill="1" pen="heavier">
+455 630 m
+485 630 l
+485 672 l
+500 672 l
+470 700 l
+440 672 l
+455 672 l
+h
+</path>
+<text pos="280 720" stroke="black" type="label" width="126.401" height="9.962" depth="2.79" halign="center" valign="center" size="Large">\textbf{Application Layer}</text>
+<text matrix="1 0 0 1 0 12" pos="280 665" stroke="black" type="label" width="162.323" height="10.756" depth="3.59" halign="center" valign="center" size="Large">void driverSetThrottle(50)</text>
+<path matrix="1 0 0 1 0 -84" stroke="0" fill="0.776 0.894 0.925" pen="fat">
+40 700 m
+520 700 l
+520 740 l
+40 740 l
+h
+</path>
+<path matrix="0.666667 0 0 0.666667 28 153.333" stroke="0" fill="white" pen="heavier">
+75 700 m
+105 700 l
+105 658 l
+120 658 l
+90 630 l
+60 658 l
+75 658 l
+h
+</path>
+<path matrix="0.659712 0 0 0.702189 162.584 129.653" stroke="0" fill="1" pen="heavier">
+455 630 m
+485 630 l
+485 672 l
+500 672 l
+470 700 l
+440 672 l
+455 672 l
+h
+</path>
+<text matrix="1 0 0 1 0 -84" pos="280 720" stroke="black" type="label" width="89.971" height="9.962" depth="2.79" halign="center" valign="center" size="Large">\textbf{Driver Layer}</text>
+<path matrix="1 0 0 1 0 -168" stroke="0" fill="0.776 0.894 0.925" pen="fat">
+40 700 m
+520 700 l
+520 740 l
+40 740 l
+h
+</path>
+<path matrix="0.666667 0 0 0.666667 28 69.333" stroke="0" fill="white" pen="heavier">
+75 700 m
+105 700 l
+105 658 l
+120 658 l
+90 630 l
+60 658 l
+75 658 l
+h
+</path>
+<path matrix="0.656152 0 0 0.676769 164.151 62.2619" stroke="0" fill="1" pen="heavier">
+455 630 m
+485 630 l
+485 672 l
+500 672 l
+470 700 l
+440 672 l
+455 672 l
+h
+</path>
+<text matrix="1 0 0 1 0 -168" pos="280 720" stroke="black" type="label" width="202.115" height="9.962" depth="2.79" halign="center" valign="center" size="Large">\textbf{Hardware Abstraction Layer}</text>
+<text matrix="1 0 0 1 4 -156" pos="280 665" stroke="black" type="label" width="323.34" height="10.756" depth="3.59" halign="center" valign="center" size="Large">Schreibe Wert auf Register (zB.) TA1CCRx = 3467
+</text>
+<path matrix="1 0 0 1 0 -252" stroke="0" fill="0.875" pen="fat">
+40 700 m
+520 700 l
+520 740 l
+40 740 l
+h
+</path>
+<text matrix="1 0 0 1 0 -252" pos="280 720" stroke="black" type="label" width="108.283" height="9.961" depth="2.79" halign="center" valign="center" size="Large">\textbf{Hardware -- µC}</text>
+<text matrix="1 0 0 1 0 -72" pos="280 665" stroke="black" type="label" width="196.848" height="10.756" depth="3.59" halign="center" valign="center" size="Large">halTimerA1SetThrottle(valReg)</text>
+</page>
+</ipe>

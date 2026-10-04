@@ -51,7 +51,7 @@ Jede Schicht kommuniziert ausschließlich mit der direkt darunterliegenden Schic
 - Abstraktion: Die Anwendung (AL) ist unabhängig von Hardwaredetails
 - Testbarkeit: Funktionen können schichtweise getestet werden
 <p align="center">
-  <img src="./media/LayerStruct.png" alt="Include Options">
+  <img src="./media/LayerStruct.svg" alt="Include Options">
 </p>
 
 ### HAL – Hardware Abstraction Layer (Registerebene)

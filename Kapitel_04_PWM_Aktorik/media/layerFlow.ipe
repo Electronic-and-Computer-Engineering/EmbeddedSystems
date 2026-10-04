@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<!DOCTYPE ipe SYSTEM "ipe.dtd">
+<ipe version="70218" creator="Ipe 7.2.26">
+<info created="D:20261004120000" modified="D:20261004095258"/>
+<ipestyle name="minimal">
+<symbol name="arrow/arc(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/farc(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/ptarc(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-0.8 0 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<anglesize name="normal" value="45"/>
+<arrowsize name="large" value="10"/>
+<arrowsize name="normal" value="7"/>
+<arrowsize name="small" value="5"/>
+<arrowsize name="tiny" value="3"/>
+<color name="black" value="0"/>
+<color name="darkgray" value="0.3"/>
+<color name="gray" value="0.5"/>
+<color name="lightgray" value="0.827"/>
+<color name="white" value="1"/>
+<dashstyle name="dashed" value="[4] 0"/>
+<dashstyle name="dotted" value="[1 3] 0"/>
+<gridsize name="4 pts" value="4"/>
+<gridsize name="8 pts" value="8"/>
+<opacity name="50%" value="0.5"/>
+<opacity name="opaque" value="1"/>
+<pen name="fat" value="1.2"/>
+<pen name="heavier" value="0.8"/>
+<pen name="normal" value="0.4"/>
+<pen name="thin" value="0.2"/>
+<symbolsize name="large" value="5"/>
+<symbolsize name="normal" value="3"/>
+<symbolsize name="small" value="2"/>
+<symbolsize name="tiny" value="1.1"/>
+<textsize name="Large" value="\Large"/>
+<textsize name="footnote" value="\footnotesize"/>
+<textsize name="large" value="\large"/>
+<textsize name="normal" value="\normalsize"/>
+<textsize name="small" value="\small"/>
+<textsize name="tiny" value="\tiny"/>
+<textstyle name="normal" begin="" end=""/>
+<layout paper="595 842" origin="0 0" frame="535 782"/>
+<titlestyle pos="0 0" size="normal" color="black"  valign="baseline"/>
+</ipestyle>
+<page>
+<layer name="alpha"/>
+<view layers="alpha" active="alpha"/>
+<text layer="alpha" matrix="1 0 0 1 16 0" pos="140 700" stroke="black" type="label" width="19.307" height="9.803" depth="0" halign="right" valign="center" size="Large">AL</text>
+<text matrix="1 0 0 1 16 32" pos="140 580" stroke="black" type="label" width="19.505" height="9.803" depth="0" halign="right" valign="center" size="Large">DL</text>
+<text matrix="1 0 0 1 20 64" pos="140 460" stroke="black" type="label" width="29.838" height="9.803" depth="0" halign="right" valign="center" size="Large">HAL</text>
+<text matrix="1 0 0 1 20 100" pos="140 340" stroke="black" type="label" width="24.963" height="9.803" depth="0" halign="right" valign="center" size="Large">HW</text>
+<path stroke="black" fill="white" pen="heavier">
+170 672 m
+330 672 l
+330 728 l
+170 728 l
+h
+</path>
+<path matrix="1 0 0 1 0 32" stroke="black" fill="0.796 0.886 0.929" pen="heavier">
+170 552 m
+330 552 l
+330 608 l
+170 608 l
+h
+</path>
+<path matrix="1 0 0 1 0 64" stroke="black" fill="0.796 0.886 0.929" pen="heavier">
+170 432 m
+330 432 l
+330 488 l
+170 488 l
+h
+</path>
+<path matrix="1 0 0 1 0 96" stroke="black" fill="lightgray" pen="heavier">
+170 312 m
+330 312 l
+330 368 l
+170 368 l
+h
+</path>
+<path stroke="black" fill="white" pen="heavier">
+350 672 m
+510 672 l
+510 728 l
+350 728 l
+h
+</path>
+<path matrix="1 0 0 1 0 32" stroke="black" fill="0.796 0.886 0.929" pen="heavier">
+350 552 m
+510 552 l
+510 608 l
+350 608 l
+h
+</path>
+<path matrix="1 0 0 1 0 64" stroke="black" fill="0.796 0.886 0.929" pen="heavier">
+350 432 m
+510 432 l
+510 488 l
+350 488 l
+h
+</path>
+<path matrix="1 0 0 1 0 96" stroke="black" fill="lightgray" pen="heavier">
+350 312 m
+510 312 l
+510 368 l
+350 368 l
+h
+</path>
+<text pos="250 700" stroke="black" type="label" width="136.184" height="8.308" depth="0.99" halign="center" valign="center" size="large">Lenkwinkel $-100 \ldots +100$</text>
+<text matrix="1 0 0 1 0 32" pos="250 589" stroke="black" type="label" width="116.887" height="8.299" depth="2.66" halign="center" valign="center" size="large">\texttt{driverSetSteering()}</text>
+<text matrix="1 0 0 1 0 32" pos="250 571" stroke="black" type="label" width="127.522" height="6.926" depth="1.93" halign="center" valign="center">Winkel $\to$ Ticks, Begrenzung</text>
+<text matrix="1 0 0 1 0 64" pos="250 469" stroke="black" type="label" width="141.494" height="8.299" depth="2.66" halign="center" valign="center" size="large">\texttt{halTimerA1SetSteering()}</text>
+<text matrix="1 0 0 1 0 64" pos="250 451" stroke="black" type="label" width="76.518" height="6.918" depth="0" halign="center" valign="center">Ticks $\to$ \texttt{TA1CCR2}</text>
+<text matrix="1 0 0 1 0 96" pos="250 340" stroke="black" type="label" width="61.532" height="9.963" depth="0" halign="center" valign="center" size="Large">Lenkservo</text>
+<text pos="430 700" stroke="black" type="label" width="130.277" height="8.965" depth="2.99" halign="center" valign="center" size="large">Geschwindigkeit in mm/s</text>
+<text matrix="1 0 0 1 0 32" pos="430 589" stroke="black" type="label" width="98.431" height="8.299" depth="2.66" halign="center" valign="center" size="large">\texttt{driverGetSpeed()}</text>
+<text matrix="1 0 0 1 0 32" pos="430 571" stroke="black" type="label" width="76.851" height="7.473" depth="2.49" halign="center" valign="center">Flanken $\to$ mm/s</text>
+<text matrix="1 0 0 1 0 64" pos="430 469" stroke="black" type="label" width="123.039" height="8.308" depth="0.99" halign="center" valign="center" size="large">\texttt{halTimerA0GetTicks()}</text>
+<text matrix="1 0 0 1 0 64" pos="430 451" stroke="black" type="label" width="118.196" height="6.926" depth="1.93" halign="center" valign="center">Capture-ISR zählt Flanken</text>
+<text matrix="1 0 0 1 0 96" pos="430 340" stroke="black" type="label" width="88.377" height="9.962" depth="2.79" halign="center" valign="center" size="Large">Drehzahlgeber</text>
+<path matrix="1 0 0 0.5 0 336" stroke="black" pen="heavier" arrow="normal/normal">
+250 672 m
+250 608 l
+</path>
+<path matrix="1 0 0 0.5 0 336" stroke="black" pen="heavier" arrow="normal/normal">
+430 608 m
+430 672 l
+</path>
+<text matrix="1 0 0 1 0 16" pos="258 640" stroke="darkgray" type="label" width="63.097" height="6.421" depth="0.83" valign="center" style="math">-100 \ldots +100</text>
+<text matrix="1 0 0 1 0 48" pos="258 520" stroke="darkgray" type="label" width="23.302" height="6.918" depth="0" valign="center">Ticks</text>
+<text matrix="1 0 0 1 0 48" pos="438 520" stroke="darkgray" type="label" width="52.442" height="6.918" depth="0" valign="center">Flankenzahl</text>
+<text matrix="1 0 0 1 0 16" pos="438 640" stroke="darkgray" type="label" width="25.515" height="7.473" depth="2.49" valign="center">mm/s</text>
+<path matrix="1 0 0 0.5 0 248" stroke="black" pen="heavier" arrow="normal/normal">
+250 672 m
+250 608 l
+</path>
+<path matrix="1 0 0 0.5 0 248" stroke="black" pen="heavier" arrow="normal/normal">
+430 608 m
+430 672 l
+</path>
+<path matrix="1 0 0 0.5 0 160" stroke="black" pen="heavier" arrow="normal/normal">
+250 672 m
+250 608 l
+</path>
+<path matrix="1 0 0 0.5 0 160" stroke="black" pen="heavier" arrow="normal/normal">
+430 608 m
+430 672 l
+</path>
+</page>
+</ipe>
