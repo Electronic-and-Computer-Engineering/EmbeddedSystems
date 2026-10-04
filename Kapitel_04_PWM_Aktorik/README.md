@@ -9,6 +9,7 @@
   - [Timer A1, PWM-Erzeugung](#timer-a1-pwm-erzeugung)
   - [Driver Layer, Aktorik](#driver-layer-aktorik)
   - [Drehzahlmessung](#drehzahlmessung)
+  - [Tipps](#tipps)
 
 **Laborübung**
 
@@ -177,7 +178,7 @@ Für die Abstraktion der Hardwarezugriffe wird ein Driver Layer (DL) eingeführt
    - Als Übergabeparameter soll ein Wertebereich gewählt werden, der einfacher verwendbar, lesbar und unabhängig von den daraus resultierenden Registerwerten ist.
    - Die Funktion soll den Eingabewert auf die PWM-Registerwerte umrechnen, auf die Endanschläge begrenzen und setzen
 
-5. Programmieren Sie `driverSteeringInit()` → Setzt das Servo auf Mittelstellung. (Es darf aber auch `driverSetSteering(0)` logischerweise verwendet werden) Diese wird innerhalb von `driverInit()` aufgerufen.
+5. Setzen Sie das Servo in `driverInit()` auf Mittelstellung – `driverSetSteering(0)`.
 
 <p align="center">
   <img src="./media/escPWM.png" alt="Include Options">
@@ -187,10 +188,12 @@ Für die Abstraktion der Hardwarezugriffe wird ein Driver Layer (DL) eingeführt
    - Umrechnung wie bei `driverSetSteering`
    - PWM-Registerwerte innerhalb spezifizierter Pulsbreiten setzen
 
-7. Programmieren Sie `driverESCinit()`
-   - Initialisierung nach Setup-Vorgabe aus der Präsentation
-   - Wartezeiten via CCR0-Interrupt ermitteln (gewünschte Lösung) oder `delayMsBlocked()` (CPU-belastende Alternative)
-   - Aufruf in `driverInit()`, erst wenn die Lenkung nachweislich funktioniert und das Fahrzeug aufgebockt ist
+7. `driverESCinit()` und die Hilfsfunktion `createPulses()` sind im Kapitelordner in `driverAktorik.c/.h` **vorgegeben** und werden unverändert übernommen. Die Sequenz und die Pulsbreiten wurden am Fahrzeug ermittelt.
+
+   `createPulses()` wartet nicht auf eine Zeit, sondern auf eine Anzahl **PWM-Perioden**. Dafür zählt die CCR0-ISR aus `halTimerA1.c` mit, zugänglich über `halTimerA1ResetPeriodCnt()` und `halTimerA1GetPeriodCnt()`.
+
+   - Rufen Sie `driverESCinit()` in `driverInit()` auf – erst wenn die Lenkung nachweislich funktioniert und das Fahrzeug aufgebockt ist.
+   - Beachten Sie: Der Periodenzähler liegt in der HAL und wird über die beiden Funktionen gelesen, nicht über die Variable selbst.
 
 8. [Meilensteinüberprüfung] Warum greift `driverSetSteering()` nicht direkt auf das PWM-Register zu, obwohl das kürzer wäre?
 
@@ -233,6 +236,12 @@ Statt einzelne Flankenabstände auszuwerten, wird gezählt, **wie viele Flanken 
 5. Verifikation: Drehen Sie ein Rad von Hand eine definierte Anzahl Umdrehungen und vergleichen Sie den berechneten Weg mit dem Radumfang.
 
 6. [Meilensteinüberprüfung] Warum wird über ein Zeitfenster gezählt und nicht der Abstand zweier Flanken gemessen? Was passiert bei sehr niedriger Drehzahl?
+
+## Testing
+
+In dieser Einheit wird zum ersten Mal der Driver Layer geprüft:
+
+➡ **[Testing – Driver Layer](Testing/Testing.md)**
 
 ## Referenzen
 
