@@ -58,8 +58,8 @@ Die Übung vermittelt praxisnah:
 - Drehzahl, Geschwindigkeit und Weg über TimerA
 - MockHAL für DL-Tests
 
-### 5. [Schnittstellen: SPI, UART, I2C](misc/cUSoon.md)
-**Markdown Soon available**
+### 5. [Schnittstellen: SPI, UART, I2C](Kapitel_05_Schnittstellen/README.md)
+
 - SPI über USCI_B1 selbst konfigurieren, interruptgesteuerte Übertragung
 - UART und I2C als vorgegebene Module einbinden und erweitern
 - Alle drei Schnittstellen am Logic-Analyzer messen und dekodieren

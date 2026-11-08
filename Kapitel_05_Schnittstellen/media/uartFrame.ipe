@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<!DOCTYPE ipe SYSTEM "ipe.dtd">
+<ipe version="70218" creator="Ipe 7.2.29">
+<info created="D:20261107070000" modified="D:20261107143340"/>
+<ipestyle name="minimal">
+<symbol name="arrow/arc(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<anglesize name="normal" value="45"/>
+<arrowsize name="large" value="10"/>
+<arrowsize name="normal" value="7"/>
+<arrowsize name="small" value="5"/>
+<color name="accent" value="0.294 0.675 0.776"/>
+<color name="black" value="0"/>
+<color name="darkgray" value="0.3"/>
+<color name="gray" value="0.5"/>
+<color name="idle" value="0.94"/>
+<color name="lightgray" value="0.827"/>
+<color name="sigfill" value="0.875 0.929 0.992"/>
+<color name="white" value="1"/>
+<dashstyle name="dashed" value="[4] 0"/>
+<dashstyle name="dotted" value="[1 3] 0"/>
+<gridsize name="10 pts" value="10"/>
+<gridsize name="4 pts" value="4"/>
+<opacity name="50%" value="0.5"/>
+<opacity name="opaque" value="1"/>
+<pen name="fat" value="1.2"/>
+<pen name="heavier" value="0.8"/>
+<pen name="normal" value="0.4"/>
+<pen name="thin" value="0.2"/>
+<symbolsize name="normal" value="3"/>
+<symbolsize name="small" value="2"/>
+<textsize name="Large" value="\Large"/>
+<textsize name="footnote" value="\footnotesize"/>
+<textsize name="large" value="\large"/>
+<textsize name="normal" value="\normalsize"/>
+<textsize name="small" value="\small"/>
+<textsize name="tiny" value="\tiny"/>
+<textstyle name="normal" begin="" end=""/>
+<layout paper="595 842" origin="0 0" frame="535 782"/>
+<titlestyle pos="0 0" size="normal" color="black"  valign="baseline"/>
+</ipestyle>
+<page>
+<layer name="alpha"/>
+<view layers="alpha" active="alpha"/>
+<path layer="alpha" stroke="sigfill" fill="sigfill" pen="thin">
+96 636 m
+456 636 l
+456 726 l
+96 726 l
+h
+</path>
+<path stroke="black" pen="fat">
+60 700 m
+96 700 l
+96 700 l
+96 650 l
+132 650 l
+132 650 l
+132 700 l
+168 700 l
+168 700 l
+168 650 l
+204 650 l
+204 650 l
+240 650 l
+240 650 l
+276 650 l
+276 650 l
+312 650 l
+312 650 l
+348 650 l
+348 650 l
+348 700 l
+384 700 l
+384 700 l
+384 650 l
+420 650 l
+420 650 l
+420 700 l
+456 700 l
+456 700 l
+492 700 l
+</path>
+<text matrix="1 0 0 1 0 8" pos="78 620" stroke="black" type="label" width="19.181" height="8.302" depth="0" halign="center" valign="center" size="large">Idle</text>
+<path stroke="lightgray" dash="dotted" pen="thin">
+96 636 m
+96 710 l
+</path>
+<text matrix="1 0 0 1 0 8" pos="114 620" stroke="black" type="label" width="26.013" height="8.169" depth="0" halign="center" valign="center" size="large">Start</text>
+<text matrix="1 0 0 1 0 8" pos="114 600" stroke="black" type="label" width="5.853" height="7.704" depth="0" halign="center" valign="center" size="large">0</text>
+<path stroke="lightgray" dash="dotted" pen="thin">
+132 636 m
+132 710 l
+</path>
+<text matrix="1 0 0 1 0 8" pos="150 620" stroke="black" type="label" width="14.793" height="8.169" depth="0" halign="center" valign="center" size="large">D0</text>
+<text matrix="1 0 0 1 0 8" pos="150 600" stroke="black" type="label" width="5.853" height="7.704" depth="0" halign="center" valign="center" size="large">1</text>
+<path stroke="lightgray" dash="dotted" pen="thin">
+168 636 m
+168 710 l
+</path>
+<text matrix="1 0 0 1 0 8" pos="186 620" stroke="black" type="label" width="14.793" height="8.169" depth="0" halign="center" valign="center" size="large">D1</text>
+<text matrix="1 0 0 1 0 8" pos="186 600" stroke="black" type="label" width="5.853" height="7.704" depth="0" halign="center" valign="center" size="large">0</text>
+<path stroke="lightgray" dash="dotted" pen="thin">
+204 636 m
+204 710 l
+</path>
+<text matrix="1 0 0 1 0 8" pos="222 620" stroke="black" type="label" width="14.793" height="8.169" depth="0" halign="center" valign="center" size="large">D2</text>
+<text matrix="1 0 0 1 0 8" pos="222 600" stroke="black" type="label" width="5.853" height="7.704" depth="0" halign="center" valign="center" size="large">0</text>
+<path stroke="lightgray" dash="dotted" pen="thin">
+240 636 m
+240 710 l
+</path>
+<text matrix="1 0 0 1 0 8" pos="258 620" stroke="black" type="label" width="14.793" height="8.169" depth="0" halign="center" valign="center" size="large">D3</text>
+<text matrix="1 0 0 1 0 8" pos="258 600" stroke="black" type="label" width="5.853" height="7.704" depth="0" halign="center" valign="center" size="large">0</text>
+<path stroke="lightgray" dash="dotted" pen="thin">
+276 636 m
+276 710 l
+</path>
+<text matrix="1 0 0 1 0 8" pos="294 620" stroke="black" type="label" width="14.793" height="8.169" depth="0" halign="center" valign="center" size="large">D4</text>
+<text matrix="1 0 0 1 0 8" pos="294 600" stroke="black" type="label" width="5.853" height="7.704" depth="0" halign="center" valign="center" size="large">0</text>
+<path stroke="lightgray" dash="dotted" pen="thin">
+312 636 m
+312 710 l
+</path>
+<text matrix="1 0 0 1 0 8" pos="330 620" stroke="black" type="label" width="14.793" height="8.169" depth="0" halign="center" valign="center" size="large">D5</text>
+<text matrix="1 0 0 1 0 8" pos="330 600" stroke="black" type="label" width="5.853" height="7.704" depth="0" halign="center" valign="center" size="large">0</text>
+<path stroke="lightgray" dash="dotted" pen="thin">
+348 636 m
+348 710 l
+</path>
+<text matrix="1 0 0 1 0 8" pos="366 620" stroke="black" type="label" width="14.793" height="8.169" depth="0" halign="center" valign="center" size="large">D6</text>
+<text matrix="1 0 0 1 0 8" pos="366 600" stroke="black" type="label" width="5.853" height="7.704" depth="0" halign="center" valign="center" size="large">1</text>
+<path stroke="lightgray" dash="dotted" pen="thin">
+384 636 m
+384 710 l
+</path>
+<text matrix="1 0 0 1 0 8" pos="402 620" stroke="black" type="label" width="14.793" height="8.169" depth="0" halign="center" valign="center" size="large">D7</text>
+<text matrix="1 0 0 1 0 8" pos="402 600" stroke="black" type="label" width="5.853" height="7.704" depth="0" halign="center" valign="center" size="large">0</text>
+<path stroke="lightgray" dash="dotted" pen="thin">
+420 636 m
+420 710 l
+</path>
+<text matrix="1 0 0 1 0 8" pos="438 620" stroke="black" type="label" width="23.412" height="8.174" depth="2.32" halign="center" valign="center" size="large">Stop</text>
+<text matrix="1 0 0 1 0 8" pos="438 600" stroke="black" type="label" width="5.853" height="7.704" depth="0" halign="center" valign="center" size="large">1</text>
+<text matrix="1 0 0 1 0 8" pos="474 620" stroke="black" type="label" width="19.181" height="8.302" depth="0" halign="center" valign="center" size="large">Idle</text>
+<path stroke="lightgray" dash="dotted" pen="thin">
+456 636 m
+456 710 l
+</path>
+<text pos="48 700" stroke="black" type="label" width="8.775" height="8.169" depth="0" halign="right" valign="center" size="large">H</text>
+<text pos="48 650" stroke="black" type="label" width="7.314" height="8.169" depth="0" halign="right" valign="center" size="large">L</text>
+<path matrix="1 0 0 1 0 28" stroke="black" arrow="normal/normal">
+240 566 m
+276 566 l
+</path>
+<path matrix="1 0 0 1 0 28" stroke="darkgray" pen="thin">
+240 572 m
+240 560 l
+</path>
+<path matrix="1 0 0 1 0 28" stroke="darkgray" pen="thin">
+276 572 m
+276 560 l
+</path>
+<text matrix="1 0 0 1 4 28" pos="258 548" stroke="black" type="label" width="91.127" height="8.965" depth="2.99" halign="center" valign="center" size="large" style="math">t_\mathrm{Bit} = 1/\mathrm{Baudrate}</text>
+<text matrix="1 0 0 1 -12 0" pos="78 720" stroke="black" type="label" width="53.163" height="8.307" depth="2.32" halign="center" valign="center" size="large">Ruhepegel</text>
+<text pos="276 738" stroke="black" type="label" width="123.199" height="8.307" depth="2.32" halign="center" valign="center" size="large">8 Datenbits, LSB zuerst</text>
+<text matrix="1 0 0 1 -8 40" pos="276 520" stroke="black" type="label" width="274.162" height="8.965" depth="2.99" halign="center" valign="center" size="large">Beispiel: Zeichen \texttt{&apos;A&apos;} (0x41) \quad $|$ \quad 8N1, keine Parit\&quot;at</text>
+</page>
+</ipe>

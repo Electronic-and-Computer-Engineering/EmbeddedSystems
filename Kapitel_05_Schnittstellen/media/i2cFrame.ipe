@@ -1,0 +1,212 @@
+<?xml version="1.0"?>
+<!DOCTYPE ipe SYSTEM "ipe.dtd">
+<ipe version="70218" creator="Ipe 7.2.29">
+<info created="D:20261107070000" modified="D:20261107142727"/>
+<ipestyle name="minimal">
+<symbol name="arrow/arc(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<anglesize name="normal" value="45"/>
+<arrowsize name="large" value="10"/>
+<arrowsize name="normal" value="7"/>
+<arrowsize name="small" value="5"/>
+<color name="accent" value="0.294 0.675 0.776"/>
+<color name="black" value="0"/>
+<color name="darkgray" value="0.3"/>
+<color name="gray" value="0.5"/>
+<color name="idle" value="0.94"/>
+<color name="lightgray" value="0.827"/>
+<color name="sigfill" value="0.875 0.929 0.992"/>
+<color name="white" value="1"/>
+<dashstyle name="dashed" value="[4] 0"/>
+<dashstyle name="dotted" value="[1 3] 0"/>
+<gridsize name="10 pts" value="10"/>
+<gridsize name="4 pts" value="4"/>
+<opacity name="50%" value="0.5"/>
+<opacity name="opaque" value="1"/>
+<pen name="fat" value="1.2"/>
+<pen name="heavier" value="0.8"/>
+<pen name="normal" value="0.4"/>
+<pen name="thin" value="0.2"/>
+<symbolsize name="normal" value="3"/>
+<symbolsize name="small" value="2"/>
+<textsize name="Large" value="\Large"/>
+<textsize name="footnote" value="\footnotesize"/>
+<textsize name="large" value="\large"/>
+<textsize name="normal" value="\normalsize"/>
+<textsize name="small" value="\small"/>
+<textsize name="tiny" value="\tiny"/>
+<textstyle name="normal" begin="" end=""/>
+<layout paper="595 842" origin="0 0" frame="535 782"/>
+<titlestyle pos="0 0" size="normal" color="black"  valign="baseline"/>
+</ipestyle>
+<page>
+<layer name="alpha"/>
+<view layers="alpha" active="alpha"/>
+<path layer="alpha" stroke="black" pen="fat">
+60 720 m
+95 720 l
+95 680 l
+106 680 l
+106 720 l
+117 720 l
+117 680 l
+128 680 l
+128 720 l
+139 720 l
+139 680 l
+150 680 l
+150 720 l
+161 720 l
+161 680 l
+172 680 l
+172 720 l
+183 720 l
+183 680 l
+194 680 l
+194 720 l
+205 720 l
+205 680 l
+216 680 l
+216 720 l
+227 720 l
+227 680 l
+238 680 l
+238 720 l
+249 720 l
+249 680 l
+260 680 l
+260 720 l
+271 720 l
+271 680 l
+282 680 l
+282 720 l
+293 720 l
+293 680 l
+304 680 l
+304 720 l
+315 720 l
+315 680 l
+326 680 l
+326 720 l
+337 720 l
+337 680 l
+348 680 l
+348 720 l
+359 720 l
+359 680 l
+370 680 l
+370 720 l
+381 720 l
+381 680 l
+392 680 l
+392 720 l
+403 720 l
+403 680 l
+414 680 l
+414 720 l
+425 720 l
+425 680 l
+436 680 l
+436 720 l
+447 720 l
+447 680 l
+458 680 l
+458 720 l
+469 720 l
+469 680 l
+480 680 l
+480 720 l
+491 720 l
+531 720 l
+</path>
+<path matrix="1 0 0 1 0 48" stroke="black" pen="fat">
+60 620 m
+83 620 l
+91 580 l
+95 580 l
+</path>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="sigfill" pen="fat">
+95 600 m
+99 620 l
+245 620 l
+249 600 l
+245 580 l
+99 580 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="172 600" stroke="black" type="label" width="69.222" height="8.302" depth="0" halign="center" valign="center" size="large">7-Bit-Adresse</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="sigfill" pen="fat">
+249 600 m
+253 620 l
+267 620 l
+271 600 l
+267 580 l
+253 580 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="260 600" stroke="black" type="label" width="19.159" height="5.98" depth="1.99" halign="center" valign="center" size="footnote">R/W</text>
+<path matrix="1 0 0 1 0 48" stroke="black" pen="fat">
+271 620 m
+274 580 l
+290 580 l
+293 620 l
+</path>
+<text matrix="1 0 0 1 0 56" pos="282 564" stroke="black" type="label" width="26.005" height="8.169" depth="0" halign="center" valign="center" size="large">ACK</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="sigfill" pen="fat">
+293 600 m
+297 620 l
+465 620 l
+469 600 l
+465 580 l
+297 580 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="381 600" stroke="black" type="label" width="59.406" height="8.302" depth="0" halign="center" valign="center" size="large">8 Datenbits</text>
+<path matrix="1 0 0 1 0 48" stroke="black" pen="fat">
+469 620 m
+472 580 l
+488 580 l
+491 620 l
+</path>
+<text matrix="1 0 0 1 0 56" pos="480 564" stroke="black" type="label" width="26.005" height="8.169" depth="0" halign="center" valign="center" size="large">ACK</text>
+<path matrix="1 0 0 1 0 48" stroke="black" pen="fat">
+491 580 m
+501 580 l
+509 620 l
+531 620 l
+</path>
+<path matrix="1 0 0 0.717391 0 208" stroke="gray" dash="dashed" pen="fat">
+87 550 m
+87 736 l
+</path>
+<text pos="87 748" stroke="black" type="label" width="7.472" height="8.203" depth="0" halign="center" valign="center" size="large">\textbf{S}</text>
+<path matrix="1 0 0 0.73913 0 192" stroke="gray" dash="dashed" pen="fat">
+505 550 m
+505 736 l
+</path>
+<text pos="505 748" stroke="black" type="label" width="9.188" height="8.203" depth="0" halign="center" valign="center" size="large">\textbf{P}</text>
+<text matrix="1 0 0 1 0 56" pos="87 538" stroke="black" type="label" width="26.013" height="8.169" depth="0" halign="center" valign="center" size="large">Start</text>
+<text matrix="1 0 0 1 0 52" pos="505 538" stroke="black" type="label" width="29.915" height="8.174" depth="2.32" halign="center" valign="center" size="large">Stopp</text>
+<text pos="48 700" stroke="black" type="label" width="22.272" height="8.169" depth="0" halign="right" valign="center" size="large">SCL</text>
+<text matrix="1 0 0 1 0 48" pos="48 600" stroke="black" type="label" width="23.893" height="8.169" depth="0" halign="right" valign="center" size="large">SDA</text>
+<path matrix="1 0 0 1 0 -8" stroke="black" pen="fat" arrow="normal/normal">
+95 760 m
+271 760 l
+</path>
+<text matrix="1 0 0 1 0 -8" pos="183 772" stroke="black" type="label" width="35.504" height="8.169" depth="0" halign="center" valign="center" size="large">Master</text>
+<path matrix="1 0 0 1 0 -8" stroke="black" pen="fat" arrow="normal/normal">
+271 760 m
+293 760 l
+</path>
+<text matrix="1 0 0 1 0 -8" pos="282 772" stroke="black" type="label" width="26.338" height="8.302" depth="0" halign="center" valign="center" size="large">Slave</text>
+<text matrix="1 0 0 1 -8 92" pos="293 510" stroke="black" type="label" width="197.502" height="8.307" depth="2.32" halign="center" valign="center" size="large">Daten wechseln, w\&quot;ahrend SCL low ist </text>
+<text matrix="1 0 0 1 -100 20" transformations="translations" pos="240 564" stroke="black" type="label" width="287.833" height="8.307" depth="2.32" valign="baseline" size="large">Start und Stopp sind die einzigen Flanken bei SCL high</text>
+<text transformations="translations" pos="348 596" stroke="black" type="label" width="0" height="0" depth="0" valign="baseline" size="large"></text>
+</page>
+</ipe>
