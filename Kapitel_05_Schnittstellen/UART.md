@@ -5,13 +5,12 @@
 ## Inhalt
 - [Das Protokoll](#das-protokoll)
 - [Warum die Baudrate genau stimmen muss](#warum-die-baudrate-genau-stimmen-muss)
-- [Zwei UARTs am Fahrzeug](#zwei-uarts-am-fahrzeug)
 - [Umsetzung im MSP430: USCI im UART-Mode](#umsetzung-im-msp430-usci-im-uart-mode)
 - [Register](#register)
 - [Baudrate berechnen](#baudrate-berechnen)
 - [Rahmenerkennung im Datenstrom](#rahmenerkennung-im-datenstrom)
-- [Die bereitgestellten Module](#die-bereitgestellten-module)
-- [Ein geteilter Zustand für zwei Module](#ein-geteilter-zustand-für-zwei-module)
+- [Das bereitgestellte Modul](#das-bereitgestellte-modul)
+- [Der Zustand liegt in einer eigenen Datei](#der-zustand-liegt-in-einer-eigenen-datei)
 - [Wer initialisiert den UART?](#wer-initialisiert-den-uart)
 
 **Family User Guide**
@@ -54,34 +53,6 @@ Genau deshalb wird der UART vom stabilen Quarztakt gespeist und nicht vom intern
 
 ---
 
-## Zwei UARTs am Fahrzeug
-
-Nur die USCI-Module der **A-Variante** beherrschen den asynchronen Betrieb. Auf dem Crazy Car sind zwei davon beschaltet, und beide sind in der Software vorbereitet:
-
-| | **USCI_A0** | **USCI_A1** |
-|---|---|---|
-| Modul | `halUSCIA0` | `halUSCIA1` |
-| Pins | P2.0 / P2.1 | P8.2 / P8.3 |
-| Weg zum PC | eZ-FET-Backchannel des Debuggers, virtueller COM-Port | Steckerpins, z. B. für ein Bluetooth-Modul |
-| Port-Mapping nötig | ja (`P2MAP0`, `P2MAP1`) | nein, feste Pinfunktion |
-| Baudrate im Projekt | 57600 | 9600 |
-| Kabel nötig | nur USB zum Debugger | keines, sobald BT-Modul gesteckt |
-
-Der Debug-UART ist der bequemere Weg: Er läuft über dasselbe USB-Kabel wie der Debugger, und am PC erscheint ein COM-Port. Sobald das Fahrzeug aber fährt, hängt es an keinem Kabel mehr – dann wird die Telemetrie über ein Bluetooth-Modul am AUX-UART gebraucht.
-
-Beide Module bieten **dieselbe Schnittstelle** an, nur mit anderem Namenspräfix:
-
-```c
-halUSCIA0Init()   ·  halUSCIA0Start()   ·  halUSCIA0Send()   ·  halUSCIA0TxBusy()   ·  halUSCIA0GetFrame()
-halUSCIA1Init()   ·  halUSCIA1Start()   ·  halUSCIA1Send()   ·  halUSCIA1TxBusy()   ·  halUSCIA1GetFrame()
-```
-
-Das ist Absicht: Der Driver Layer soll zwischen beiden umschalten können, ohne dass sich an seinem eigenen Code etwas ändert. Wie das gemacht wird, sehen Sie in Einheit 7 – dort gibt es dafür einen Satz Makros, die zur Übersetzungszeit auf das eine oder andere Modul zeigen.
-
-> **Warum das hier schon steht:** Zwei Module mit identischer Schnittstelle sehen nach Redundanz aus. Sie sind aber der Grund, warum der Driver Layer später nichts davon wissen muss, über welchen Weg seine Daten gehen.
-
----
-
 ## Umsetzung im MSP430: USCI im UART-Mode
 
 Der asynchrone Betrieb wird über `UCSYNC = 0` gewählt. Wie bei allen USCI-Modulen gilt: Konfiguration nur im Reset, also zwischen Setzen und Löschen von `UCSWRST`.
@@ -97,7 +68,7 @@ P2MAP1 = PM_UCA0TXD;
 PMAPKEYID = 0;                  // wieder sperren
 ```
 
-Beim AUX-UART entfällt das: P8.2 und P8.3 tragen die UCA1-Funktion fest, dort genügt `P8SEL`.
+Nicht jeder Pin braucht das: Wo die Sonderfunktion fest auf dem Pin liegt, genügt das `PxSEL`-Bit. Beim SPI haben Sie genau diesen Fall.
 
 ---
 
@@ -123,6 +94,7 @@ Beim AUX-UART entfällt das: P8.2 und P8.3 tragen die UCA1-Funktion fest, dort g
 | `UCA0TXBUF` | – | Sendepuffer |
 | `UCA0RXBUF` | – | Empfangspuffer |
 | `UCA0IE` | `UCRXIE`, `UCTXIE` | Interruptfreigaben |
+| `UCA0IFG` | `UCRXIFG`, `UCTXIFG` | Interrupt-Flags, einzeln setz- und löschbar |
 | `UCA0IV` | – | Vektorregister |
 
 Die Statusbits `UCFE`, `UCOE` und `UCPE` sind diagnostisch wertvoll: Ein gesetztes `UCFE` deutet fast immer auf eine falsche Baudrate hin, ein gesetztes `UCOE` darauf, dass die ISR zu selten läuft.
@@ -137,7 +109,7 @@ $$N = \frac{f_{\text{BRCLK}}}{\text{Baudrate}}$$
 
 Der ganzzahlige Anteil kommt in `UCA0BR0` und `UCA0BR1`, der Rest wird über den **Modulator** angenähert. `UCBRSx` gibt an, in wie vielen von acht Bitzeiten der Teiler um eins erhöht wird – im Mittel entsteht so ein gebrochenes Teilerverhältnis.
 
-$$\text{UCBRx} = \lfloor N \rfloor \qquad \text{UCBRSx} = \text{round}\big((N - \lfloor N \rfloor) \cdot 8\big)$$
+$$\text{UCBRx} = \lfloor N \rfloor \qquad \text{UCBRSx} = \big\lfloor (N - \lfloor N \rfloor) \cdot 8 \big\rfloor$$
 
 Im bereitgestellten Modul steht genau diese Rechnung:
 
@@ -149,6 +121,8 @@ UCA0BR0  = brScaler & 0xFF;
 UCA0BR1  = brScaler >> 8;
 UCA0MCTL = brDecPlaces << 1;        // UCBRSx liegt ab Bit 1
 ```
+
+Beide Zeilen schneiden ab, sie runden nicht: Die Integer-Division verwirft den Rest. Mathematisch wäre Runden die bessere Näherung – bei 57600 Baud kommt beides auf denselben Wert, weil der verworfene Anteil klein ist. Erst wenn der Nachkommaanteil nahe an einem halben Achtel liegt, unterscheiden sich die beiden Wege um eine Modulatorstufe.
 
 **Rechnen Sie das für Ihre Taktfrequenz und 57600 Baud nach** – Sie brauchen die Zahlen für die Messung am Analog Discovery.
 
@@ -170,7 +144,7 @@ Der Sonderfall, über den man dabei stolpert: Passt ein Zeichen nicht zum erwart
 
 ---
 
-## Die bereitgestellten Module
+## Das bereitgestellte Modul
 
 ```c
 void halUSCIA0Init(unsigned int baudrate);
@@ -186,21 +160,19 @@ unsigned char halUSCIA0Send(const unsigned char *data, unsigned char length);   
 unsigned char halUSCIA0TxBusy(void);
 ```
 
-`halUSCIA1` bietet dieselben Funktionen mit dem Präfix `halUSCIA1` an.
-
-Nach `halUSCIAxInit()` ist der Empfang zunächst **aus**. Er wird erst mit `halUSCIAxStart()` eingeschaltet, und zwar zusammen mit der Angabe, worauf gewartet werden soll.
+Nach `halUSCIA0Init()` ist der Empfang zunächst **aus**. Er wird erst mit `halUSCIA0Start()` eingeschaltet, und zwar zusammen mit der Angabe, worauf gewartet werden soll.
 
 > **Achtung:** Die übergebenen Arrays müssen gültig bleiben, bis die Übertragung abgeschlossen ist. Das Modul merkt sich den **Zeiger**, nicht den Inhalt. Eine lokale Variable in einer Funktion, die vorher zurückkehrt, führt zu Datenmüll auf der Leitung – und zu einem Fehler, der sich nur sporadisch zeigt.
 
-Beide Richtungen laufen über dieselbe ISR, unterschieden über `UCAxIV`. Der Sende-Interrupt wird beim Anstoßen einer Übertragung freigegeben und am Ende wieder abgeschaltet – sonst würde er dauerhaft feuern, weil ein leerer Sendepuffer immer eine Anforderung bedeutet.
+Beide Richtungen laufen über dieselbe ISR, unterschieden über `UCA0IV`. Der Sende-Interrupt wird beim Anstoßen einer Übertragung freigegeben und am Ende wieder abgeschaltet – sonst würde er dauerhaft feuern, weil ein leerer Sendepuffer immer eine Anforderung bedeutet.
 
 ---
 
-## Ein geteilter Zustand für zwei Module
+## Der Zustand liegt in einer eigenen Datei
 
-Hier liegt die Besonderheit der beiden UART-Module, und sie hat Folgen für die Benutzung.
+Hier liegt die Besonderheit des Moduls, und sie hat Folgen für die Benutzung.
 
-Empfangspuffer, Schreibposition, Sync-Zeiger und Sendezeiger liegen **nicht** in den Modulen selbst, sondern in einer gemeinsamen Datei:
+Empfangspuffer, Schreibposition, Sync-Zeiger und Sendezeiger liegen **nicht** im Modul selbst, sondern in einer Datei daneben:
 
 ```c
 /* halSharedUART.h */
@@ -214,31 +186,31 @@ volatile const unsigned char *uartTxPtr = 0;
 volatile unsigned char uartTxLen = 0;
 ```
 
-Beide Module greifen per `extern` darauf zu. Daraus folgen zwei Dinge:
+Das Modul greift per `extern` darauf zu. Daraus folgen zwei Dinge:
+
+**`UART_RX_MAX` steht an zwei Stellen.** Die Puffergröße ist in `halSharedUART.h` und zusätzlich in `halUSCIA0.h` definiert – mit demselben Wert, sonst würde der Compiler meckern. Das Modul bleibt dadurch für sich übersetzbar, aber wer den Puffer vergrößern will, muss beide Stellen anfassen. Eine davon zu vergessen führt zu einem Array, das kleiner ist als die Längenprüfung in `halUSCIA0Start()` erlaubt.
 
 **Die Datei darf nur an genau einer Stelle inkludiert werden.** Sie *definiert* die Variablen, sie deklariert sie nicht nur. Ein zweites `#include` in einer anderen `.c`-Datei erzeugt dieselben Symbole ein zweites Mal, und der Linker bricht mit einem Duplikat ab. Im Projekt steht das `#include` deshalb ausschließlich in `halGeneral.c`.
 
-**Es kann immer nur ein UART aktiv sein.** Würden beide gleichzeitig empfangen, schrieben sie in denselben Puffer und überschrieben sich gegenseitig die Schreibposition. Das Ergebnis wären Rahmen, die mal ankommen und mal nicht.
+**Warum überhaupt eine eigene Datei?** Für ein einzelnes Modul wäre sie überflüssig – der Zustand könnte genauso gut in `halUSCIA0.c` liegen. Der Grund wird in Einheit 7 sichtbar: Das Fahrzeug bekommt dort einen zweiten UART für die Funkstrecke, und der teilt sich diesen Zustand. Ein Empfangspuffer statt zweier, zugunsten des Speichers.
 
-Für dieses Fahrzeug ist das kein Verlust – Debug-Ausgabe über USB und Telemetrie über Bluetooth werden ohnehin nie zugleich gebraucht. Es ist eine bewusste Entscheidung zugunsten des Speichers: Ein Empfangspuffer statt zweier, und die Umschaltung kostet keine Laufzeit, weil sie zur Übersetzungszeit passiert.
-
-> **Zu beantworten:** Was müsste man ändern, damit beide UARTs gleichzeitig laufen können? Was kostet das an RAM?
+> **Zu beantworten:** Welche Einschränkung handelt man sich damit ein, sobald ein zweites Modul dieselben Variablen benutzt?
 
 ---
 
 ## Wer initialisiert den UART?
 
-In dieser Einheit rufen Sie `halUSCIA0Init()` und `halUSCIA1Init()` in `halInit()` auf, wie jedes andere HAL-Modul auch.
+In dieser Einheit rufen Sie `halUSCIA0Init()` in `halInit()` auf, wie jedes andere HAL-Modul auch.
 
-Im fertigen Fahrzeug steht die Initialisierung an anderer Stelle: im **Driver Layer**. Der Grund folgt aus dem geteilten Zustand – welcher der beiden UARTs mit welcher Baudrate läuft, entscheidet die Anwendung, nicht die Hardwareschicht. `halInit()` müsste sonst eine Entscheidung treffen, die ihm nicht zusteht.
+Im fertigen Fahrzeug steht die Initialisierung an anderer Stelle: im **Driver Layer**. Der Grund folgt aus dem geteilten Zustand – über welchen Weg und mit welcher Baudrate die Daten gehen, entscheidet die Anwendung, nicht die Hardwareschicht. `halInit()` müsste sonst eine Entscheidung treffen, die ihm nicht zusteht.
 
 ```
 main()
-  └─ halInit()        →  GPIO, Takt, Timer, SPI, I2C, ADC, DMA  ... und in Einheit 5 auch die UARTs
+  └─ halInit()        →  GPIO, Takt, Timer, SPI, I2C, ADC, DMA  ... und in Einheit 5 auch der UART
   └─ driverInit()     →  ab Einheit 7: der UART, mit der dort gewählten Baudrate
 ```
 
-Ab Einheit 7 übernimmt ein Modul des Driver Layers die Umschaltung: Ein einziges `#define` legt fest, ob die Telemetrie über USB oder über Bluetooth geht, und der übrige Code merkt davon nichts. Dann wandert der Init-Aufruf aus `halInit()` dorthin.
+Ab Einheit 7 übernimmt ein Modul des Driver Layers die Umschaltung zwischen den dann zwei Wegen, und der übrige Code merkt davon nichts. Dann wandert der Init-Aufruf aus `halInit()` dorthin.
 
 Das ist die einzige Stelle im Projekt, an der ein HAL-Modul nicht in `halInit()` initialisiert wird – und sie ist leicht zu übersehen.
 

@@ -23,7 +23,7 @@ Drei Ebenen, die sich unterscheiden lassen:
 
 **Konfiguration.** Steht das Modul im richtigen Modus? Stimmen Taktquelle, Teiler, Bitreihenfolge, Polarität? Das ist derselbe Registervergleich wie bisher und funktioniert für alle drei Schnittstellen.
 
-**Zustand.** Meldet das Modul im Ruhezustand korrekt, dass es frei ist? Wird es während einer Übertragung als beschäftigt gemeldet, und ist es danach wieder frei? Dafür gibt es bei allen drei Modulen eine Statusabfrage – `TxSuc`, `halUSCIA0TxBusy()`, `halI2CBusy()`.
+**Zustand.** Meldet das Modul im Ruhezustand korrekt, dass es frei ist? Wird es während einer Übertragung als beschäftigt gemeldet, und ist es danach wieder frei? Dafür bietet jedes Modul eine Statusabfrage an – `halUSCIB1Busy()`, `halUSCIA0TxBusy()`, `halI2CBusy()`.
 
 **Verhalten.** Kommt am anderen Ende das Richtige an? Hier stößt der Test auf dem Controller an eine Grenze: Die Gegenstelle ist das Analog Discovery, und das muss angeschlossen und konfiguriert sein. Ein Testfall, der davon abhängt, schlägt auf jedem Arbeitsplatz ohne angestecktes Messgerät fehl – und ein Test, der nur manchmal läuft, ist kein Test.
 
@@ -39,7 +39,7 @@ Legen Sie drei Testmodule in `test/tstHAL/` an und hängen Sie sie in `testHalGe
 
 ```
 testHalUSCIB1.c/.h      SPI
-testHalUSCIA0.c/.h      UART
+testHalUSCIA0.c/.h      Debug-UART
 testHalUSCIB0.c/.h      I2C
 ```
 
@@ -49,12 +49,12 @@ testHalUSCIB0.c/.h      I2C
 - Taktpolarität und Taktphase entsprechen Ihrer Vorgabe.
 - Der RX-Interrupt ist freigegeben.
 - Der Teiler entspricht der geforderten Taktfrequenz. Prüfen Sie gegen Ihr `#define`, nicht gegen die ausgerechnete Zahl.
-- Nach der Initialisierung meldet `TxSuc` einen abgeschlossenen Zustand – es läuft keine Übertragung.
-- Eine Übertragung von zwei Bytes wird innerhalb einer plausiblen Zeitschranke abgeschlossen: `TxSuc` steht danach wieder auf 1 und `TxData.cnt` auf dem erwarteten Wert.
+- Nach der Initialisierung meldet `halUSCIB1Busy()` eine 0 – es läuft keine Übertragung.
+- Eine Übertragung von zwei Bytes wird innerhalb einer plausiblen Zeitschranke abgeschlossen: `halUSCIB1Busy()` liefert danach wieder 0 und `TxData.cnt` steht auf dem erwarteten Wert.
 
 Der letzte Punkt ist der wertvollste, weil er die ISR mitprüft. Rechnen Sie vorher aus, wie lange zwei Bytes bei Ihrer Taktfrequenz dauern, und wählen Sie die Zeitschranke danach – nicht umgekehrt.
 
-### `testHalUSCIA0` – UART, mindestens 4 Fälle
+### `testHalUSCIA0` – Debug-UART, mindestens 4 Fälle
 
 - Das Modul steht im UART-Mode, asynchron, 8 Datenbits, keine Parität, ein Stoppbit.
 - Taktquelle und Baudratenteiler entsprechen der eingestellten Baudrate.
@@ -87,6 +87,8 @@ Diese beiden Fälle sind die wichtigsten des ganzen Moduls: Sie weisen nach, das
 
 Alle drei Module hinterlassen Zustand: laufende Übertragungen, gesetzte Fehler-Flags, freigegebene Interrupts. Ergänzen Sie `testHalCleanUp.c` entsprechend, sodass jeder Testfall unter denselben Bedingungen startet.
 
+Der UART braucht hier besondere Aufmerksamkeit: Sein Empfangszustand liegt nicht im Modul, sondern in `halSharedUART.h`. Räumen Sie ihn an **einer** Stelle auf – ab Einheit 7 greift ein zweites Modul auf dieselben Variablen zu, und dann rächt sich jedes Aufräumen, das in einem der Module versteckt ist.
+
 Überlegen Sie dabei, was **nicht** zurückgesetzt werden darf. Die Modulkonfiguration aus `halInit()` gehört nicht dazu – sonst prüfen die Konfigurationstests am Ende nur noch Ihr eigenes Aufräumen.
 
 ---
@@ -97,9 +99,8 @@ Alle drei Module hinterlassen Zustand: laufende Übertragungen, gesetzte Fehler-
 2. Setzen Sie die oben genannten Anforderungen um. Die Mindestanzahl ist eine Untergrenze, keine Zielvorgabe.
 3. Ergänzen Sie das Aufräumen.
 4. Lassen Sie die gesamte Suite laufen. Die Fälle aus den Einheiten 2 bis 4 müssen weiterhin bestehen.
-5. [Meilensteinüberprüfung] Welche Ihrer Testfälle würden auch dann noch bestehen, wenn die Leitung zum Display unterbrochen wäre? Was sagt das über die Aussagekraft dieser Tests?
-6. [Meilensteinüberprüfung] Beim I2C lässt sich ein Fehlerfall ohne Gegenstelle auslösen, bei SPI und UART nicht. Woran liegt das?
-7. [Meilensteinüberprüfung] Welche Aussagen über Ihre Schnittstellen können **nur** die Messung am Analog Discovery liefern, und welche **nur** die Unity-Suite?
+
+> **Bei der Überprüfung** sprechen wir über Ihre Testfälle: **warum** Sie etwas **wie** geprüft haben und welche Fälle Vorrang haben.
 
 ---
 

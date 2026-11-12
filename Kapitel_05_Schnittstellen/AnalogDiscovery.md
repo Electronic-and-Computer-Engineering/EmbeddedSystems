@@ -43,7 +43,7 @@ Für die Schnittstellenmessung werden zwei Instrumente gebraucht, und es ist wic
 
 **2. Logiksignale.** Die digitalen Eingänge heißen **DIO 0 bis 15**. Sie sind für 3,3-V-Logik ausgelegt und passen damit direkt zum MSP430. Legen Sie pro Signal eine Leitung auf einen DIO-Pin und notieren Sie die Zuordnung – ohne Notiz ist nach dem dritten Umstecken nicht mehr klar, welcher Kanal was zeigt.
 
-**3. Pull-Ups beim I2C.** Das Analog Discovery hat **keine** zuschaltbaren Pull-Ups; SDA und SCL brauchen externe Widerstände (4,7 kΩ für 100 kHz). Prüfen Sie zuerst im [Schaltplan](https://fhjoanneum-my.sharepoint.com/:b:/g/personal/florian_mayer_fh-joanneum_at/EfXYu-rqsLRErJbybsbN4AEB_RUMizJhwpb5D_ysimZehA?e=Ti7PtO), ob die Platine welche bestückt hat. Fehlen sie, bleiben beide Leitungen auf undefiniertem Pegel und der Bus meldet sich als dauerhaft belegt.
+**3. Pull-Ups beim I2C.** Das Analog Discovery hat **keine** zuschaltbaren Pull-Ups; SDA und SCL brauchen externe Widerstände – bei den 400 kHz dieses Projekts 2,2 kΩ. Prüfen Sie zuerst im [Schaltplan](https://fhjoanneum-my.sharepoint.com/:b:/g/personal/florian_mayer_fh-joanneum_at/EfXYu-rqsLRErJbybsbN4AEB_RUMizJhwpb5D_ysimZehA?e=Ti7PtO), ob die Platine welche bestückt hat. Fehlen sie, bleiben beide Leitungen auf undefiniertem Pegel und der Bus meldet sich als dauerhaft belegt.
 
 > **VORSICHT:** Die Aufschrift **MOSI und CLK am Displayboard sind vertauscht.** Gehen Sie beim Anschließen nach dem Schaltplan, nicht nach dem Aufdruck.
 
@@ -61,11 +61,10 @@ Tragen Sie Ihre Zuordnung ein. Die Controllerpins der vorgegebenen Module stehen
 | SPI CS | GPIO, Makro aus `halGPIO.h` | |
 | Debug-UART TXD | P2.1 | |
 | Debug-UART RXD | P2.0 | |
-| AUX-UART | P8.2 / P8.3 | |
 | I2C SCL | P2.7 | |
 | I2C SDA | P2.6 | |
 
-Beim AUX-UART legen Sie **beide** Pins auf je einen DIO-Kanal. Welcher der beiden TXD ist, zeigt die Messung selbst: Dort entsteht beim Senden Aktivität, die andere Leitung bleibt im Ruhepegel. Das ist schneller als die Suche in der Port-Funktionstabelle des Datenblatts.
+Wenn Sie bei einem Pinpaar unsicher sind, welche Leitung TXD ist, legen Sie **beide** auf je einen DIO-Kanal: Dort entsteht beim Senden Aktivität, die andere bleibt im Ruhepegel. Das ist schneller als die Suche in der Port-Funktionstabelle.
 
 ---
 
@@ -103,7 +102,7 @@ Beim AUX-UART legen Sie **beide** Pins auf je einen DIO-Kanal. Welcher der beide
 | | Bits per word | 8 |
 | **UART** | Data | TXD-Kanal |
 | | Bits | 8, Parity **None**, Stop **1** |
-| | Rate | 57600 (Debug) bzw. 9600 (AUX) |
+| | Rate | 57600 |
 | **I2C** | Clock / Data | SCL- und SDA-Kanal |
 | | Address | **7 Bit** |
 
@@ -136,13 +135,13 @@ Beim UART gibt es keine Master-/Slave-Rolle – deshalb spricht die Aufgabenstel
 
 ## Aufzeichnen und dokumentieren
 
-**Bitzeit messen.** Cursor im Logic-Fenster auf zwei aufeinanderfolgende Flanken setzen; die Anzeige liefert den Abstand. Bei 57600 Baud sind rund 17,4 µs zu erwarten, bei 9600 Baud rund 104 µs. Weicht der gemessene Wert ab, liegt es am Baudratenteiler – nicht am Messgerät.
+**Bitzeit messen.** Cursor im Logic-Fenster auf zwei aufeinanderfolgende Flanken setzen; die Anzeige liefert den Abstand. Bei 57600 Baud sind rund 17,4 µs zu erwarten. Weicht der gemessene Wert ab, liegt es am Baudratenteiler – nicht am Messgerät.
 
 **Taktfrequenz messen.** Beim SPI genügt der Abstand zweier Taktflanken; der Kehrwert der Periode ist die Frequenz. Vergleichen Sie mit dem `#define` im Header.
 
 **Exportieren.** *File → Export* speichert das Bild als PNG oder die Rohwerte als CSV. Für das Protokoll genügen die PNGs – mit sichtbarer Dekoderzeile, sonst ist nicht nachvollziehbar, was gemessen wurde.
 
-Benennen Sie die Dateien so, dass die Einstellung mitgeht, z. B. `uart_aux_9600.png`. Vier Screenshots mit gleichem Namen sind im Protokoll nicht mehr auseinanderzuhalten.
+Benennen Sie die Dateien so, dass die Einstellung mitgeht, z. B. `uart_debug_57600.png`. Vier Screenshots mit gleichem Namen sind im Protokoll nicht mehr auseinanderzuhalten.
 
 ---
 

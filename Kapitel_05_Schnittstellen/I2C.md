@@ -51,7 +51,7 @@ Das hat drei Konsequenzen:
 
 **Ohne Pull-Ups funktioniert gar nichts.** Die Leitungen bleiben dann auf undefiniertem Pegel, und der Bus meldet sich als dauerhaft belegt. Das ist beim Aufbau am Steckbrett der häufigste Fehler.
 
-**Die Flankensteilheit begrenzt die Geschwindigkeit.** Der High-Pegel entsteht durch Umladen der Busleitung über den Pull-Up; kleinere Widerstände erlauben höhere Frequenzen, kosten aber mehr Strom. Typisch sind 4,7 kΩ für 100 kHz und 2,2 kΩ für 400 kHz.
+**Die Flankensteilheit begrenzt die Geschwindigkeit.** Der High-Pegel entsteht durch Umladen der Busleitung über den Pull-Up; kleinere Widerstände erlauben höhere Frequenzen, kosten aber mehr Strom. Typisch sind 4,7 kΩ für 100 kHz und 2,2 kΩ für 400 kHz. **Der Bus des Crazy Car läuft im Fast Mode mit 400 kHz** – es gilt also der kleinere Wert.
 
 | Modus | Bitrate |
 |---|---|
@@ -112,6 +112,9 @@ UCB0BR1   = br >> 8;
 UCB0CTL1 &= ~UCSWRST;                       // freigeben
 ```
 
+Der Teiler `br` entsteht aus SMCLK und der gewünschten Busfrequenz – und er ist **ganzzahlig**. Geht die Rechnung nicht glatt auf, muss gerundet werden, und das Modul rundet bewusst nach oben: Ein zu großer Teiler macht den Bus etwas langsamer als angefordert, ein zu kleiner schneller als erlaubt.
+
+Die tatsächliche SCL-Frequenz liegt deshalb **unter** den angeforderten 400 kHz. Wie weit, rechnen Sie aus Taktquelle und Teiler selbst aus – und messen es anschließend am Analog Discovery nach.
 > **Port-Mapping:** Die `PxMAP`-Register sind schreibgeschützt und müssen über `PMAPKEYID` entsperrt werden; danach schließt sich das Fenster wieder. Sehen Sie sich in `halGPIO.c` an, wie das gelöst ist.
 
 ---

@@ -15,7 +15,7 @@ volatile unsigned char i2cTxLen = 0;
 volatile unsigned char i2cRxLen = 0;
 volatile unsigned char i2cBusy  = 0;
 volatile unsigned char i2cError = 0;
-volatile unsigned char i2cDummy = 0;         // NEU: zum Verwerfen unerwarteter Bytes
+volatile unsigned char i2cDummy = 0;         // zum Verwerfen unerwarteter Bytes
 
 void halUSCIB0Init(unsigned long baudrate)
 {
@@ -36,7 +36,7 @@ unsigned char halI2CWrite(unsigned char addr, const unsigned char *data, unsigne
     if (i2cBusy) return 0;                      // Bus beschaeftigt
     if (len == 0) return 0;
 
-    while (UCB0CTL1 & UCTXSTP);                 // NEU: vorherige Stoppbedingung erst fertig senden
+    while (UCB0CTL1 & UCTXSTP);                 // vorherige Stoppbedingung erst zu Ende senden lassen
 
     i2cTxPtr = data;
     i2cTxLen = len;
@@ -55,7 +55,7 @@ unsigned char halI2CWriteRead(unsigned char addr, const unsigned char *wData, un
     if (i2cBusy) return 0;
     if (wLen == 0 || rLen == 0) return 0;
 
-    while (UCB0CTL1 & UCTXSTP);                 // NEU: vorherige Stoppbedingung erst fertig senden
+    while (UCB0CTL1 & UCTXSTP);                 // vorherige Stoppbedingung erst zu Ende senden lassen
 
     i2cTxPtr = wData;                           // Registeradresse
     i2cTxLen = wLen;
@@ -79,8 +79,8 @@ __interrupt void usciB0Isr(void)
     {
         case USCI_I2C_UCNACKIFG:                // Slave antwortet nicht
             UCB0CTL1 |= UCTXSTP;
-            UCB0IFG  &= ~UCTXIFG;               // NEU: anstehendes TXIFG verwerfen
-            i2cTxLen = 0;                       // NEU: Uebertragung komplett abbrechen,
+            UCB0IFG  &= ~UCTXIFG;               // anstehendes TXIFG verwerfen, sonst sendet die ISR weiter
+            i2cTxLen = 0;                       // Uebertragung komplett abbrechen,
             i2cRxLen = 0;                       //      sonst macht die ISR mit alten Werten weiter
             i2cError = 1;
             i2cBusy  = 0;
@@ -99,7 +99,7 @@ __interrupt void usciB0Isr(void)
 
                 if (i2cRxLen == 1)              // Sonderfall: nur ein Byte
                 {
-                    while ((UCB0CTL1 & UCTXSTT) && !(UCB0IFG & UCNACKIFG));  // NEU: bei NACK nicht ewig warten
+                    while ((UCB0CTL1 & UCTXSTT) && !(UCB0IFG & UCNACKIFG));  // bei NACK nicht ewig auf das Startbit warten
                     UCB0CTL1 |= UCTXSTP;        // Stopp direkt nach dem einen Byte
                 }
             }
@@ -112,7 +112,7 @@ __interrupt void usciB0Isr(void)
             break;
 
         case USCI_I2C_UCRXIFG:
-            if (i2cRxLen == 0)                  // NEU: unerwartetes Byte
+            if (i2cRxLen == 0)                  // unerwartetes Byte
             {
                 i2cDummy = UCB0RXBUF;           // nur lesen (loescht RXIFG), nicht in fremden Speicher schreiben
                 break;

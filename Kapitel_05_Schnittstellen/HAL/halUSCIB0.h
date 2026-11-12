@@ -9,7 +9,7 @@
 #define HAL_HALUSCIB0_H_
 
 /*  I2C-Master auf UCB0 (P2.6 SDA, P2.7 SCL, per Port-Mapping)
-    Takt SMCLK 2,5 MHz, Übertragung läuft im Interrupt.
+    400 kHz Fast Mode, Takt SMCLK 2,5 MHz, Übertragung läuft im Interrupt.
     Die übergebenen Arrays müssen gültig bleiben, bis halI2CBusy() 0 liefert.   */
 
 void halUSCIB0Init(unsigned long baudrate);
