@@ -57,34 +57,29 @@ Zwei Parameter legen fest, wann ein Bit gültig ist:
 | 3 | 1 | 1 | Takt idle HIGH, Übernahme bei steigender Flanke |
 
 <p align="center">
-  <img src="./media/CLKCyclesPol0.png" alt="Taktzyklen bei CPOL = 0">
+  <img src="./media/CLKCyclesPol0.png" alt="Taktzyklen CPOL 0">
+  <br><em>CPOL = 0 – der Takt ruht auf LOW.</em>
 </p>
-<p align="center"><em>CPOL = 0: Der Takt liegt zwischen den Übertragungen auf LOW.</em></p>
 
 <p align="center">
-  <img src="./media/CLKCyclesPol1.png" alt="Taktzyklen bei CPOL = 1">
+  <img src="./media/CLKCyclesPol1.png" alt="Taktzyklen CPOL 1">
+  <br><em>CPOL = 1 – der Takt ruht auf HIGH. So arbeitet das Display in diesem Projekt.</em>
 </p>
-<p align="center"><em>CPOL = 1: Der Takt liegt zwischen den Übertragungen auf HIGH. <strong>Dieser Fall gilt für das Display des Crazy Car.</strong></em></p>
 
 Welcher Modus zu verwenden ist, steht im Datenblatt des Slave-Bausteins. Passen Master und Slave nicht zusammen, werden die Bits um eine halbe Taktperiode versetzt abgetastet – das Ergebnis sind Daten, die zufällig aussehen, obwohl die Leitungen in Ordnung sind.
 
-> **Achtung, `UCCKPH` ist invers zu CPHA.** `UCCKPL` entspricht CPOL eins zu eins, `UCCKPH` aber **nicht** CPHA: TI beschreibt das Bit darüber, auf welcher Flanke das Bit *übernommen* wird, die übliche CPHA-Konvention darüber, auf welcher es *angelegt* wird. Das dreht die Bedeutung um:
+> **ACHTUNG – `UCCKPH` ist nicht CPHA, sondern dessen Gegenteil.**
 >
-> | | CPOL | CPHA | `UCCKPL` | `UCCKPH` |
-> |---|---|---|---|---|
-> | Modus 0 | 0 | 0 | 0 | 1 |
-> | Modus 1 | 0 | 1 | 0 | 0 |
-> | Modus 2 | 1 | 0 | 1 | 1 |
-> | Modus 3 | 1 | 1 | 1 | 0 |
+> TI hat dieses Bit umgekehrt zur verbreiteten CPHA-Konvention definiert: `UCCKPH = 1` bedeutet, dass ein Bit an der *ersten* Taktflanke übernommen wird – das entspricht CPHA = 0.
 >
-> Das Display des Crazy Car verlangt **Modus 3**: Takt im Ruhezustand HIGH, Übernahme an der zweiten Flanke. In Registerbits heißt das **`UCCKPL` gesetzt und `UCCKPH` gelöscht**.
+> | gewünscht | Bit im Register |
+> |---|---|
+> | CPOL = 0 | `UCCKPL = 0` |
+> | CPOL = 1 | `UCCKPL = 1` |
+> | CPHA = 0 | **`UCCKPH = 1`** |
+> | CPHA = 1 | **`UCCKPH = 0`** |
 >
-> ```c
-> UCB1CTL0 |=  UCCKPL;        // Takt idle HIGH
-> UCB1CTL0 &= ~UCCKPH;        // Uebernahme an der zweiten Flanke
-> ```
->
-> Verlassen Sie sich im Zweifel auf die Registerbits, nicht auf die Modusnummer: Welche Zahl ein Datenblatt „Clock Phase" nennt, hängt davon ab, welche der beiden Konventionen es verwendet. Nachzulesen im *Family User Guide*, Kapitel 37, Registerbeschreibung `UCxxCTL0`.
+> Für dieses Projekt (CPOL = 1, CPHA = 0) heißt das: `UCCKPL` **und** `UCCKPH` werden beide gesetzt. Wer `UCCKPH` auf 0 lässt, erzeugt genau das oben beschriebene Fehlerbild – und sucht es erfahrungsgemäß in der Verdrahtung statt im Register. Nachzulesen im Family User Guide, Kapitel 37, Registerbeschreibung `UCBxCTL0`.
 
 ---
 
@@ -116,7 +111,7 @@ UCB1CTL1 &= ~UCSWRST;       // Modul freigeben
 
 | Register | Relevante Bits | Bedeutung |
 |---|---|---|
-| `UCB1CTL0` | `UCCKPH` | Taktphase – **invers zu CPHA** |
+| `UCB1CTL0` | `UCCKPH` | Taktphase – **invers zu CPHA**, siehe Warnkasten oben |
 | | `UCCKPL` | Taktpolarität (CPOL) |
 | | `UCMSB` | `1` = MSB zuerst |
 | | `UC7BIT` | `0` = 8 Datenbits |
@@ -174,7 +169,13 @@ Für eine interruptgesteuerte Übertragung mehrerer Bytes ist das **RX**-Flag di
 
 Wer auf `UCTXIFG` reagiert, schreibt das nächste Byte zu früh und zieht CS zu früh wieder hoch. Deshalb wird in dieser Übung der RX-Interrupt freigegeben und die ISR schreibt von dort aus das jeweils nächste Byte nach.
 
-**Chip Select** gehört nicht zum USCI-Modul, sondern ist ein gewöhnlicher GPIO-Ausgang. Er wird vor dem ersten Byte auf LOW gezogen und erst nach dem letzten wieder auf HIGH – bei einer Übertragung von mehreren Bytes also nicht zwischendurch.
+**Chip Select** gehört nicht zum USCI-Modul, sondern ist ein gewöhnlicher GPIO-Ausgang – die Software muss ihn selbst bedienen.
+
+Für die meisten Teilnehmer genügt es, CS über die gesamte Übertragung aktiv (LOW) zu lassen: Sie nehmen jedes Byte entgegen, solange sie ausgewählt sind. Manche Bausteine übernehmen den empfangenen Wert aber erst mit der **steigenden Flanke von CS** – ein D/A-Wandler legt den neuen Wert erst dann auf seinen Ausgang, und auch Konfigurationseinstellungen werden erst damit wirksam. Für solche Teilnehmer ist CS nicht nur eine Auswahl-, sondern eine **Übernahmeleitung**.
+
+Deshalb gibt der HAL in diesem Projekt CS nach jedem vollständig übertragenen Byte wieder frei und zieht es vor dem nächsten erneut auf LOW. Das kostet praktisch nichts und hält die Schnittstelle für beide Arten von Teilnehmern verwendbar.
+
+Die Grenze dieses Vorgehens sollten Sie kennen: Ein Baustein, der eine mehrteilige Befehlsfolge innerhalb *eines* CS-Fensters erwartet, verliert den Zusammenhang, wenn CS zwischendurch steigt. Solche Teilnehmer brauchen eine Rahmenbildung auf Treiberebene – darauf kommen wir in Einheit 6 zurück.
 
 ---
 

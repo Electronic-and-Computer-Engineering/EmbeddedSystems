@@ -24,7 +24,7 @@
 
 - Recherche:
   - Worin unterscheiden sich synchrone und asynchrone Übertragung?
-  - Woran erkennt ein UART-Empfänger den Anfang eines Zeichens, obwohl keine Taktleitung mitläuft?
+  - Wie wird bei I2C ein Teilnehmer adressiert, wenn es keine Chip-Select-Leitung gibt?
   - Warum braucht ein I2C-Bus Pull-Up-Widerstände, ein SPI-Bus aber nicht?
   - Wozu dient der Port-Mapping-Controller, und warum ist der Zugriff auf seine Register geschützt?
 - Arbeiten Sie die vier Unterkapitel durch – siehe unten.
@@ -43,7 +43,7 @@
 
 ---
 
-In dieser Einheit werden alle drei seriellen Schnittstellen des Fahrzeugs in Betrieb genommen. **SPI** implementieren Sie selbst; es ist die überschaubarste der drei und wird in der nächsten Einheit für das Display gebraucht. **UART** und **I2C** werden als fertige Module bereitgestellt; dort liegt die Arbeit darin, den fremden Code zu verstehen und sein Verhalten zu dokumentieren.
+In dieser Einheit werden die drei seriellen Schnittstellen des Fahrzeugs in Betrieb genommen. **SPI** implementieren Sie selbst; es ist die überschaubarste der drei und wird in der nächsten Einheit für das Display gebraucht. **UART** und **I2C** werden als fertige Module bereitgestellt; dort liegt die Arbeit darin, den fremden Code zu verstehen und sein Verhalten zu dokumentieren.
 
 | Schnittstelle | Modul | Verwendung | Ihre Aufgabe |
 |---|---|---|---|
@@ -62,7 +62,7 @@ Die Grundlagen stehen in vier eigenen Unterkapiteln. Die ersten drei behandeln j
 | | Inhalt |
 |---|---|
 | ➡ **[SPI am MSP430](SPI.md)** | Leitungen, CPOL/CPHA, Schieberegister, USCI_B1, Takt und Teiler |
-| ➡ **[UART am MSP430](UART.md)** | Rahmenaufbau, Baudratenberechnung mit Modulator, USCI_A0, Rahmenerkennung |
+| ➡ **[UART am MSP430](UART.md)** | Rahmenaufbau, Baudratenberechnung mit Modulator, USCI_A0, Rahmenerkennung, Lage des Empfangspuffers |
 | ➡ **[I2C am MSP430](I2C.md)** | Open Drain, Adressierung, ACK/NACK, Repeated Start, USCI_B0, Zustandsautomat |
 | ➡ **[Messen mit dem Analog Discovery](AnalogDiscovery.md)** | Anschluss, Pinbelegung, Logic und Protocol, Dekoder-Einstellungen, Fehlersuche |
 
@@ -90,13 +90,11 @@ Praktisch heißt das: Jede Schnittstelle bietet nach außen genau drei Dinge an 
 
 ```c
 halUSCIB1Init();                        // einmal beim Start
-halUSCIB1Send(data, len);               // Übertragung anstoßen
-while (halUSCIB1Busy());                // auf das Ende warten
+halUSCIB1Transmit();                    // Übertragung anstoßen
+while (LCD_Data.Status.B.TxSuc == 0);   // auf das Ende warten
 ```
 
 Dieselbe Dreiteilung finden Sie in den vorgegebenen Modulen wieder: `halUSCIA0Init()` / `halUSCIA0Send()` / `halUSCIA0TxBusy()` und `halUSCIB0Init()` / `halI2CWrite()` / `halI2CBusy()`. Das ist kein Zufall, sondern dasselbe Muster.
-
-Ihr SPI-Modul verwaltet seinen Zustand in einer globalen Struktur. Die gehört dem Modul – nach außen sichtbar sind nur die drei Funktionen. Eine Zeile wie `LCD_Data.TxData.len = …` oder `LCD_Data.Status.B.TxSuc` im Driver Layer wäre ein Registerzugriff mit Zwischenschritt: Sie greift an dem Ablauf vorbei, den die ISR verwaltet.
 
 > **Prüfen Sie Ihren Code am Ende der Einheit daraufhin:** Steht in einer Datei des Driver Layers irgendwo ein Registername oder ein `#include <msp430.h>`, gehört die betreffende Zeile in den HAL.
 
@@ -121,7 +119,7 @@ Der Unterschied zwischen beiden Wegen ist der Grund, warum diese Aufgabe eigenst
 
 - Welcher Wert muss in `PMAPKEYID` geschrieben werden, und was passiert bei einem anderen?
 - Wie lange bleibt der Zugriff offen, und wie schließt man ihn wieder?
-- Was geschieht mit einem Schreibzugriff auf ein `PxMAPy`-Register, nachdem das Fenster wieder geschlossen ist?
+- Was geschieht mit einem Schreibzugriff auf ein `PxMAPy`-Register, nachdem das Zugriffsfenster geschlossen ist?
 
 Die letzte Frage ist die unangenehmste: Sie erklärt, warum ein zweiter Konfigurationsversuch im laufenden Programm stillschweigend ohne Wirkung bleiben kann.
 
@@ -159,8 +157,9 @@ Die letzte Frage ist die unangenehmste: Sie erklärt, warum ein zweiter Konfigur
    // TODO: für jeden gemappten Pin zusätzlich das PxSEL-Bit setzen.
    //       Das Mapping allein schaltet die Sonderfunktion nicht ein.
 
-   // Hinweis: Nicht jeder Pin braucht Mapping. Wo die Sonderfunktion fest
-   //          auf dem Pin liegt, genuegt das PxSEL-Bit.
+   // Hinweis: Nicht jedes Signal braucht das Mapping. Prüfen Sie in der
+   //          Port-Funktionstabelle, welche Ihrer Pins die Sonderfunktion
+   //          fest tragen – dort genügt das PxSEL-Bit.
    ```
 
    Ersetzen Sie die TODO-Kommentare durch Code und schreiben Sie dazu, was Ihre Zugriffe auf `PMAPKEYID` bewirken – sonst weiß beim nächsten Lesen niemand mehr, warum die beiden Zeilen dort stehen.
@@ -189,7 +188,7 @@ Das LC-Display des Crazy Car Controllers wird über die SPI-Schnittstelle USCI_B
    - SPI-Master-Mode
    - Taktfrequenz: 100 kHz (als `#define` im Header)
    - 8 Bit, MSB first
-   - Taktpolarität und Taktphase: `UCCKPL` gesetzt, `UCCKPH` gelöscht – das Display erwartet Takt idle HIGH und Übernahme an der zweiten Flanke (SPI-Modus 3). Warum die Bits nicht heißen wie die Modusbezeichnung, steht im Unterkapitel.
+   - CPOL = 1, CPHA = 0
    - RX-Interrupt aktivieren
    - Softwarereset vor/nach Konfiguration setzen (`UCB1CTL1`)
    - Aufruf in `halInit()`
@@ -222,40 +221,96 @@ typedef struct {
 
 > **Hinweis:** Das Empfangsarray ist bewusst auf ein einzelnes Byte reduziert. Das Display sendet nichts zurück, und der Speicher wird in einer späteren Einheit für FreeRTOS gebraucht.
 
-4. **Globale Variable vom Typ `USCIB1_SPICom` in `halGeneral.c` deklarieren** – sie heißt `LCD_Data`, `volatile` nicht vergessen, die ISR schreibt darauf.
+4. **Globale Variable `LCD_Data` vom Typ `USCIB1_SPICom` in `halGeneral.c` deklarieren** – `volatile` nicht vergessen, die ISR schreibt darauf.
 
 5. **Als `extern volatile` in den Dateien deklarieren, die sie verwenden.**
 
-6. **Übertragung anstoßen – zwei Funktionen, eine davon nach außen:**
+6. **Das Gerüst für Sende- und Serviceroutine** sieht so aus. Was in die einzelnen TODOs gehört, sagen die Punkte 7 bis 9 – ersetzen Sie jedes davon durch Code und schreiben Sie Ihre Begründung in den Kommentar daneben:
 
-   Modulintern (`static`), setzt die Übertragung in Gang:
+   ```c
+   /* Auszug aus halUSCIB1.c – Senden und Serviceroutine */
+
+   extern volatile USCIB1_SPICom LCD_Data;
+
+   /* ---- Übertragung anstoßen ----------------------------------- */
+
+   void halUSCIB1Transmit(void)
+   {
+       // TODO: Nichts tun, solange noch eine Übertragung läuft.
+       //       Welches Bit zeigt das an?
+
+       // TODO: Chip Select aktivieren – Makro aus halGPIO.h
+
+       // TODO: Zähler auf das erste Byte stellen und den
+       //       Fertig-Status zurücknehmen
+
+       // TODO: Erstes Byte aus TxData.Data in UCB1TXBUF schreiben.
+       //       Alle weiteren Bytes schreibt die ISR.
+       //       TxData.len hat der Aufrufer vorher gesetzt.
+   }
+
+   /* ---- Serviceroutine ----------------------------------------- */
+
+   #pragma vector = USCI_B1_VECTOR
+   __interrupt void usciB1Isr(void)
+   {
+       switch (UCB1IV)              // Lesen löscht das behandelte Flag
+       {
+           case USCI_UCRXIFG:
+
+               // TODO: Chip Select freigeben. Das Byte ist jetzt
+               //       vollständig durchgelaufen – warum gehört diese
+               //       Zeile hierher und nicht in den Fertig-Zweig?
+
+               // TODO: Empfangenes Byte aus UCB1RXBUF abholen.
+               //       Warum muss dieses Register in jedem Fall
+               //       gelesen werden, obwohl das Display nichts
+               //       zurückschickt?
+
+               // TODO: Zähler der übertragenen Bytes fortschreiben
+
+               // TODO: Abbruchbedingung – TxData.cnt gegen TxData.len
+               //
+               //       Übertragung vollständig:
+               //         - TxSuc setzen
+               //         - Zähler so hinterlassen, dass die nächste
+               //           Übertragung wieder bei Byte 0 beginnt
+               //
+               //       sonst:
+               //         - Chip Select wieder aktivieren
+               //         - nächstes Byte aus TxData.Data nachschreiben
+
+               break;
+
+           default:
+               break;
+       }
+   }
+   ```
+
+   Die vier Schritte in der ISR – CS freigeben, Byte abholen, Zähler fortschreiben, Abbruchbedingung prüfen – sind in dieser Reihenfolge zu durchlaufen. Wer zuerst prüft und dann zählt, sendet ein Byte zu viel.
+
+7. **Funktion `halUSCIB1Transmit()` schreiben:**
    - Erstes Byte in `UCB1TXBUF` schreiben
    - `TxSuc` auf 0 setzen
    - Alle weiteren Bytes schreibt die ISR, bis `TxData.len` erreicht ist
 
-   Nach außen:
-   ```c
-   unsigned char halUSCIB1Send(const unsigned char *data, unsigned char len);
-   ```
-   kopiert die Daten in `TxData`, setzt die Länge und ruft die interne Funktion auf. Rückgabe `0`, wenn bereits eine Übertragung läuft – dasselbe Muster wie `halUSCIA0Send()`.
-
-   > **Warum kopieren und nicht nur den Zeiger merken?** Die anderen Module merken sich den Zeiger und verlangen deshalb, dass das Array gültig bleibt. Hier liegt der Puffer ohnehin schon im Modul – kopieren kostet nichts zusätzlich und nimmt dem Aufrufer eine Fehlerquelle ab.
-
-7. **ISR-Funktion (RX-Interrupt) programmieren:**
+8. **ISR-Funktion (RX-Interrupt) programmieren:**
    - Die ISR wird über das **RX**-Interrupt angestoßen, nicht über TX – die Begründung steht im Unterkapitel.
    - Abbruchbedingung: Vergleich von `TxData.cnt` mit `TxData.len`
    - Ist die Übertragung vollständig, `TxSuc` auf 1 setzen. Dieses Bit dient später dazu, auf das Ende einer Übertragung zu warten – etwa bei der Displayinitialisierung.
+   - Die Abfrage über `UCB1IV` ist dieselbe Konstruktion, die Sie bei `P1IV` in Einheit 2 kennengelernt haben und die Ihnen in den vorgegebenen UART- und I2C-Modulen wieder begegnet. Da hier nur eine Interruptquelle freigegeben ist, wäre eine direkte Abfrage von `UCB1IFG` ebenfalls korrekt – überlegen Sie, warum sie das bei mehreren freigegebenen Quellen nicht mehr wäre.
 
-8. **Statusabfrage nach außen anbieten:** `unsigned char halUSCIB1Busy(void)`, die `TxSuc` kapselt und `1` liefert, solange eine Übertragung läuft.
+9. **Chip Select (CS) einbinden** – über das Makro aus `halGPIO.h`, das Sie in der vorigen Aufgabe angelegt haben:
+   - vor dem ersten Byte: `CS_LOW`
+   - nach jedem vollständig übertragenen Byte: `CS_HIGH`
+   - vor jedem nachgeschriebenen Byte wieder: `CS_LOW`
 
-   Mit `halUSCIB1Init()`, `halUSCIB1Send()` und `halUSCIB1Busy()` sind die drei Dinge beisammen, die eine Schnittstelle nach außen anbietet. Ab hier greift niemand außerhalb des Moduls mehr auf `LCD_Data` zu – weder lesend noch schreibend.
-
-9. **Chip Select (CS) einbinden:**
-   - Vor der Übertragung: `CS_LOW`
-   - Nach dem letzten Byte: `CS_HIGH`
-   - über das Makro aus `halGPIO.h`, das Sie in der vorigen Aufgabe angelegt haben
+   Dass CS zwischen den Bytes steigt und nicht über die ganze Übertragung aktiv bleibt, hat einen Grund – er steht in ➡ **[SPI am MSP430](SPI.md)**.
 
 10. **[Meilensteinüberprüfung]** Woran erkennt der Driver Layer, dass eine Übertragung abgeschlossen ist?
+
+11. **[Meilensteinüberprüfung]** Was passiert, wenn `halUSCIB1Transmit()` mit `TxData.len == 0` aufgerufen wird? Sehen Sie sich dazu Ihre Abbruchbedingung genau an.
 
 ---
 
@@ -268,7 +323,7 @@ Diese Module schreiben Sie **nicht** selbst. Ihre Aufgabe ist es, sie in Betrieb
 > Grundlagen, Register und die vollständige Schnittstellenbeschreibung:
 > ➡ **[UART am MSP430](UART.md)** · ➡ **[I2C am MSP430](I2C.md)**
 
-Beim UART bekommen Sie `halUSCIA0` – den Debug-UART, der über den Debugger am PC als COM-Port erscheint. Sein Empfangszustand liegt dabei nicht im Modul selbst, sondern in einer eigenen Datei. Warum das so gebaut ist, steht im Unterkapitel; vollständig auflösen wird sich die Frage in Einheit 7.
+Der UART läuft in dieser Einheit als Debug-Schnittstelle über `halUSCIA0`: über den eZ-FET-Backchannel des Debuggers, am PC als virtueller COM-Port. Er bleibt dabei auf der HAL-Ebene und wird direkt angesprochen – wer ihn später initialisiert und mit welcher Baudrate, ist eine Frage des Driver Layers und kommt in einer späteren Einheit.
 
 > **Achtung, für alle Module:** Die übergebenen Arrays müssen gültig bleiben, bis die Übertragung abgeschlossen ist. Die Module merken sich den **Zeiger**, nicht den Inhalt. Eine lokale Variable in einer Funktion, die vorher zurückkehrt, führt zu Datenmüll auf der Leitung.
 
@@ -286,22 +341,26 @@ Beim UART bekommen Sie `halUSCIA0` – den Debug-UART, der über den Debugger am
 
 3. Rufen Sie `halUSCIA0Init()` und `halUSCIB0Init()` in `halInit()` auf. Die Parameter entnehmen Sie den Kommentaren in den Headern.
 
-   > **Ausblick:** Im fertigen Fahrzeug wird der UART nicht hier initialisiert, sondern aus dem Driver Layer heraus – weil erst die Anwendung entscheidet, über welchen Weg die Daten gehen. In dieser Einheit bleiben wir auf der HAL-Ebene; die Umstellung folgt in Einheit 7.
+   > **Ausblick:** Im fertigen Fahrzeug wird der UART nicht hier initialisiert, sondern aus dem Driver Layer heraus – weil erst die Anwendung entscheidet, über welchen Weg und mit welcher Baudrate die Daten gehen. In dieser Einheit bleiben wir auf der HAL-Ebene.
 
-4. Prüfen Sie die Pins aus Ihrer Tabelle noch einmal gegen das, was die drei Module erwarten. Debug-UART und I2C liegen auf gemappten Pins – vergleichen Sie mit dem SPI, wo die Sonderfunktion fest auf dem Pin liegt.
+4. Prüfen Sie die Pins aus Ihrer Tabelle noch einmal gegen das, was die beiden Module erwarten. Debug-UART und I2C liegen auf gemappten Pins, die SPI-Signale auf Pins mit fester Funktion – vergleichen Sie, was in `halGPIOInit()` für die beiden Fälle jeweils zu tun war.
 
 5. Schreiben Sie für jede Schnittstelle eine kurze Testausgabe, die zyklisch aus der Endlosschleife läuft:
    - **SPI:** zwei bekannte Bytes, z. B. `0xA5` und `0x3C`
    - **Debug-UART:** eine kurze Zeichenfolge über `halUSCIA0Send()`
-   - **I2C:** ein Schreibzugriff und ein Lesezugriff auf eine frei gewählte Adresse. Es hängt noch keine Gegenstelle am Bus, der Zugriff endet also mit einem NACK – das ist hier das **erwartete** Ergebnis. Prüfen Sie `halI2CError()`; eine vollständige Übertragung erzeugen Sie erst bei der Messung.
+   - **I2C:** ein Schreibzugriff und ein Lesezugriff auf eine frei gewählte Adresse
 
-   > **Achtung:** Stoßen Sie eine neue Sendung erst an, wenn `halUSCIA0TxBusy()` eine 0 liefert. Das Modul merkt sich den Zeiger auf Ihr Array, nicht dessen Inhalt.
+   > **Achtung:** Stoßen Sie eine neue Sendung erst an, wenn `halUSCIA0TxBusy()` eine 0 liefert – sonst überschreiben Sie den Sendezeiger einer noch laufenden Übertragung.
 
 6. **Debug-UART am PC prüfen.** Starten Sie ein Terminalprogramm (z. B. HTerm), wählen Sie den COM-Port des Debuggers – er erscheint als *MSP Application UART* – und stellen Sie 57600 Baud, 8N1 ein. Ihre Zeichenfolge muss dort im Klartext ankommen.
 
    Senden Sie anschließend in die Gegenrichtung: Geben Sie mit `halUSCIA0Start()` ein Sync-Muster und eine Rahmenlänge vor, tippen Sie den passenden Rahmen in HTerm ein und holen Sie ihn mit `halUSCIA0GetFrame()` ab. Prüfen Sie den Inhalt im Debugger.
 
+   > Dasselbe prüfen Sie im nächsten Abschnitt noch einmal am Analog Discovery – dort sehen Sie zusätzlich das Bittiming auf der Leitung.
+
 7. **[Meilensteinüberprüfung]** Rechnen Sie den Baudratenteiler für Ihre Taktfrequenz und 57600 Baud nach. Welchen Wert nimmt der Modulator an, und warum ist er nötig?
+
+8. **[Meilensteinüberprüfung]** Rechnen Sie dieselbe Teilung für 9600 Baud nach. Wie groß ist die relative Abweichung jeweils, und welche der beiden Baudraten ist damit unkritischer?
 
 ### [AUFGABE] Funktionsdiagramm der vorgegebenen Module
 
@@ -338,43 +397,74 @@ Beantworten Sie die Fragen schriftlich – das Diagramm allein reicht nicht.
 
 Ob eine Schnittstelle korrekt konfiguriert ist, zeigt erst die Messung. Alle drei Schnittstellen werden mit demselben Gerät geprüft – dem Digilent Analog Discovery unter WaveForms. Es dient dabei zugleich als Gegenstelle: Mithören zeigt nur, was der Controller sendet. Erst mit einem antwortenden Teilnehmer lässt sich der Empfangspfad prüfen – und beim I2C überhaupt erst eine vollständige Übertragung erzeugen, weil ohne Antwort jeder Zugriff mit einem NACK endet.
 
-> **Anschluss, Pinbelegung und alle Einstellungen in WaveForms stehen im Unterkapitel:**
+> **Anschluss, Pinbelegung und die vollständigen Einstellungen stehen im Unterkapitel:**
 > ➡ **[Messen mit dem Analog Discovery](AnalogDiscovery.md)**
 >
-> Arbeiten Sie es vor dieser Aufgabe durch. Die Schritte unten nennen nur noch, *was* zu messen ist, nicht mehr, wie das Gerät dafür einzurichten ist.
+> Arbeiten Sie es vor dieser Aufgabe durch. Die Schritte unten sagen, *was* zu messen ist; die kursiven Zeilen darunter nennen nur, **wo** die jeweilige Einstellung in WaveForms liegt. Die Begründung der Werte und die Fehlertabelle bleiben im Unterkapitel.
 
 ### [AUFGABE] Messen am Analog Discovery
 
+> **Einmal vorab, für alle drei Schnittstellen:** Masse zuerst verbinden. *Logic* und *Protocol* greifen intern auf dieselben Pins zu und dürfen deshalb nicht gleichzeitig offen sein – zum Mitlesen während eines Protocol-Betriebs die Betriebsart **Spy** verwenden. Abtastrate und Puffertiefe stehen im Logic-Fenster oben links unter **Rate** und **Samples**; für alles in dieser Einheit sind 10 MS/s bequem ausreichend.
+
 **SPI**
 
-1. Kanäle auf CLK, MOSI, MISO und CS legen. Unter *Logic* den SPI-Dekoder hinzufügen: 8 Bit, MSB first, CS aktiv LOW, Abtastflanke passend zu Ihrer Konfiguration. Der Dekoder benennt die Flanke direkt – übersetzen Sie Ihre beiden Registerbits darauf, statt eine Modusnummer zu raten.
-2. Zeichnen Sie die zyklische Ausgabe Ihrer beiden Bytes auf. Dokumentieren Sie Taktfrequenz, Bitreihenfolge und das Verhalten der CS-Leitung zwischen den Bytes.
+1. Kanäle auf CLK, MOSI, MISO und CS legen. Unter *Logic* den SPI-Dekoder hinzufügen: 8 Bit, MSB first, CPOL und CPHA passend zu Ihrer Konfiguration, CS aktiv LOW.
+
+   *In WaveForms:* Hauptfenster → **Logic**. Im Signalraster **+ (Add)** → *Protocol* → **SPI** für die Dekoderzeile. Dieselbe Schaltfläche → *Signal* für die vier Rohkanäle – der Dekoder zeigt Bytes, aber nicht, warum er sie so gelesen hat. Die Felder *Select*, *Clock*, *Data* und *Bits per word* liegen in der Dekoderzeile selbst. Trigger auf die **fallende Flanke von CS**, damit das Bild am Anfang der Übertragung beginnt.
+
+2. Zeichnen Sie die zyklische Ausgabe Ihrer beiden Bytes auf. Dokumentieren Sie Taktfrequenz, Bitreihenfolge und das Verhalten der CS-Leitung zwischen den Bytes – und begründen Sie, warum CS dort steigt.
+
+   *In WaveForms:* **Single** statt **Run** – ein stehendes Bild lässt sich vermessen. Für die Taktfrequenz zwei Cursor auf benachbarte Taktflanken setzen; die Anzeige liefert den Abstand, der Kehrwert ist die Frequenz. Bild über *File → Export*.
+
 3. Betreiben Sie das Analog Discovery unter *Protocol → SPI* als **Slave** und lassen Sie es ein bekanntes Byte zurücksenden. Prüfen Sie im Debugger, ob dieses Byte in `RxData.Data` ankommt.
+
+   *In WaveForms:* Logic-Fenster **schließen**. Hauptfenster → **Protocol** → Reiter **SPI** → Betriebsart **Slave**. Das Antwortbyte in die MISO-Daten des Reiters eintragen. Pinzuordnung, Frequenz, Polarität und Bitreihenfolge stehen in denselben Feldern wie beim Dekoder – nur wirken sie hier auf das, was das Gerät tatsächlich treibt.
 
    Damit weisen Sie nach, dass Ihr Empfangspfad funktioniert – am Display allein ließe sich das nicht zeigen, weil es nichts zurückschickt.
 
 **UART**
 
-4. **Debug-UART:** Kanal auf die TX-Leitung von UCA0 legen, unter *Logic* den UART-Dekoder hinzufügen: 57600 Baud, 8N1. Messen Sie die Dauer eines einzelnen Bits und vergleichen Sie sie mit der eingestellten Baudrate.
+4. Kanal auf die TX-Leitung von UCA0 legen, unter *Logic* den UART-Dekoder hinzufügen: 57600 Baud, 8N1. Messen Sie die Dauer eines einzelnen Bits und vergleichen Sie sie mit der eingestellten Baudrate.
 
-5. Betreiben Sie das Analog Discovery unter *Protocol → UART* als **Empfänger** und lassen Sie sich die Zeichenfolge im Klartext anzeigen. Senden Sie anschließend in der Gegenrichtung: Das Gerät schickt einen Rahmen, Ihr Controller empfängt ihn über `halUSCIA0Start()` und `halUSCIA0GetFrame()`.
+   *In WaveForms:* **Logic** → **+ (Add)** → *Protocol* → **UART**. In der Dekoderzeile den Datenkanal, *Bits* 8, *Parity* None, *Stop* 1 und **Rate** 57600. Trigger auf die **fallende Flanke** der TX-Leitung – das ist das Startbit. Bitzeit mit zwei Cursorn auf aufeinanderfolgende Flanken.
+
+5. Stellen Sie den Dekoder anschließend versuchsweise auf 9600 Baud um, ohne am Controller etwas zu ändern. Zeichnen Sie auf, was er dann liefert – das ist das Fehlerbild, das Sie bei einer falsch eingestellten Gegenstelle erwarten dürfen. Rechnen Sie nach, in welchem Verhältnis die beiden Bitzeiten stehen.
+
+   *In WaveForms:* nur das Feld **Rate** der Dekoderzeile ändern und erneut **Single** drücken. Die Rohkanäle bleiben identisch – alles, was sich im Bild ändert, kommt aus der Auswertung, nicht von der Leitung.
+
+6. Betreiben Sie das Analog Discovery unter *Protocol → UART* als **Empfänger** und lassen Sie sich die Zeichenfolge im Klartext anzeigen. Senden Sie anschließend in der Gegenrichtung: Das Gerät schickt einen Rahmen, Ihr Controller empfängt ihn über `halUSCIA0Start()` und `halUSCIA0GetFrame()`.
+
+   *In WaveForms:* **Protocol** → Reiter **UART** → **Send & Receive**. Baudrate und Pinzuordnung im Reiter prüfen, bevor Sie senden; empfangene Zeichen erscheinen im Receive-Fenster, zu sendende tragen Sie im Send-Feld ein. Beim UART gibt es keine Master-/Slave-Rolle – deshalb heißt die Betriebsart hier anders als bei SPI und I2C.
 
    Wählen Sie das Sync-Muster so, wie Sie es an `halUSCIA0Start()` übergeben haben – sonst erkennt der Empfänger den Rahmenanfang nicht.
 
+7. **[Meilensteinüberprüfung]** Der Debug-UART ließ sich mit HTerm am PC prüfen, weil der Debugger einen virtuellen COM-Port bereitstellt. Was müsste am Fahrzeug stecken, damit auch eine Schnittstelle ohne diesen Weg am PC ankommt?
+
 **I2C**
 
-6. Kanäle auf SDA und SCL legen, unter *Logic* den I2C-Dekoder hinzufügen.
-7. Betreiben Sie das Analog Discovery unter *Protocol → I2C* als **Slave** mit einer frei gewählten Adresse. Führen Sie von Ihrem Controller aus einen Schreibzugriff und anschließend einen Lesezugriff auf diese Adresse durch.
-8. Im aufgezeichneten Diagramm müssen erkennbar sein: Startbedingung, Adressbyte mit R/W-Bit, ACK des Slaves, Repeated Start, gelesene Bytes, Stoppbedingung.
-9. **Fehlerfall provozieren:** Greifen Sie auf eine Adresse zu, auf die kein Teilnehmer eingestellt ist. Zeichnen Sie auf, was passiert, und prüfen Sie im Debugger, ob `halI2CError()` gesetzt wird.
+8. Kanäle auf SDA und SCL legen, unter *Logic* den I2C-Dekoder hinzufügen.
+
+   *In WaveForms:* **Logic** → **+ (Add)** → *Protocol* → **I2C**. SCL und SDA in der Dekoderzeile zuordnen, Adressdarstellung auf **7 Bit** stellen. Trigger über den Trigger-Assistenten des I2C-Dekoders auf die **Startbedingung**.
+
+9. Betreiben Sie das Analog Discovery unter *Protocol → I2C* als **Slave** mit einer frei gewählten Adresse. Führen Sie von Ihrem Controller aus einen Schreibzugriff und anschließend einen Lesezugriff auf diese Adresse durch.
+
+   *In WaveForms:* Logic-Fenster schließen. **Protocol** → Reiter **I2C** → Betriebsart **Slave**. Dort drei Dinge eintragen: die Adresse (7 Bit), die Anzahl der zu quittierenden Schreibbytes, und die Bytes, die bei einem Lesezugriff zurückgehen. Erst damit entsteht eine vollständige Übertragung mit ACK.
+
+10. Im aufgezeichneten Diagramm müssen erkennbar sein: Startbedingung, Adressbyte mit R/W-Bit, ACK des Slaves, Repeated Start, gelesene Bytes, Stoppbedingung.
+
+    *In WaveForms:* zum Mitlesen die Betriebsart **Spy** im selben Reiter – sie dekodiert dasselbe wie *Logic*, ohne dass sich die beiden Instrumente um die Pins streiten.
+
+11. **Fehlerfall provozieren:** Greifen Sie auf eine Adresse zu, auf die kein Teilnehmer eingestellt ist. Zeichnen Sie auf, was passiert, und prüfen Sie im Debugger, ob `halI2CError()` gesetzt wird.
+
+    *In WaveForms:* nichts umstellen. Ändern Sie die Adresse **im Controller**, nicht die des Slaves – so bleibt die Aufzeichnung mit der aus Schritt 10 direkt vergleichbar.
 
 **Zu dokumentieren**
 
-10. Je ein Screenshot pro Schnittstelle mit sichtbarer Dekodierung, dazu einer vom I2C-Fehlerfall.
-11. Stimmen die gemessenen Taktfrequenzen mit Ihren berechneten Werten überein? Woher kommt eine eventuelle Abweichung?
-12. **[Meilensteinüberprüfung]** Vergleichen Sie die Diagramme: Woran erkennen Sie im Signalverlauf, ob eine Schnittstelle synchron oder asynchron arbeitet?
-13. **[Meilensteinüberprüfung]** SPI verwendet eine eigene Leitung zur Auswahl des Teilnehmers, I2C nicht. Wie lösen die beiden Protokolle dieselbe Aufgabe unterschiedlich, und welche Folgen hat das für die Anzahl der nötigen Leitungen?
-14. **[Meilensteinüberprüfung]** Wie unterscheidet sich der Signalverlauf im I2C-Fehlerfall von einer erfolgreichen Übertragung? An welcher Stelle genau bricht sie ab?
+12. Je ein Screenshot pro Schnittstelle mit sichtbarer Dekodierung – beim UART zusätzlich der Versuch mit falsch eingestelltem Dekoder – sowie einer vom I2C-Fehlerfall.
+13. Stimmen die gemessenen Taktfrequenzen mit Ihren berechneten Werten überein? Woher kommt eine eventuelle Abweichung?
+14. **[Meilensteinüberprüfung]** Vergleichen Sie die Diagramme: Woran erkennen Sie im Signalverlauf, ob eine Schnittstelle synchron oder asynchron arbeitet?
+15. **[Meilensteinüberprüfung]** SPI verwendet eine eigene Leitung zur Auswahl des Teilnehmers, I2C nicht. Wie lösen die beiden Protokolle dieselbe Aufgabe unterschiedlich, und welche Folgen hat das für die Anzahl der nötigen Leitungen?
+16. **[Meilensteinüberprüfung]** Wie unterscheidet sich der Signalverlauf im I2C-Fehlerfall von einer erfolgreichen Übertragung? An welcher Stelle genau bricht sie ab?
 
 ---
 
