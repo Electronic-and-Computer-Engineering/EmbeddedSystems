@@ -14,6 +14,22 @@
 - [Debugging](#debugging-übung)
 - [Unity-Tests](#testing)
 
+**Zu erreichende Ziele**
+
+Am Ende dieser Einheit reagiert das Fahrzeug auf die Tasten – über Interrupts, nicht
+über Polling – und Sie können den Ablauf im Debugger nachvollziehen.
+
+- [ ] Die Rechendauer je einer Integer- und einer Fließkommaoperation ist am Oszilloskop gemessen und dokumentiert; die Hintergrundbeleuchtung dient dabei als Zeitmarke.
+- [ ] Start- und Stopptaste sind als Eingänge mit Interrupt und passender Flankenerkennung konfiguriert.
+- [ ] Eine ISR für den Port-Vektor existiert; `__enable_interrupt()` steht am Ende von `halInit()`.
+- [ ] Die Struktur `ButtonCom` ist definiert, `CCButton` ist global und `volatile` deklariert.
+- [ ] Die ISR erkennt, welche Taste gedrückt wurde, und setzt `active` und `button`.
+- [ ] Die Endlosschleife in `main()` schaltet die Hintergrundbeleuchtung ein bzw. aus – ohne die Tasten abzufragen.
+- [ ] Die Prellzeit Ihres Tasters ist gemessen; die Entprellung über das Umschalten der Flanke funktioniert.
+- [ ] Breakpoints, Registeransicht, Watch-Expressions und ein bedingter Breakpoint sind im Debugger erprobt.
+
+**Tests:** HAL-Tests – die bereitgestellte Suite ist eingerichtet und läuft vollständig durch.
+
 **Laborübung**
 
 - *MSP430x5xx and MSP430x6xx Family User Guide Rev. O* – Texas Instruments

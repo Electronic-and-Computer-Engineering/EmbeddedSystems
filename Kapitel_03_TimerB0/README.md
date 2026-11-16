@@ -11,6 +11,22 @@
 - [Blockierendes Warten](#blockierendes-warten)
 - [Zusätzlich Fragen für die Meilensteinüberprüfung](#zusätzlich-fragen-für-die-meilensteinüberprüfung)
 
+**Zu erreichende Ziele**
+
+Am Ende dieser Einheit läuft das Fahrzeug auf dem Quarztakt, und der Timer erzeugt ein
+Zeitraster, das Sie nachgemessen haben.
+
+- [ ] Die XT2-Pins sind in `halGPIO.c` konfiguriert; `halUCS.c/.h` existiert und `halUCSInit()` wird in `halInit()` aufgerufen.
+- [ ] MCLK läuft mit 20 MHz, SMCLK mit 2,5 MHz; die Fault-Flags werden beim Hochlauf abgefragt.
+- [ ] SMCLK ist an einem GPIO ausgegeben und am Oszilloskop gemessen; Soll- und Istfrequenz sind dokumentiert.
+- [ ] Die Taktfrequenzen liegen als `#define` im Header und werden von allen Berechnungen verwendet.
+- [ ] `halTimerB0.c/.h` existiert; die Hintergrundbeleuchtung blinkt mit 2 Hz, am Oszilloskop verifiziert.
+- [ ] Die Timer-ISR fragt das richtige Interrupt-Flag ab.
+- [ ] `delayMsBlocked()` ist in `halUCS.c` implementiert; die zweite Blinkvariante über die Endlosschleife läuft.
+- [ ] Beide Varianten sind gemessen und verglichen; die Abweichung der Delay-Variante ist erklärt.
+
+**Tests:** HAL-Tests – die Suite ist um eigene Testfälle ergänzt und läuft vollständig durch.
+
 **Laborübung**
 
 - *MSP430x5xx and MSP430x6xx Family User Guide Rev. O* – Texas Instruments

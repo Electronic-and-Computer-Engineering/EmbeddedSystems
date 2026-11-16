@@ -11,6 +11,26 @@
   - [Drehzahlmessung](#drehzahlmessung)
   - [Tipps](#tipps)
 
+**Zu erreichende Ziele**
+
+Am Ende dieser Einheit fährt und lenkt das aufgebockte Fahrzeug über eine Schnittstelle,
+die keine Registernamen mehr enthält – und es weiß, wie weit es gefahren ist.
+
+- [ ] `halTimerA1.c/.h` erzeugt die PWM für Lenkung und Gas; nach `halInit()` liegt an beiden Kanälen **kein** Puls an.
+- [ ] `halTimerA1SetSteering()` und `halTimerA1SetThrottle()` setzen die Pulsbreite in Timer-Ticks.
+- [ ] Die Registerwerte für Mittelstellung und beide Endanschläge sind am Fahrzeug ermittelt und als `#define` abgelegt.
+- [ ] Frequenz und Pulsbreiten sind am Analog Discovery gemessen und dokumentiert – Mittelstellung und beide Endanschläge.
+- [ ] `driverGeneral.c/.h` existiert; `driverInit()` wird in `main()` nach `halInit()` aufgerufen.
+- [ ] `driverSetSteering()` und `driverSetThrottle()` nehmen einen Wert von -100 bis +100 entgegen, rechnen um und begrenzen auf die Endanschläge.
+- [ ] Das Servo steht nach `driverInit()` in Mittelstellung.
+- [ ] `driverESCinit()` ist unverändert übernommen und läuft am aufgebockten Fahrzeug durch.
+- [ ] `halTimerA0.c/.h` zählt die Flanken des Drehzahlgebers im Capture Mode über ein festes Messfenster.
+- [ ] `driverSensors.c/.h` liefert Geschwindigkeit in mm/s und zurückgelegten Weg in mm.
+- [ ] Die Wegmessung ist verifiziert: Rad von Hand um eine definierte Anzahl Umdrehungen gedreht, berechneter Weg mit dem Radumfang verglichen.
+- [ ] Im Driver Layer steht kein Registername.
+
+**Tests:** HAL-Tests und DL-Tests – der Driver Layer wird erstmals gegen den MockHAL geprüft.
+
 **Laborübung**
 
 - *MSP430x5xx and MSP430x6xx Family User Guide Rev. O* – Texas Instruments

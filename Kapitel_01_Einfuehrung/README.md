@@ -8,6 +8,20 @@
 - [Softwarestruktur](#softwarestruktur)
 - [Code Composer Studio](#code-composer-studio)
 - [IO Port Konfiguration](#io-port-konfiguration)
+
+**Zu erreichende Ziele**
+
+Am Ende dieser Einheit steht ein Projekt, das übersetzt und startet – und eine
+Pinkonfiguration, die zum Schaltplan passt. Prüfbar ist das im Debugger.
+
+- [ ] Das Projekt ist in CCS angelegt, die Ordner `HAL`, `DL` und `AL` existieren und sind als Include-Pfade eingetragen. Der Optimizer ist ausgeschaltet.
+- [ ] Das Projekt baut fehlerfrei und läuft in eine Endlosschleife in `main()`.
+- [ ] `halGeneral.c/.h` existiert mit der Funktion `halInit()`, die aus `main()` aufgerufen wird.
+- [ ] `halWdt.c/.h` ist angelegt; `halWdtInit()` wird in `halInit()` aufgerufen – **vor** `HAL_PMM_Init()`.
+- [ ] `halGpio.c/.h` enthält für jeden beschalteten Pin ein `#define` mit sprechendem Namen.
+- [ ] `halGpioInit()` setzt die Richtung aller beschalteten Pins und wird in `halInit()` aufgerufen.
+- [ ] Unbenutzte Pins sind als Ausgang mit definiertem Pegel konfiguriert – kein Pin bleibt floating.
+
 ### Durchzuführende Aufgaben
 - [[AUFGABE] Anlegen eines Basis Projektes](#aufgabe-anlegen-eines-basis-projektes)
 - [[AUFGABE] Grundkonfiguration der GPIOs](#aufgabe-grundkonfiguration-der-gpio)

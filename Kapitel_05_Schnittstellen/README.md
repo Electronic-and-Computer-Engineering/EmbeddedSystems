@@ -10,6 +10,23 @@
 - [Verifikation mit dem Analog Discovery](#verifikation-mit-dem-analog-discovery)
 - [Testing](#testing)
 
+**Zu erreichende Ziele**
+
+Am Ende dieser Einheit sprechen alle drei seriellen Schnittstellen, und Sie haben am
+Messgerät nachgewiesen, dass auf der Leitung steht, was dort stehen soll.
+
+- [ ] Für jedes Signal von SPI, UART und I2C ist der Controllerpin bestimmt und in `halGPIOInit()` konfiguriert; gemappte Pins sind über `PMAPKEYID` freigeschaltet und wieder gesperrt.
+- [ ] Chip Select ist ein gewöhnlicher Ausgang mit eigenem Makro in `halGPIO.h`.
+- [ ] `halUSCIB1.c/.h` ist selbst geschrieben: SPI-Master, 100 kHz, 8 Bit, MSB first, RX-Interrupt freigegeben.
+- [ ] Die SPI-ISR schreibt die Folgebytes nach, gibt CS nach jedem Byte frei und meldet das Ende der Übertragung über `TxSuc`.
+- [ ] Die vorgegebenen Module für UART und I2C sind eingebunden und werden in `halInit()` initialisiert; `halSharedUART.h` ist nur an einer Stelle inkludiert.
+- [ ] Die Testausgabe läuft zyklisch: zwei bekannte Bytes über SPI, eine Zeichenfolge über den Debug-UART, ein Schreib- und ein Lesezugriff über I2C.
+- [ ] Je ein Funktionsdiagramm für UART und I2C liegt vor, die Leitfragen sind schriftlich beantwortet.
+- [ ] Alle drei Schnittstellen sind am Analog Discovery gemessen und dekodiert; das Gerät war dabei Gegenstelle, nicht nur Mithörer.
+- [ ] (Optional) Der I2C-Fehlerfall ist provoziert und aufgezeichnet; `halI2CError()` wird gesetzt.
+
+**Tests:** HAL-Tests – eigene Testmodule für SPI, UART und I2C; die Fälle aus den Einheiten 2 bis 4 bestehen weiterhin.
+
 **Laborübung**
 
 - *MSP430x5xx and MSP430x6xx Family User Guide Rev. O* – Texas Instruments
@@ -83,8 +100,8 @@ Wer aus dem Driver Layer heraus direkt in `UCB1TXBUF` schreibt, umgeht den Zusta
 | Schicht | darf | darf nicht |
 |---|---|---|
 | **HAL** | Register lesen und schreiben, ISRs bereitstellen, Status nach außen melden | – |
-| **DL** | HAL-Funktionen aufrufen, Status abfragen | Register anfassen, `#include <msp430.h>` |
-| **AL** | DL-Funktionen aufrufen | beides nicht |
+| **DL** | HAL-Funktionen aufrufen, Status abfragen | Register manipulieren, `#include <msp430.h>` nicht mehr notwendig|
+| **AL** | DL-Funktionen aufrufen | Keine HAL Funktionen, keine Registermanipulation|
 
 Praktisch heißt das: Jede Schnittstelle bietet nach außen genau drei Dinge an – eine Funktion zum Initialisieren, eine zum Anstoßen einer Übertragung, und eine Abfrage, ob sie fertig ist. Was dazwischen passiert, bleibt im Modul.
 
@@ -221,7 +238,7 @@ typedef struct {
 
 > **Hinweis:** Das Empfangsarray ist bewusst auf ein einzelnes Byte reduziert. Das Display sendet nichts zurück, und der Speicher wird in einer späteren Einheit für FreeRTOS gebraucht.
 
-4. **Globale Variable `LCD_Data` vom Typ `USCIB1_SPICom` in `halGeneral.c` deklarieren** – `volatile` nicht vergessen, die ISR schreibt darauf.
+4. **Globale Variable `LCD_Data` vom Typ `USCIB1_SPICom` in `halUSCIB1.c` deklarieren** – `volatile` nicht vergessen, die ISR schreibt darauf.
 
 5. **Als `extern volatile` in den Dateien deklarieren, die sie verwenden.**
 
