@@ -69,19 +69,18 @@ Die Übung vermittelt praxisnah:
 <details>
 <summary><strong>6–7: Sensorik, Datenerfassung, Display</strong></summary>
 
-### 6. [Abstandssensoren, ADC und DMA](misc/cUSoon.md)
+### 6. [Display und Kommunikation](Kapitel_06_Display_Kommunikation/README.md)
+- Displaytreiber vervollständigen: Position, Zeichenausgabe, Zeichentabelle
+- Rahmenformat und Serviceroutinen der Kommunikation vervollständigen
+- Dummywerte oder vorhandene Sensorwerte am Display und am PC sichtbar machen
+- Umschaltung USB / Bluetooth über ein `#define`, DL-Tests mit Mock-HAL
+
+### 7. [Abstandssensoren, ADC und DMA](misc/cUSoon.md)
 **Markdown Soon available**
 - ToF-Sensoren und API angeleitet einbinden, Adressvergabe über XSHUT
 - ADC12_A aufsetzen, timergesteuerte Abtastung, Batteriespannung
 - Erfassung auf DMA umstellen, DL-Tests müssen unverändert bestehen
 - Verifikation ausschließlich im Debugger
-
-### 7. [Display und Kommunikation](misc/cUSoon.md)
-**Markdown Soon available**
-- Displayinitialisierung (ST7565), Zeichenausgabe, Zeichentabelle
-- Rahmenformat und Serviceroutinen der Kommunikation vervollständigen
-- Sensorwerte am Display und am PC sichtbar machen
-- DL-Tests mit Mock-HAL
 
 </details>
 
