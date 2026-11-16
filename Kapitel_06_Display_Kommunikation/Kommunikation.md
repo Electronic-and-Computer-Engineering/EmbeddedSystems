@@ -6,6 +6,7 @@
 - [Warum ein Rahmen nötig ist](#warum-ein-rahmen-nötig-ist)
 - [Die beiden Rahmenformate](#die-beiden-rahmenformate)
 - [Ein Zahlenwert, zwei Bytes](#ein-zahlenwert-zwei-bytes)
+- [Negative Zahlen](#negative-zahlen)
 - [USB oder Bluetooth: die Umschaltung](#usb-oder-bluetooth-die-umschaltung)
 - [Der zweite UART](#der-zweite-uart)
 - [Die Gegenstelle am PC](#die-gegenstelle-am-pc)
@@ -39,7 +40,7 @@ Beide Richtungen haben ein eigenes Format, und beide sind absichtlich unterschie
 
 `C` steht für Car, `H` für Host. Dass die beiden Richtungen verschiedene Kennungen haben, ist kein Schmuck: Hängt versehentlich eine Schleife zwischen TX und RX, oder lauscht ein Gerät auf der falschen Leitung, fällt es sofort auf, statt plausibel aussehenden Unsinn zu erzeugen.
 
-> **Warum das Rahmenende prüfen, wenn der Anfang doch schon erkannt wurde?** Das Sync-Muster kann auch mitten in Nutzdaten auftreten – ein Sensorwert von 0x4853 besteht aus genau den Bytes `'H'` und `'S'`. Der Empfänger beginnt dann an der falschen Stelle. Erst die Prüfung des Rahmenendes deckt das auf, und der Rahmen wird verworfen statt falsch ausgewertet.
+> **Warum das Rahmenende prüfen, wenn der Anfang doch schon erkannt wurde?** Weil das Sync-Muster auch mitten in den Nutzdaten auftauchen kann. Ein Sensorwert von **18515** wird als die beiden Bytes 72 und 83 übertragen – und das sind genau die ASCII-Codes von `'H'` und `'S'`. Der Empfänger hält diese zwei Datenbytes für einen Rahmenanfang und beginnt an der falschen Stelle. Erst die Prüfung des Rahmenendes deckt das auf: Dort steht dann kein `'E'`, `'H'`, und der Rahmen wird verworfen statt falsch ausgewertet.
 
 ---
 
@@ -58,13 +59,51 @@ Die Gegenstelle setzt entsprechend zusammen:
 vals = double(payload(1:2:end)) * 256 + double(payload(2:2:end));
 ```
 
-Diese Festlegung heißt **Big Endian** und ist bei Übertragungsprotokollen die übliche. Der MSP430 selbst legt Zahlen im Speicher umgekehrt ab – würde man einfach den Speicherinhalt verschicken, käme auf der anderen Seite ein um Faktor 256 verschobener Wert an. Genau diesen Fehler haben Sie beim VL53L1X in Einheit 7 noch einmal, dort in der Gegenrichtung.
+Diese Festlegung heißt **Big Endian** und ist bei Übertragungsprotokollen die übliche. Der MSP430 legt Zahlen im Speicher andersherum ab – würde man den Speicherinhalt einfach so hinausschicken, kämen die Bytes vertauscht an. Deshalb zerlegt der Code die Zahl ausdrücklich, statt sich auf die Speicherlage zu verlassen.
+
+Was dabei schiefgehen kann, sieht man am besten an echten Zahlen. Nehmen Sie den vorgegebenen Testsatz:
+
+| gesendet | richtig zusammengesetzt | bei vertauschten Bytes |
+|---|---|---|
+| 0 | 0 | 0 |
+| 4095 | 4095 | **65295** |
+| 65535 | 65535 | 65535 |
+| −40 | −40 | **55551** |
+
+Zwei der vier Werte sind unauffällig: Bei 0 und 65535 sind beide Bytes gleich, da fällt eine Vertauschung nicht auf. Bei 4095 und −40 schon, und zwar sofort und ohne Rechnerei. Genau deshalb stehen diese vier Zahlen im Testsatz.
+
+---
+
+## Negative Zahlen
+
+Der Rahmen überträgt **keine Vorzeichen**. Er überträgt 16 Bit, mehr nicht. Ob diese 16 Bit eine Zahl von 0 bis 65535 bedeuten oder eine von −32768 bis +32767, steht nirgends im Rahmen – das entscheidet erst, wer die Zahl ausliest.
+
+Auf der Fahrzeugseite heißt das: Sie schicken den Wert einfach als `unsigned int` weg, auch wenn er negativ gemeint ist. Das Bitmuster bleibt dasselbe:
+
+```c
+signed int lenkwinkel = -40;
+werte[0] = (unsigned int)lenkwinkel;    // dasselbe Bitmuster, jetzt als 65496 gelesen
+```
+
+Auf der PC-Seite wird es wieder eingerenkt. Die Regel ist eine Zeile: **Alles über 32767 ist in Wirklichkeit negativ**, und man zieht 65536 ab.
+
+```matlab
+if wert > 32767
+    wert = wert - 65536;        % 65496 -> -40
+end
+```
+
+Im MATLAB-Skript steht dafür die Variable `SIGNED`: ein Eintrag je Wert, `1` bedeutet „diesen als vorzeichenbehaftet lesen". Beim Testsatz ist das nur der letzte.
+
+Das ist keine Notlösung, sondern genau das, was jedes Protokoll tut. Die Bedeutung von Bits steht in der Vereinbarung zwischen den beiden Seiten, nicht in den Bits selbst. Dieselbe Frage stellt sich in Einheit 7 noch einmal beim VL53L1X, dort in der Gegenrichtung.
 
 ---
 
 ## USB oder Bluetooth: die Umschaltung
 
-Das Fahrzeug hat zwei UARTs: den Debug-UART über den Debugger und den AUX-UART auf der Steckerleiste, an dem ein Bluetooth-Modul hängt. Beide sollen **dasselbe** Protokoll sprechen, und der Treiber soll nicht wissen, über welchen er gerade redet.
+Das Fahrzeug hat zwei UARTs: den Debug-UART über den Debugger und den AUX-UART auf der Steckerleiste, an den sich ein Funkmodul stecken lässt. Beide sollen **dasselbe** Protokoll sprechen, und der Treiber soll nicht wissen, über welchen er gerade redet.
+
+> Ob zum Zeitpunkt Ihrer Übung ein Funkmodul am Fahrzeug steckt, sagt Ihnen die Betreuung. Für den Nachweis der Umschaltung brauchen Sie keines: Dass der Rahmen danach auf der **anderen Leitung** und mit **anderem Bittiming** erscheint, sehen Sie am Analog Discovery.
 
 Gelöst ist das mit einem Satz Makros, der zur Übersetzungszeit umgelegt wird:
 
@@ -98,7 +137,7 @@ Drei Dinge folgen daraus:
 
 ## Der zweite UART
 
-`halUSCIA1` haben Sie bereits aus Einheit 5 im Projekt – dort haben Sie es eingebunden und am Analog Discovery gemessen. Jetzt bekommt es seinen eigentlichen Zweck. Es ist dasselbe Modul wie `halUSCIA0`, mit drei Unterschieden:
+`halUSCIA1` bekommen Sie fertig. Es ist dasselbe Modul wie `halUSCIA0` aus Einheit 5, mit drei Unterschieden:
 
 | | `halUSCIA0` | `halUSCIA1` |
 |---|---|---|
@@ -107,6 +146,8 @@ Drei Dinge folgen daraus:
 | Baudrate im Projekt | 57600 | 9600 |
 
 Die niedrigere Baudrate am Bluetooth ist kein Zufall: Viele Module laufen ab Werk mit 9600, und die Luftstrecke verträgt weniger als ein Kabel.
+
+Der Unterschied bei den Pins ist der Grund, warum für diesen UART **kein Port-Mapping** nötig ist: P8.2 und P8.3 tragen die UCA1-Funktion fest, dort genügt das `PxSEL`-Bit. Das Schlüsselregister `PMAPKEYID` aus Einheit 5 brauchen Sie hier nicht.
 
 > **Vergleichen Sie die beiden Empfangszweige Zeile für Zeile.** Sie sind fast identisch – an einer Stelle aber nicht. Spielen Sie beide Varianten von Hand durch: Sync-Muster `'H','S'`, eintreffender Zeichenstrom `H H S …`. Welche der beiden erkennt den Rahmen, welche nicht, und woran liegt es? Das ist genau der Fall aus dem Kasten oben, diesmal im Code.
 

@@ -3,7 +3,7 @@
 
 ## Inhalt
 - [Die Unterkapitel](#die-unterkapitel)
-- [Die Anwendung ruft nur den Driver Layer](#die-anwendung-ruft-nur-den-driver-layer)
+- [Der Treiber kennt sein Modul nicht](#der-treiber-kennt-sein-modul-nicht)
 - [Steuerleitungen des Displays](#steuerleitungen-des-displays)
 - [Displaytreiber vervollständigen](#displaytreiber-vervollständigen)
 - [Kommunikation in Betrieb nehmen](#kommunikation-in-betrieb-nehmen)
@@ -16,11 +16,13 @@ Am Ende dieser Einheit zeigt das Fahrzeug eigene Werte auf dem Display an und ta
 Daten mit dem PC aus – über USB oder über Bluetooth, entschieden durch ein einziges `#define`.
 
 - [ ] A0- und Reset-Leitung sind in `halGPIOInit()` als Ausgänge konfiguriert und über `halSetLCDCmd()`, `halSetLCDData()` und `halSetLCDReset()` schaltbar.
-- [ ] `driverLCD.c` ist vervollständigt: löschen, Text und Zahlen ausgeben.
+- [ ] `driverLCD.c` ist vervollständigt: Text und Zahlen ausgeben.
 - [ ] Text läuft am Zeilenende in die nächste Seite um und bricht am Displayende ab.
+- [ ] `halUSCIA1` ist eingebunden: P8.2 und P8.3 auf Sonderfunktion, Initialisierung in `halInit()`, `halSharedUART.h` weiterhin nur an einer Stelle inkludiert.
 - [ ] `driverCom.c` ist vervollständigt: Telemetrierahmen packen, Kommandorahmen auspacken und auf das Rahmenende prüfen.
 - [ ] `driverLCDInit()` und `driverComInit()` werden aus `driverInit()` aufgerufen; die Hauptschleife empfängt, zeigt an und sendet.
-- [ ] Das MATLAB-Skript zeigt die gesendeten Werte; ein Kommando vom PC verändert Lenkung oder Gas.
+- [ ] Der vorgegebene Testsatz kommt am PC unverfälscht an, **einschließlich** `4095` und `-40`.
+- [ ] Das MATLAB-Skript zeigt eigene Messwerte; ein Kommando vom PC verändert Lenkung oder Gas.
 - [ ] Die Umschaltung auf Bluetooth ist durch Ändern **einer** Zeile nachgewiesen, ohne Eingriff in `driverCom.c`.
 - [ ] Telemetrierahmen und Kommandorahmen sind am Analog Discovery dekodiert; an der A0-Leitung ist erkennbar, welche SPI-Bytes Befehle und welche Bilddaten sind.
 
@@ -65,7 +67,7 @@ In dieser Einheit bekommen die Schnittstellen aus Einheit 5 ihre Gegenstelle. Wa
 | Steuerleitungen | `halGPIO` | A0 und Reset des Displays | selbst ergänzen |
 | Display | `driverLCD` | Anzeige am Fahrzeug | drei Funktionen selbst schreiben |
 | Kommunikation | `driverCom` | Telemetrie und Fernsteuerung | zwei Funktionen selbst schreiben |
-| AUX-UART | `halUSCIA1` | Bluetooth-Modul | aus Einheit 5, nur umschalten |
+| AUX-UART | `halUSCIA1` | Bluetooth-Modul | vorgegeben, einbinden und messen |
 
 Beide Treiber werden am Ende mit dem Analog Discovery gemessen und dekodiert – diesmal nicht als Funktionsnachweis einer Schnittstelle, sondern als Prüfung Ihres eigenen Protokolls.
 
@@ -84,24 +86,31 @@ Arbeiten Sie das jeweilige Unterkapitel vor der zugehörigen Aufgabe durch. Die 
 
 ---
 
-## Die Anwendung ruft nur den Driver Layer
+## Der Treiber kennt sein Modul nicht
 
-In Einheit 5 galt: Registerzugriffe gehören in den HAL. Jetzt kommt die Gegenrichtung dazu – **ein Treiber darf nicht wissen, an welchem Modul er hängt.**
+Einheit 5 hat eine Regel aufgestellt: Registerzugriffe gehören in den HAL. Diese Einheit stellt die zweite daneben – **ein Treiber darf nicht einmal wissen, welches HAL-Modul unter ihm arbeitet.**
 
-Sichtbar wird das an der Kommunikation. `driverCom.c` ruft nie `halUSCIA0Send()` oder `halUSCIA1Send()` auf, sondern nur `halComSend()`. Welches Modul dahintersteht, entscheidet ein einziges `#define` in `driverCom.h`:
+Sichtbar wird das an der Kommunikation. `driverCom.c` ruft nie `halUSCIA0Send()` oder `halUSCIA1Send()` auf, sondern immer nur `halComSend()`. Diesen Namen gibt es als Funktion gar nicht – er wird vom Präprozessor ersetzt, und zwar je nach einem einzigen Schalter in `driverCom.h`:
 
 ```c
-#define COM_USE_BT  0       // 0 = USB (UCA0), 1 = Bluetooth (UCA1)
+#define COM_USE_BT  0                       // 0 = USB (UCA0), 1 = Bluetooth (UCA1)
+
+#if COM_USE_BT
+    #define halComSend   halUSCIA1Send      // ab hier bedeutet halComSend: UCA1
+#else
+    #define halComSend   halUSCIA0Send      // ab hier bedeutet halComSend: UCA0
+#endif
 ```
 
-Steht dort eine `1`, geht alles über Bluetooth – und **keine Zeile** in `driverCom.c` ändert sich. Dasselbe gilt beim Display: `driverLCD.c` kennt `driverLCDWriteData()` und `halSetLCDData()`, aber kein einziges USCI-Register.
+Beim Übersetzen wird aus jedem `halComSend()` im Treiber die eine oder die andere Funktion. Ändern Sie die `0` in eine `1`, geht alles über Bluetooth – und **keine Zeile** in `driverCom.c` ändert sich. Dasselbe Prinzip beim Display: `driverLCD.c` kennt `driverLCDWriteData()` und `halSetLCDData()`, aber kein einziges USCI-Register.
 
 Daraus ergibt sich, wo in dieser Einheit was entsteht:
 
 | Schicht | Datei | was dazukommt |
 |---|---|---|
 | **HAL** | `halGPIO.c/.h` | A0- und Reset-Leitung, drei Schaltfunktionen |
-| **DL** | `driverLCD.c` | `Clear`, `WriteText`, `WriteUInt` |
+| **HAL** | `halUSCIA1.c/.h` | der zweite UART, vorgegeben – Aufruf in `halInit()` |
+| **DL** | `driverLCD.c` | `WriteText`, `WriteUInt` |
 | **DL** | `driverCom.c` | `driverComSend()`, `driverComReceive()` |
 | **AL** | `main.c` | Hauptschleife: empfangen, anzeigen, senden |
 
@@ -120,24 +129,31 @@ void driverInit(void)
 Die Hauptschleife besteht aus drei Schritten, immer in derselben Reihenfolge:
 
 ```c
+unsigned char cmd = 0;          // zuletzt empfangene Kommandonummer
+unsigned int  val = 0;          // zuletzt empfangener Wert
+unsigned int  tele[2];          // die Werte, die ans PC gehen
+
 while (1)
 {
-    if (driverComReceive(&cmd, &val))       // 1. empfangen
+    /* 1. empfangen */
+    if (driverComReceive(&cmd, &val))
     {
         // Kommando auf Lenkung oder Gas abbilden
     }
 
-    driverLCDWriteUInt(val, 2, 0);          // 2. anzeigen
+    /* 2. anzeigen – Seite 2, Spalte 0 */
+    driverLCDWriteUInt(val, 2, 0);
 
-    tele[0] = /* z. B. Lenkwinkel      */ 0;
-    tele[1] = /* z. B. Flankenzahl, E4 */ 0;
-    driverComSend(tele, 2);                 // 3. senden
+    /* 3. senden */
+    tele[0] = 0;                // hier z. B. den Lenkwinkel eintragen
+    tele[1] = 0;                // hier z. B. die Flankenzahl aus Einheit 4
+    driverComSend(tele, 2);
 
-    delayMsBlocked(100);                    // rund zehn Rahmen je Sekunde
+    delayMsBlocked(100);        // rund zehn Rahmen je Sekunde
 }
 ```
 
-Die Wartezeit am Ende ist nötig: Ohne sie versucht die Schleife tausende Male pro Sekunde zu senden. `driverComSend()` liefert dann `0` zurück, solange der Sender beschäftigt ist – kaputt geht nichts, aber die CPU dreht leer und die Anzeige flackert.
+Die Wartezeit am Ende ist nötig. Ohne sie durchläuft die Schleife tausende Male pro Sekunde: `driverComSend()` liefert dann meistens `0` zurück, weil der vorige Rahmen noch unterwegs ist, und das Display wird ununterbrochen neu beschrieben, obwohl sich nichts geändert hat. Kaputt geht dabei nichts – die CPU dreht nur leer.
 
 > **In den Serviceroutinen schreiben Sie nichts.** Die Empfangs-ISR des UART sammelt den Rahmen selbsttätig ein, sobald `driverComInit()` ihr über `halComStart()` Sync-Muster und Rahmenlänge mitgeteilt hat; die SPI-ISR schiebt die Displaybytes nach. Ihr Code fragt nur ab und stößt an.
 
@@ -172,12 +188,29 @@ In Einheit 5 haben Sie das Chip Select auf demselben Weg angelegt. Das vorgegebe
 
 3. **In `halGPIOInit()` als Ausgang konfigurieren.** Beide brauchen ein gesetztes `PxDIR`-Bit und **kein** `PxSEL` – es sind einfache Ausgänge, keine Sonderfunktion.
 
-4. **Drei Funktionen in `halGPIO.c` schreiben**, Prototypen in `halGPIO.h`:
+4. **Drei Funktionen in `halGPIO.c` schreiben.** Die Prototypen kommen nach `halGPIO.h`, der Rumpf sieht so aus – ersetzen Sie die TODOs durch je eine Zeile:
 
    ```c
-   void halSetLCDCmd(void);                 // A0 = 0 -> die folgenden Bytes sind Befehle
-   void halSetLCDData(void);                // A0 = 1 -> die folgenden Bytes sind Bildpunkte
-   void halSetLCDReset(bool lcdResetOn);    // true = Reset aktiv, false = Reset gelöst
+   /* Auszug aus halGPIO.c – Steuerleitungen des Displays */
+
+   void halSetLCDCmd(void)                  // A0 = 0: die folgenden Bytes sind Befehle
+   {
+       // TODO: A0-Pin auf 0 ziehen
+   }
+
+   void halSetLCDData(void)                 // A0 = 1: die folgenden Bytes sind Bildpunkte
+   {
+       // TODO: A0-Pin auf 1 setzen
+   }
+
+   void halSetLCDReset(bool lcdResetOn)
+   {
+       // TODO: lcdResetOn == true  -> Reset aktiv
+       //       lcdResetOn == false -> Reset geloest
+       //
+       //       Vorsicht: die Leitung ist aktiv LOW. "Reset aktiv" heisst
+       //       Pegel 0, nicht 1.
+   }
    ```
 
    Für `bool` muss `<stdbool.h>` in `halGPIO.h` eingebunden sein.
@@ -194,12 +227,13 @@ In Einheit 5 haben Sie das Chip Select auf demselben Weg angelegt. Das vorgegebe
 
 Der Controller kennt keine Zeichen, keine Zahlen und keine Zeilen – er kennt Bytes im Bildspeicher. Alles andere macht Ihr Treiber.
 
-Vorgegeben ist, was im Datenblatt steht und nur abgeschrieben werden könnte: der Weg eines Bytes zum Display, die Initialisierungssequenz, die Aufteilung der Spaltenadresse und die Fonttabelle.
+Vorgegeben ist, was im Datenblatt steht oder reine Mechanik ist: der Weg eines Bytes zum Display, die Initialisierungssequenz, die Aufteilung der Spaltenadresse, das Löschen und die Fonttabelle.
 
 ```c
 void driverLCDWriteCommand(const unsigned char *data, unsigned char dataLength);  // A0 = 0
 void driverLCDWriteData   (const unsigned char *data, unsigned char dataLength);  // A0 = 1
-void driverLCDSetPosition (unsigned char page, unsigned char col);                // Cursor
+void driverLCDSetPosition (unsigned char page, unsigned char col);                // Cursor setzen
+void driverLCDClear       (void);                                                 // alle Seiten leeren
 ```
 
 Die ersten beiden warten intern auf das Ende der vorigen SPI-Übertragung, schalten A0 um und stoßen `halUSCIB1Transmit()` aus Einheit 5 an; das Chip Select wird dort gesetzt, nicht hier.
@@ -210,16 +244,14 @@ Die ersten beiden warten intern auf das Ende der vorigen SPI-Übertragung, schal
 
 1. **Dateien ins Projekt übernehmen:** `driverFonttable.h`, `driverLCD.h` und `driverLCD.c` nach `DL/`, danach **F5**.
 
-2. **`driverLCDClear(void)` schreiben** – TODO 1 in der Datei.
-   - Alle Seiten nacheinander anfahren, je Seite `LCD_MAX_COLM` Bytes aus `emptyPage` senden
-   - Ein Aufruf von `driverLCDWriteData()` je Seite genügt – der Spaltenzähler rückt selbsttätig weiter
-   - `LCD_MAX_ROW` ist die Nummer der **letzten** Seite, nicht die Anzahl der Seiten
+2. **Erster Funktionsnachweis.** Tragen Sie `driverLCDInit()` in `driverInit()` ein und starten Sie das Programm. Die Anzeige muss danach **leer** sein statt zufällig gefüllt – `driverLCDInit()` ruft das vorgegebene `driverLCDClear()` bereits auf.
 
-   `driverLCDInit()` ruft diese Funktion bereits auf. Sobald sie steht, ist die Anzeige nach dem Start leer statt zufällig gefüllt – der erste sichtbare Erfolg.
+   Bleibt sie zufällig gefüllt oder hängt das Programm, liegt es nicht an Ihrem Treiber, sondern an den Steuerleitungen oder am SPI aus Einheit 5. Sehen Sie in die [Fehlerbilder](Display.md#fehlerbilder), bevor Sie weitermachen.
 
-3. **`driverLCDWriteText()` schreiben** – TODO 2.
-   - Cursor setzen, dann je Zeichen die sechs Spalten aus `font_table[]` als Bilddaten senden
-   - Die Zeichenbreite steht als `fonts_width_max` im Fontheader, `col` führen Sie selbst mit
+3. **`driverLCDWriteText()` schreiben** – TODO 1.
+   - Cursor einmal auf `(page, col)` setzen, dann je Zeichen die sechs Spalten aus `font_table[]` als Bilddaten senden
+   - Die Zeichenbreite steht als `fonts_width_max` im Fontheader
+   - Nach jedem Zeichen `col` um diese Breite erhöhen. Das Display zählt zwar selbst weiter, aber **Ihre** Funktion muss wissen, wo sie steht – sonst merkt sie nicht, wann die Zeile zu Ende ist
 
    Drei Fälle sind abzufangen:
 
@@ -231,13 +263,14 @@ Die ersten beiden warten intern auf das Ende der vorigen SPI-Übertragung, schal
 
    `char` ist auf dem MSP430 vorzeichenbehaftet – ein Zeichen über 127 ergibt sonst einen negativen Index.
 
-4. **`driverLCDWriteUInt()` schreiben** – TODO 3.
-   - `number % 10 + '0'` liefert die **letzte** Ziffer; füllen Sie einen Puffer von hinten nach vorne
-   - Ein `unsigned int` hat höchstens fünf Stellen
+4. **`driverLCDWriteUInt()` schreiben** – TODO 2.
+   - `number % DEZIMAL + '0'` liefert die **letzte** Ziffer als ASCII-Zeichen, `number /= DEZIMAL` rückt eine Stelle weiter
+   - Die Ziffern fallen also von rechts nach links an, ausgegeben werden müssen sie von links nach rechts: Füllen Sie einen Puffer von hinten nach vorne
+   - Für die Puffergröße ist `MAX_DIGIT` aus `driverLCD.h` gedacht; ein `unsigned int` wird höchstens 65535, also fünf Stellen
    - Ausgeben über `driverLCDWriteText()`, nicht über eine eigene Zeichenschleife
-   - Der Fall `number == 0` braucht eine eigene Behandlung – eine abweisende Schleife läuft dort kein einziges Mal
+   - **Achtung bei `number == 0`:** Eine `while`-Schleife, die vor dem ersten Durchlauf prüft, läuft hier kein einziges Mal, und es wird gar nichts ausgegeben. Entweder `do … while` verwenden oder die Null gesondert behandeln
 
-5. **`driverLCDInit()` in `driverInit()` eintragen** und einen Startbildschirm ausgeben: Teamname und eine Zahl, an einer Position Ihrer Wahl.
+5. **Startbildschirm ausgeben:** Teamname und eine Zahl, an einer Position Ihrer Wahl. Damit ist der Treiber abgenommen.
 
 6. **[Meilensteinüberprüfung]** Sie schreiben 128 Bytes in eine Seite, ohne die Position dazwischen neu zu setzen. Warum funktioniert das, und was passiert beim 129. Byte?
 
@@ -252,46 +285,71 @@ Ein UART überträgt einen Strom von Bytes ohne Anfang und Ende. Damit daraus Te
 Vorgegeben sind der Header mit den Rahmenlängen und der Umschaltung, die Initialisierung und die Gegenstelle am PC. Ihre Arbeit sind die beiden Funktionen, die den Rahmen packen und auspacken:
 
 ```c
-unsigned char halComSend(const unsigned char *data, unsigned char length);  // 0 = Sender belegt
-unsigned char halComTxBusy(void);                                          // 1 = sendet gerade
-unsigned char halComGetFrame(unsigned char *dest);                         // 0 = kein Rahmen da
+unsigned char halComSend(const unsigned char *data, unsigned char length);  // 1 = übernommen, 0 = Sender belegt
+unsigned char halComTxBusy(void);                                           // 1 = sendet gerade, 0 = frei
+unsigned char halComGetFrame(unsigned char *dest);                          // >0 = Rahmen kopiert, 0 = keiner da
 ```
 
-> **Achtung:** `halComSend()` merkt sich den **Zeiger** auf Ihren Puffer, nicht dessen Inhalt – dieselbe Regel wie bei den Modulen aus Einheit 5. Wer `comTxFrame` überschreibt, während noch gesendet wird, verschickt Datenmüll.
+`halComTxBusy()` brauchen Sie gleich im ersten Schritt von `driverComSend()`: Sie müssen wissen, ob noch gesendet wird, **bevor** Sie den Puffer neu beschreiben.
+
+> **Achtung:** `halComSend()` merkt sich nur die **Adresse** Ihres Puffers, nicht dessen Inhalt. Das Modul liest die Bytes nach und nach aus `comTxFrame` heraus, während Ihr Programm längst weiterläuft. Wer den Puffer in dieser Zeit überschreibt, verschickt eine Mischung aus altem und neuem Rahmen. Dieselbe Regel galt schon für die Module aus Einheit 5.
 
 > Rahmenformat, Umschaltung und Gegenstelle: ➡ **[Kommunikation mit dem Fahrzeug](Kommunikation.md)**
 
 ### [AUFGABE] driverCom – Rahmenformat implementieren
 
-1. **Dateien ins Projekt übernehmen:** `driverCom.h` und `driverCom.c` nach `DL/`, danach **F5**.
+1. **Dateien ins Projekt übernehmen:** `driverCom.h` und `driverCom.c` nach `DL/`, `halUSCIA1.c/.h` nach `HAL/`, danach **F5**.
 
-   `halUSCIA1.c/.h` liegt noch einmal bei, ist aber identisch mit Einheit 5. Haben Sie es dort bereits eingebunden, überspringen Sie das – ein zweites Exemplar führt zu doppelten Symbolen beim Linken.
+2. **Den zweiten UART in Betrieb nehmen.** `halUSCIA1` ist das Gegenstück zu Ihrem Debug-UART aus Einheit 5 – gleiche Schnittstelle, andere Pins, andere Baudrate.
 
-2. **`driverComInit()` in `driverInit()` aufrufen.** Die Funktion ist vorgegeben; sehen Sie sich an, was `halComStart()` mit dem Sync-Muster macht. Ab diesem Aufruf sucht die Empfangs-ISR nach `'H'`, `'S'`.
+   - Pins P8.2 und P8.3 in `halGPIOInit()` auf die Sonderfunktion schalten. Hier genügt das `PxSEL`-Bit, die UCA1-Funktion liegt fest – es ist kein Port-Mapping nötig.
+   - `halUSCIA1Init()` in `halInit()` aufrufen, mit der Baudrate aus `COM_BAUDRATE`.
+   - `halSharedUART.h` bleibt weiterhin **nur an einer Stelle** inkludiert, in `halGeneral.c`. Beide UART-Module greifen auf denselben Empfangs- und Sendezustand zu; ein zweites `#include` führt zu doppelten Symbolen beim Linken.
 
-3. **`driverComSend()` schreiben** – TODO 1 bis 4.
+3. **`driverComInit()` in `driverInit()` aufrufen.** Die Funktion ist vorgegeben; sehen Sie sich an, was `halComStart()` mit dem Sync-Muster macht. Ab diesem Aufruf sucht die Empfangs-ISR nach `'H'`, `'S'`.
+
+4. **`driverComSend()` schreiben** – TODO 1 bis 4.
    - Läuft noch eine Übertragung, nichts tun und `0` zurückgeben
    - Mehr als `COM_TX_MAX_VAL` Werte auf das Maximum begrenzen
-   - Rahmen in `comTxFrame[]` aufbauen: `'C'`, `'S'`, je Wert zwei Bytes, `'E'`, `'C'`
+   - Rahmen in `comTxFrame[]` aufbauen: `COM_CAR_START_1`, `COM_CAR_START_2`, je Wert zwei Bytes, `COM_CAR_END_1`, `COM_CAR_END_2`
    - `n` mitzählen – es ist am Ende die Rahmenlänge für `halComSend()`
 
    Die Reihenfolge der beiden Bytes je Wert ist festgelegt; `crazyCarCom.m` setzt sie genau so wieder zusammen.
 
-4. **`driverComReceive()` schreiben** – TODO 5 bis 7.
+5. **`driverComReceive()` schreiben** – TODO 5 bis 7.
    - Rahmen mit `halComGetFrame()` abholen; liefert sie `0`, ist keiner da
-   - **Rahmenende prüfen** – `frame[5]` und `frame[6]` müssen `'E'` und `'H'` sein
+   - **Rahmenende prüfen** – `frame[COM_RX_END_1]` und `frame[COM_RX_END_2]` müssen `COM_HOST_END_1` und `COM_HOST_END_2` sein
    - Bei ungültigem Rahmen `0` zurückgeben und `*cmd` und `*value` **nicht** anfassen
    - Sonst Kommando und Wert über die `COM_RX_…`-Indizes auspacken und `1` zurückgeben
 
    Auf den Rahmenanfang müssen Sie nicht prüfen, darauf hat der HAL bereits synchronisiert. Warum die Prüfung des Rahmenendes trotzdem nötig ist, steht im [Unterkapitel](Kommunikation.md#die-beiden-rahmenformate).
 
-5. **Hauptschleife aufbauen** und zwei Werte zyklisch senden – zum Beispiel Lenkwinkel und die Flankenzahl Ihrer Drehzahlmessung aus Einheit 4.
+6. **Gegenstelle starten.** `crazyCarCom.m` liegt **außerhalb** des CCS-Projekts – legen Sie es irgendwo ab, wo MATLAB es findet, und öffnen Sie es dort. Anzupassen sind `PORT` und `BAUD`; `NUM_VALS` und `SIGNED` stehen bereits auf dem Testsatz. `NUM_VALS` muss immer zu Ihrem `count` passen, sonst verwirft das Skript stillschweigend jeden Rahmen.
 
-6. **Gegenstelle starten.** `crazyCarCom.m` öffnen und `PORT`, `BAUD` und `NUM_VALS` anpassen. `NUM_VALS` muss zu Ihrem `count` passen, sonst verwirft das Skript stillschweigend jeden Rahmen.
+   Den COM-Port finden Sie im Gerätemanager unter *MSP Application UART*. Lassen Sie HTerm dabei geschlossen – zwei Programme können denselben Port nicht gleichzeitig öffnen.
 
-7. **[Meilensteinüberprüfung]** Was passiert, wenn ein Sensorwert zufällig die Bytes `'E'` und `'C'` enthält? Beschreiben Sie das Fehlerbild und einen Weg, es zu vermeiden.
+7. **Mit dem Testsatz prüfen.** Bevor Sie eigene Messwerte verschicken, senden Sie den vorgegebenen Satz aus `driverCom.c`:
 
-8. **[Meilensteinüberprüfung]** Die Umschaltung zwischen USB und Bluetooth kostet zur Laufzeit nichts. Warum, und welchen Preis zahlt man dafür?
+   ```c
+   driverComSend(comTestVals, COM_TEST_COUNT);
+   ```
+
+   Am PC müssen danach genau diese vier Zahlen stehen:
+
+   | | erwartet | falls die Bytereihenfolge vertauscht ist |
+   |---|---|---|
+   | Wert 0 | `0` | 0 – fällt nicht auf |
+   | Wert 1 | `4095` | **65295** |
+   | Wert 2 | `65535` | 65535 – fällt nicht auf |
+   | Wert 3 | `-40` | **55551** |
+
+   Die beiden mittleren Spalten sind das eigentliche Abnahmekriterium. Stimmen `4095` und `-40`, stimmt Ihre Zerlegung – bei `0` und `65535` sind beide Bytes gleich, da würde auch eine falsche Reihenfolge richtig aussehen.
+
+8. **Eigene Werte senden.** Erst jetzt den Testsatz durch echte Größen ersetzen – zum Beispiel Lenkwinkel und die Flankenzahl Ihrer Drehzahlmessung aus Einheit 4.
+
+9. **[Meilensteinüberprüfung]** Was passiert, wenn ein Sensorwert zufällig die Bytes `'E'` und `'C'` enthält? Beschreiben Sie das Fehlerbild und einen Weg, es zu vermeiden.
+
+10. **[Meilensteinüberprüfung]** Die Umschaltung zwischen USB und Bluetooth kostet zur Laufzeit nichts. Warum, und welchen Preis zahlt man dafür?
 
 ### [AUFGABE] Fernsteuerung und Telemetrie
 
@@ -307,6 +365,8 @@ Natürlich ist klar, dass wir das CrazyCar grundsätzlich nicht mit dem PC ferns
    | `2` | Gas | Ihre Festlegung |
 
 2. **Kommandos auswerten.** Im `if`-Zweig der Hauptschleife die Kommandonummer auf `driverSetSteering()` oder `driverSetThrottle()` abbilden.
+
+   > Das Gas reagiert nur, wenn der ESC scharfgeschaltet ist. Steht `driverESCinit()` in Ihrem `driverInit()` noch auskommentiert, bewegt sich nichts – das ist kein Fehler Ihrer Kommandoauswertung. Prüfen Sie die Lenkung zuerst, sie braucht keine Vorbereitung.
 
    > Der Wert kommt als `unsigned int` an, die beiden Funktionen erwarten `signed char` von −100 bis +100. Wie schickt der PC eine −50 durch ein vorzeichenloses 16-Bit-Feld? Legen Sie die Codierung fest und halten Sie sie in Ihrer Kommandotabelle fest.
 
@@ -346,7 +406,7 @@ In Einheit 5 haben Sie nachgewiesen, dass die Schnittstellen korrekte Bytes erze
 
 3. `COM_USE_BT` in `driverCom.h` auf `1` setzen, neu bauen, flashen. **In `driverCom.c` darf sich keine Zeile ändern** – das ist der eigentliche Nachweis dieser Aufgabe.
 
-4. Legen Sie den Kanal auf die TX-Leitung von UCA1 und stellen Sie den Dekoder auf 9600 Baud um. Zeichnen Sie denselben Rahmen noch einmal auf.
+4. Legen Sie den Kanal auf die TX-Leitung von UCA1 – P8.2 auf der Steckerleiste – und stellen Sie den Dekoder auf 9600 Baud um. Zeichnen Sie denselben Rahmen noch einmal auf.
 
    Messen Sie in beiden Aufzeichnungen die Dauer eines einzelnen Bits. Das Verhältnis muss zu den beiden Baudraten passen – rechnen Sie nach.
 

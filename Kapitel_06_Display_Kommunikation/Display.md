@@ -52,12 +52,25 @@ Daraus ergibt sich der Weg jedes Bytes zum Display: warten, bis die vorige Über
 Der Bildspeicher ist nicht als Fläche organisiert, sondern in **acht Seiten zu je 128 Spalten**. Eine Seite ist acht Bildpunkte hoch; ein geschriebenes Byte füllt also eine Spalte einer Seite, mit dem niederwertigsten Bit oben.
 
 ```
-        Spalte 0   1   2  ...  127
-Page 0  [ 8 Pixel hoch ]           ← Bit 0 oben, Bit 7 unten
-Page 1
-...
-Page 7
+            Spalte 0    1    2   ...   127
+          +----+----+----+---------+----+
+ Seite 0  | B  | B  | B  |   ...   | B  |   <- 128 Bytes, je 8 Pixel hoch
+          +----+----+----+---------+----+
+ Seite 1  |    |    |    |         |    |
+          +----+----+----+---------+----+
+   ...
+ Seite 7  |    |    |    |         |    |
+          +----+----+----+---------+----+
+
+ Ein einzelnes Byte B steht senkrecht:
+
+          Bit 0   oberster Bildpunkt
+          Bit 1
+           ...
+          Bit 7   unterster Bildpunkt
 ```
+
+Acht Seiten zu je acht Bildpunkten ergeben die 64 Zeilen des Displays. Ein Zeichen aus der Fonttabelle ist sechs solcher Bytes nebeneinander und passt damit genau in eine Seite – deshalb gibt es keine halben Zeilen und keine freie Höhenwahl.
 
 Nach jedem geschriebenen Byte rückt der interne Spaltenzähler **selbsttätig** eine Position weiter. 128 Bytes hintereinander füllen also eine ganze Seite, ohne dass die Position dazwischen neu gesetzt werden muss. Am Zeilenende springt der Zähler aber **nicht** in die nächste Seite – dort muss der Treiber eingreifen.
 
@@ -153,10 +166,11 @@ Drei Dinge gehen in dieser Einheit erfahrungsgemäß zuerst schief. Alle drei se
 | `lcdSend()`, `driverLCDWriteCommand()`, `driverLCDWriteData()` | der Weg eines Bytes zum Display |
 | `driverLCDInit()` | Hardware-Reset und die neun Befehle aus dem Datenblatt |
 | `driverLCDSetPosition()` | die Aufteilung der Spaltenadresse, drei Zeilen aus dem Datenblatt |
+| `driverLCDClear()` | acht Seiten in einer Schleife leeren – reine Mechanik |
 
-Offen bleiben `driverLCDClear()`, `driverLCDWriteText()` und `driverLCDWriteUInt()` – sie sind in `driverLCD.c` als TODO 1 bis 3 markiert. Nicht in der Datei, sondern im HAL liegen die beiden Steuerleitungen: `halSetLCDCmd()`, `halSetLCDData()` und `halSetLCDReset()` schreiben Sie selbst.
+Offen bleiben `driverLCDWriteText()` und `driverLCDWriteUInt()` – sie sind in `driverLCD.c` als TODO 1 und 2 markiert. Beide enthalten das, was sich nicht abschreiben lässt: Zeilenumbruch, Abbruch am Displayende und die Zerlegung einer Zahl in Ziffern. Nicht in der Datei, sondern im HAL liegen die beiden Steuerleitungen: `halSetLCDCmd()`, `halSetLCDData()` und `halSetLCDReset()` schreiben Sie selbst.
 
-> **`driverLCDInit()` ruft `driverLCDClear()` auf** – eine Funktion, die Sie erst schreiben müssen. Vorher bleibt die Anzeige nach der Initialisierung mit zufälligem Inhalt stehen. Das ist kein Fehler, sondern die Reihenfolge der Aufgabe.
+> **`driverLCDInit()` ruft `driverLCDClear()` auf.** Beide sind vorgegeben – nach dem ersten Start muss die Anzeige deshalb leer sein. Ist sie es nicht, stimmt etwas an den Steuerleitungen oder am SPI, nicht an Ihrem Treiber.
 
 ---
 

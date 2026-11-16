@@ -4,8 +4,9 @@
  * UNVOLLSTAENDIG - an jedem TODO fehlt Code.
  *
  * Vorgegeben: der Weg eines Bytes zum Display (lcdSend, WriteCommand,
- * WriteData), die Initialisierungssequenz und das Setzen der Position.
- * Ihre Arbeit: Clear, WriteText, WriteUInt.
+ * WriteData), die Initialisierungssequenz, das Setzen der Position und
+ * das Loeschen.
+ * Ihre Arbeit: WriteText und WriteUInt.
  */
 
 #include "driverLCD.h"
@@ -96,25 +97,31 @@ void driverLCDSetPosition(unsigned char page, unsigned char col)
 }
 
 
-/* ########## Ihre Arbeit ########## */
-
+/*
+ * Display loeschen: jede Seite einmal anfahren und mit Nullbytes fuellen.
+ *
+ * Der Spaltenzaehler des Displays rueckt nach jedem Byte selbsttaetig
+ * weiter - deshalb genuegt ein einziger Aufruf von driverLCDWriteData()
+ * ueber eine ganze Seite. LCD_MAX_ROW ist die Nummer der LETZTEN Seite,
+ * daher <= und nicht <.
+ */
 void driverLCDClear(void)
 {
-    // TODO 1: alle Seiten nacheinander anfahren und mit emptyPage
-    //         ueberschreiben.
-    //
-    //         Achtung: LCD_MAX_ROW ist die Nummer der LETZTEN Seite,
-    //         nicht die Anzahl der Seiten.
-    //
-    //         Je Seite: Position auf Spalte 0 setzen, dann LCD_MAX_COLM
-    //         Bytes als Daten schicken. Der Spaltenzaehler des Displays
-    //         ruckt selbsttaetig weiter, deshalb genuegt ein Aufruf
-    //         von driverLCDWriteData() pro Seite.
+    unsigned char page;
+
+    for (page = 0; page <= LCD_MAX_ROW; page++)
+    {
+        driverLCDSetPosition(page, 0);
+        driverLCDWriteData(emptyPage, LCD_MAX_COLM);
+    }
 }
+
+
+/* ########## Ihre Arbeit ########## */
 
 void driverLCDWriteText(const char *text, unsigned char textLength, unsigned char page, unsigned char col)
 {
-    // TODO 2: Cursor auf (page, col) setzen, dann Zeichen fuer Zeichen die
+    // TODO 1: Cursor auf (page, col) setzen, dann Zeichen fuer Zeichen die
     //         sechs Spalten aus font_table[] als Daten senden.
     //         Die Breite eines Zeichens steht als fonts_width_max im
     //         Fontheader. col nach jedem Zeichen mitfuehren.
@@ -133,7 +140,7 @@ void driverLCDWriteText(const char *text, unsigned char textLength, unsigned cha
 
 void driverLCDWriteUInt(unsigned int number, unsigned char page, unsigned char col)
 {
-    // TODO 3: Zahl in Ziffern zerlegen und als Text ausgeben.
+    // TODO 2: Zahl in Ziffern zerlegen und als Text ausgeben.
     //
     //         number % 10 + '0' liefert die LETZTE Ziffer als ASCII,
     //         number /= 10 rueckt eine Stelle weiter. Die Ziffern fallen

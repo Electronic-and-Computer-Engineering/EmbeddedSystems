@@ -36,9 +36,9 @@ test/tstDL/testDLLcd.c/.h       Textausgabe und Zahlendarstellung
 
 Für die Sendeseite müssen Sie an den Rahmenpuffer herankommen, ohne die Übertragung anzustoßen. Überlegen Sie, wie – das ist Teil der Aufgabe.
 
-- Ein Rahmen mit zwei Werten hat die erwartete Länge und beginnt mit `'C'`, `'S'`.
-- Der Wert `0x1234` erscheint als zwei Bytes in der festgelegten Reihenfolge.
-- Der Rahmen endet mit `'E'`, `'C'`.
+- Ein Rahmen mit zwei Werten hat die Länge `COM_TX_LEN(2)` und beginnt mit `COM_CAR_START_1`, `COM_CAR_START_2`.
+- Der Wert `4095` erscheint als die beiden Bytes `15` und `255`, in dieser Reihenfolge. Nehmen Sie bewusst diesen Wert und nicht `0` oder `65535` – dort sind beide Bytes gleich, und der Test würde auch bei vertauschter Reihenfolge bestehen.
+- Der Rahmen endet mit `COM_CAR_END_1`, `COM_CAR_END_2`.
 - Mehr als `COM_TX_MAX_VAL` Werte werden begrenzt und sprengen den Puffer nicht.
 - `driverComReceive()` liefert bei einem Rahmen mit falschem Rahmenende eine 0 und schreibt **nichts** nach `*cmd` und `*value`.
 - Ein gültiger Rahmen wird korrekt ausgepackt: Kommando und 16-Bit-Wert stimmen.
@@ -47,7 +47,7 @@ Der vierte und der fünfte Fall sind die wertvollsten. Beide prüfen das Verhalt
 
 ### `testDLLcd` – mindestens 3 Fälle
 
-Geprüft wird, was **Sie** geschrieben haben, nicht das Vorgegebene. `driverLCDSetPosition()` ist fertig ausgeliefert und braucht keinen Test; interessant sind die drei Funktionen mit Logik darin:
+Geprüft wird, was **Sie** geschrieben haben, nicht das Vorgegebene. `driverLCDSetPosition()` und `driverLCDClear()` sind fertig ausgeliefert und brauchen keinen Test; interessant sind die beiden Funktionen mit Logik darin:
 
 - `driverLCDWriteUInt()` zerlegt eine Zahl korrekt in Ziffern. Prüfen Sie `0`, eine einstellige und eine fünfstellige Zahl – die Reihenfolge der Ziffern ist der eigentliche Fehlerkandidat.
 - `driverLCDWriteText()` bricht am Zeilenende in die nächste Seite um. Ein Text, der bei Spalte 125 beginnt, muss auf zwei Seiten landen.
@@ -58,8 +58,9 @@ Dafür brauchen Sie einen Weg, die erzeugten Bytes abzufangen statt sie ans Disp
 ### Allgemeine Anforderungen
 
 - Jeder Testfall prüft **eine** Aussage und stellt seinen Ausgangszustand selbst her.
-- Verglichen wird gegen die `#define` aus `driverCom.h` und `driverLCD.h`, nie gegen Zahlenwerte.
+- Verglichen wird gegen die `#define` aus `driverCom.h` und `driverLCD.h`, nie gegen Zahlenwerte oder Zeichen. Für die Rahmenkennungen stehen `COM_CAR_START_1`, `COM_CAR_END_2` und die übrigen Namen bereit, für die Rahmenlänge `COM_TX_LEN(n)`.
 - Kein Testfall darf eine Übertragung auslösen, die auf Hardware wartet.
+- `comTxFrame` ist in `driverCom.c` definiert und im Header nicht sichtbar. Wie Ihr Testmodul trotzdem hinkommt, ist Teil der Aufgabe – aber ändern Sie dafür nichts am Treiber, was Sie danach nicht erklären können.
 
 ---
 

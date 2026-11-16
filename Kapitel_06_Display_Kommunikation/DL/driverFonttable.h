@@ -4,7 +4,13 @@
 #define FONT_HEIGHT	8
 #define fonts_width_max	6
 
-const unsigned char font_table[128][6] = {
+/*
+ * static: jede einbindende Datei bekommt ihre eigene Kopie.
+ * Ohne static waere das hier eine DEFINITION im Header - ein zweites
+ * #include (z. B. im Testmodul) fuehrt dann zu doppelten Symbolen
+ * beim Linken, genau wie bei halSharedUART.h aus Einheit 5.
+ */
+static const unsigned char font_table[128][6] = {
      {0x00,0x00,0x00,0x00,0x00,0x00},
      {0x00,0x00,0x00,0x00,0x00,0x00},
      {0x00,0x00,0x00,0x00,0x00,0x00},
