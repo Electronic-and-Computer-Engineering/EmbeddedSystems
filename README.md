@@ -75,8 +75,8 @@ Die Übung vermittelt praxisnah:
 - Dummywerte oder vorhandene Sensorwerte am Display und am PC sichtbar machen
 - Umschaltung USB / Bluetooth über ein `#define`, DL-Tests mit Mock-HAL
 
-### 7. [Abstandssensoren, ADC und DMA](misc/cUSoon.md)
-**Markdown Soon available**
+### 7. [Abstandssensoren, ADC und DMA](Kapitel_07_Sensorik/README.md)
+
 - ToF-Sensoren und API angeleitet einbinden, Adressvergabe über XSHUT
 - ADC12_A aufsetzen, timergesteuerte Abtastung, Batteriespannung
 - Erfassung auf DMA umstellen, DL-Tests müssen unverändert bestehen
