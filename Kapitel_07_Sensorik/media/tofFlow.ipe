@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE ipe SYSTEM "ipe.dtd">
+<ipe version="70218" creator="Kapitel 6">
+<info created="D:20261112000000" modified="D:20261112000000"/>
+<ipestyle name="kapitel6">
+<symbol name="arrow/to(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m -1 0.333 l -1 -0.333 l h</path></symbol>
+<color name="akzent" value="0.90 0.45 0.10"/>
+<color name="akzentBg" value="0.99 0.92 0.82"/>
+<color name="grau" value="0.78 0.78 0.78"/>
+<color name="grauText" value="0.35 0.35 0.35"/>
+<color name="tuerkis" value="0.00 0.686 0.796"/>
+<textsize name="klein" value="\small"/>
+<textsize name="winzig" value="\footnotesize"/>
+</ipestyle>
+<page>
+<layer name="alpha"/>
+<view layers="alpha" active="alpha"/>
+<path stroke="akzent" fill="akzentBg" pen="fat">20 268 m 320 268 l 320 302 l 20 302 l h</path>
+<text pos="32 284" stroke="black" type="label" size="normal" halign="left" valign="baseline">\texttt{driverTof.c}</text>
+<text pos="32 276" stroke="akzent" type="label" size="winzig" halign="left" valign="baseline">driverTofSetAllAddresses() \ StartSensor() \ GetDistance()</text>
+<text pos="14 284" stroke="tuerkis" type="label" size="winzig" halign="right" valign="baseline">DL</text>
+<path stroke="grau" fill="white" pen="normal">20 196 m 320 196 l 320 252 l 20 252 l h</path>
+<text pos="32 234" stroke="grauText" type="label" size="normal" halign="left" valign="baseline">\texttt{VL53L1X\_api.c}</text>
+<text pos="32 204" stroke="grauText" type="label" size="winzig" halign="left" valign="baseline">die Bibliothek von ST</text>
+<text pos="14 234" stroke="tuerkis" type="label" size="winzig" halign="right" valign="baseline">extLib</text>
+<path stroke="grau" fill="white" pen="normal">20 140 m 320 140 l 320 180 l 20 180 l h</path>
+<text pos="32 162" stroke="grauText" type="label" size="normal" halign="left" valign="baseline">\texttt{vl53l1\_platform.c}</text>
+<text pos="32 148" stroke="grauText" type="label" size="winzig" halign="left" valign="baseline">die Br\"ucke: acht Funktionen auf Ihren I2C</text>
+<text pos="14 162" stroke="tuerkis" type="label" size="winzig" halign="right" valign="baseline">extLib</text>
+<path stroke="grau" fill="white" pen="normal">20 68 m 320 68 l 320 124 l 20 124 l h</path>
+<text pos="32 106" stroke="grauText" type="label" size="normal" halign="left" valign="baseline">\texttt{halUSCIB0.c}</text>
+<text pos="32 76" stroke="grauText" type="label" size="winzig" halign="left" valign="baseline">Ihr I2C aus Einheit 5</text>
+<text pos="14 106" stroke="tuerkis" type="label" size="winzig" halign="right" valign="baseline">HAL</text>
+<path stroke="akzent" fill="akzentBg" pen="fat">20 12 m 320 12 l 320 52 l 20 52 l h</path>
+<text pos="32 34" stroke="black" type="label" size="normal" halign="left" valign="baseline">\texttt{halGPIO.c} \ XSHUT</text>
+<text pos="32 20" stroke="akzent" type="label" size="winzig" halign="left" valign="baseline">drei Ausg\"ange, \texttt{halSetToFXshut()}</text>
+<text pos="14 34" stroke="tuerkis" type="label" size="winzig" halign="right" valign="baseline">HAL</text>
+<path stroke="tuerkis" pen="fat" arrow="to(spx)/normal">470 300 m 470 60 l</path>
+<text pos="462 286" stroke="tuerkis" type="label" size="winzig" halign="right" valign="baseline">\texttt{driverTofGetDistance()}</text>
+<path stroke="tuerkis" pen="normal" dash="dotted">322 289 m 466 289 l</path>
+<text pos="462 222" stroke="tuerkis" type="label" size="winzig" halign="right" valign="baseline">\texttt{VL53L1X\_GetDistance()}</text>
+<path stroke="tuerkis" pen="normal" dash="dotted">322 225 m 466 225 l</path>
+<text pos="462 160" stroke="tuerkis" type="label" size="winzig" halign="right" valign="baseline">\texttt{VL53L1\_RdWord()}</text>
+<path stroke="tuerkis" pen="normal" dash="dotted">322 163 m 466 163 l</path>
+<text pos="462 96" stroke="tuerkis" type="label" size="winzig" halign="right" valign="baseline">\texttt{halI2CWriteRead()}</text>
+<path stroke="tuerkis" pen="normal" dash="dotted">322 99 m 466 99 l</path>
+<text pos="470 312" stroke="tuerkis" type="label" size="winzig" halign="right" valign="baseline">ein Aufruf</text>
+<path stroke="akzent" fill="akzentBg" pen="fat">20 -36 m 34 -36 l 34 -24 l 20 -24 l h</path>
+<text pos="40 -33" stroke="akzent" type="label" size="winzig" halign="left" valign="baseline">schreiben Sie</text>
+<path stroke="grau" fill="white" pen="normal">150 -36 m 164 -36 l 164 -24 l 150 -24 l h</path>
+<text pos="170 -33" stroke="grauText" type="label" size="winzig" halign="left" valign="baseline">vorgegeben</text>
+</page>
+</ipe>
