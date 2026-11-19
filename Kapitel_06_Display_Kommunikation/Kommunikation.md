@@ -27,16 +27,21 @@ Beide Richtungen haben ein eigenes Format, und beide sind absichtlich unterschie
 
 **Vom Fahrzeug zum PC** – Telemetrie, beliebig viele Werte:
 
-```
- 'C'  'S'   v0_high v0_low   v1_high v1_low   …   'E'  'C'
- └─ Start ─┘ └──────── je Wert zwei Bytes ────────┘ └─ Ende ─┘
-```
+<p align="center">
+  <img src="./media/frameCar.svg" alt="Rahmen vom Auto zum PC">
+</p>
 
 **Vom PC zum Fahrzeug** – ein Kommando mit einem Wert, feste Länge:
 
-```
- 'H'  'S'   cmd   val_high  val_low   'E'  'H'
-```
+<p align="center">
+  <img src="./media/frameHost.svg" alt="Rahmen vom PC zum Auto">
+</p>
+
+Was in beiden Bildern **nicht** vorkommt, ist so wichtig wie das, was drinsteht: keine Längenangabe, keine Prüfsumme, kein Feld, das den Inhalt beschreibt. Der Rahmen trägt eine Kennung, die Nutzbytes und wieder eine Kennung – mehr nicht. Alles andere ist **Vereinbarung**: Wie viele Werte kommen, in welcher Reihenfolge sie stehen und was sie bedeuten, wissen beide Seiten aus ihrem eigenen Code. Im Fahrzeug steht es als `count` in Ihrem Aufruf von `driverComSend()`, am PC als `NUM_VALS` beziehungsweise `NAMEN` in der Gegenstelle.
+
+Das ist keine Sparsamkeit, sondern eine Entscheidung. Ein selbstbeschreibender Rahmen müsste auf beiden Seiten ausgewertet werden, und ein Empfänger, der auf eine angekündigte Länge wartet, bleibt stehen, wenn die Ankündigung verlorengeht. Hier gibt es nichts, worauf man vergeblich warten könnte: Kommt Unsinn, setzt der Empfang beim nächsten Sync-Muster wieder auf.
+
+Dafür zahlen Sie einen Preis, und den sollten Sie kennen: **Ändern Sie die Anzahl der Werte im Fahrzeug, müssen Sie sie auch in der Gegenstelle ändern.** Dieselbe Festlegung steht an zwei Stellen. Vergisst man eine davon, verwirft der PC stillschweigend jeden Rahmen – ein Fehlerbild, das aussieht, als wäre die Leitung tot.
 
 `C` steht für Car, `H` für Host. Dass die beiden Richtungen verschiedene Kennungen haben, ist kein Schmuck: Hängt versehentlich eine Schleife zwischen TX und RX, oder lauscht ein Gerät auf der falschen Leitung, fällt es sofort auf, statt plausibel aussehenden Unsinn zu erzeugen.
 
@@ -155,9 +160,11 @@ Der Unterschied bei den Pins ist der Grund, warum für diesen UART **kein Port-M
 
 ## Die Gegenstelle am PC
 
-Zum Fahrzeug gehört eine Gegenstelle, und die bekommen Sie als MATLAB-Skript: [`tools/crazyCarCom.m`](tools/crazyCarCom.m). Es öffnet den seriellen Port, synchronisiert auf `'C','S'`, prüft das Rahmenende, setzt die Werte zusammen und zeichnet sie auf.
+Zum Fahrzeug gehören zwei Gegenstellen. Beide sprechen dasselbe Protokoll, sie sind für verschiedene Arbeitsschritte gedacht.
 
-Das ist bewusst ein kurzes Skript und keine Oberfläche: **Sie sollen die Gegenseite Ihres eigenen Protokolls lesen können.** Dieselbe Festlegung steht dort in MATLAB, die Sie in C getroffen haben – wenn eine der beiden Seiten nicht stimmt, sehen Sie an welcher Stelle.
+**Zum Lesen: [`tools/crazyCarCom.m`](tools/crazyCarCom.m)**
+
+Ein kurzes MATLAB-Skript. Es öffnet den seriellen Port, synchronisiert auf `'C','S'`, prüft das Rahmenende, setzt die Werte zusammen und zeichnet sie auf. Absichtlich kurz und absichtlich ohne Oberfläche: **Sie sollen die Gegenseite Ihres eigenen Protokolls lesen können.** Dieselbe Festlegung steht dort in MATLAB, die Sie in C getroffen haben – wenn eine der beiden Seiten nicht stimmt, sehen Sie an welcher Stelle. Fangen Sie damit an.
 
 ```matlab
 PORT      = "COM7";        % Gerätemanager -> MSP Application UART
@@ -166,6 +173,35 @@ NUM_VALS  = 2;             % so viele Werte schickt Ihr driverComSend()
 ```
 
 Drei Zeilen sind anzupassen, und alle drei müssen zu Ihrem Fahrzeug passen. Stimmt `NUM_VALS` nicht, läuft die Synchronisation aus dem Tritt und das Skript verwirft jeden Rahmen – ein guter Testfall für Ihre eigene Fehlerprüfung.
+
+**Zum Arbeiten: [`tools/ccMonitor.py`](tools/ccMonitor.py)**
+
+Eine kleine Oberfläche in Python. Links läuft mit, was das Fahrzeug sendet; rechts schicken Sie Kommandorahmen hin, ohne jedes Mal ein Skript zu ändern. Beide Richtungen zeigt sie zusätzlich in Hex an:
+
+```
+43 53 | FF D8  00 32 | 45 43
+```
+
+Damit sehen Sie Ihren Rahmen so, wie er auf der Leitung steht – dieselbe Ansicht wie später im UART-Dekoder des Analog Discovery, nur ohne Messgerät. Das macht sie zum nützlichsten Werkzeug bei der Fehlersuche: Steht links ein Rahmen, der anders aussieht als gedacht, liegt der Fehler in `driverComSend()`. Steht gar keiner, liegt er davor.
+
+Angepasst wird auch hier nur der Block am Dateianfang:
+
+```python
+PORT  = "COM7"                       # Geraetemanager -> MSP Application UART
+BAUD  = 57600                        # 57600 ueber USB, 9600 ueber Bluetooth
+NAMEN = ["Wert 0", "Wert 1", ...]    # so viele Werte schickt Ihr driverComSend()
+VORZEICHEN = [0, 0, 0, 1]            # 1 = diesen Wert als vorzeichenbehaftet lesen
+TYPEN = {1: ("Lenkwinkel", -100, 100),
+         2: ("Gas",        -100, 100)}   # Ihre Kommandotabelle
+```
+
+`TYPEN` ist Ihre Kommandotabelle aus der Aufgabenstellung, noch einmal – je Eintrag erscheint rechts eine Zeile mit Schieberegler und Knopf. Für eine Nummer, die es im Fahrzeug noch gar nicht gibt, gibt es unten eine freie Zeile: Typ und Wert eintippen, senden, am Fahrzeug im Debugger nachsehen. So lässt sich ein Kommando ausprobieren, bevor es im C-Code existiert.
+
+Zwei Dinge sind zu beachten. `pyserial` und `matplotlib` müssen installiert sein (`pip install pyserial matplotlib`), und **nur ein Programm kann den Port öffnen** – MATLAB, HTerm und der Monitor vertragen sich nicht gleichzeitig.
+
+Ohne Fahrzeug lässt sich die Oberfläche mit `python ccMonitor.py --demo` ansehen, und `python ccMonitor.py --selftest` prüft Packen und Auspacken gegen genau den Testsatz, der weiter oben in der Tabelle steht – ohne Port, ohne Fenster.
+
+In beiden Werkzeugen steht dieselbe Vereinbarung wie in Ihrem C-Code, und in beiden steht sie an genau einer Stelle. Das ist der praktische Teil dessen, was im Abschnitt über die Rahmenformate steht: Was nicht im Rahmen steht, muss gepflegt werden.
 
 ---
 

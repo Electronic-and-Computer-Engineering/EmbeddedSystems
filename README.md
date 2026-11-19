@@ -71,7 +71,7 @@ Die Übung vermittelt praxisnah:
 
 ### 6. [Display und Kommunikation](Kapitel_06_Display_Kommunikation/README.md)
 - Displaytreiber vervollständigen: Position, Zeichenausgabe, Zeichentabelle
-- Rahmenformat und Serviceroutinen der Kommunikation vervollständigen
+- Frameformat und Serviceroutinen der Kommunikation vervollständigen
 - Dummywerte oder vorhandene Sensorwerte am Display und am PC sichtbar machen
 - Umschaltung USB / Bluetooth über ein `#define`, DL-Tests mit Mock-HAL
 

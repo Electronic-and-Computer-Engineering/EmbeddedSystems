@@ -79,7 +79,7 @@ Die Grundlagen stehen in vier eigenen Unterkapiteln. Die ersten drei behandeln j
 | | Inhalt |
 |---|---|
 | ➡ **[SPI am MSP430](SPI.md)** | Leitungen, CPOL/CPHA, Schieberegister, USCI_B1, Takt und Teiler |
-| ➡ **[UART am MSP430](UART.md)** | Rahmenaufbau, Baudratenberechnung mit Modulator, USCI_A0, Rahmenerkennung, Lage des Empfangspuffers |
+| ➡ **[UART am MSP430](UART.md)** | Frameaufbau, Baudratenberechnung mit Modulator, USCI_A0, Frameerkennung, Lage des Empfangspuffers |
 | ➡ **[I2C am MSP430](I2C.md)** | Open Drain, Adressierung, ACK/NACK, Repeated Start, USCI_B0, Zustandsautomat |
 | ➡ **[Messen mit dem Analog Discovery](AnalogDiscovery.md)** | Anschluss, Pinbelegung, Logic und Protocol, Dekoder-Einstellungen, Fehlersuche |
 
@@ -333,7 +333,7 @@ typedef struct {
 
 ## UART und I2C einbinden
 
-Beide Module sind deutlich aufwendiger als SPI: Der UART muss in einem kontinuierlichen Zeichenstrom den Anfang eines Rahmens erkennen, und die I2C-Serviceroutine ist ein Zustandsautomat mit Adressierung, Repeated Start und Fehlerbehandlung.
+Beide Module sind deutlich aufwendiger als SPI: Der UART muss in einem kontinuierlichen Zeichenstrom den Anfang eines Frames erkennen, und die I2C-Serviceroutine ist ein Zustandsautomat mit Adressierung, Repeated Start und Fehlerbehandlung.
 
 Diese Module schreiben Sie **nicht** selbst. Ihre Aufgabe ist es, sie in Betrieb zu nehmen und ihr Verhalten so zu dokumentieren, dass Sie sie in den folgenden Einheiten sicher verwenden können.
 
@@ -371,7 +371,7 @@ Der UART läuft in dieser Einheit als Debug-Schnittstelle über `halUSCIA0`: üb
 
 6. **Debug-UART am PC prüfen.** Starten Sie ein Terminalprogramm (z. B. HTerm), wählen Sie den COM-Port des Debuggers – er erscheint als *MSP Application UART* – und stellen Sie 57600 Baud, 8N1 ein. Ihre Zeichenfolge muss dort im Klartext ankommen.
 
-   Senden Sie anschließend in die Gegenrichtung: Geben Sie mit `halUSCIA0Start()` ein Sync-Muster und eine Rahmenlänge vor, tippen Sie den passenden Rahmen in HTerm ein und holen Sie ihn mit `halUSCIA0GetFrame()` ab. Prüfen Sie den Inhalt im Debugger.
+   Senden Sie anschließend in die Gegenrichtung: Geben Sie mit `halUSCIA0Start()` ein Sync-Muster und eine Framelänge vor, tippen Sie den passenden Frame in HTerm ein und holen Sie ihn mit `halUSCIA0GetFrame()` ab. Prüfen Sie den Inhalt im Debugger.
 
    > Dasselbe prüfen Sie im nächsten Abschnitt noch einmal am Analog Discovery – dort sehen Sie zusätzlich das Bittiming auf der Leitung.
 
@@ -396,8 +396,8 @@ Fremden Code einzubinden ist einfach – ihn zu verstehen ist die eigentliche Ar
 **Leitfragen, die Ihr Diagramm beantworten soll:**
 
 *UART:*
-1. Der Empfänger sucht in einem fortlaufenden Zeichenstrom nach dem Anfang eines Rahmens. Wie erkennt er ihn, und was passiert bei einem Zeichen, das nicht passt?
-2. Was geschieht, wenn ein Byte eintrifft, das selbst wieder der Rahmenanfang sein könnte?
+1. Der Empfänger sucht in einem fortlaufenden Zeichenstrom nach dem Anfang eines Frames. Wie erkennt er ihn, und was passiert bei einem Zeichen, das nicht passt?
+2. Was geschieht, wenn ein Byte eintrifft, das selbst wieder der Frameanfang sein könnte?
 3. Warum wird der TX-Interrupt am Ende einer Übertragung wieder abgeschaltet?
 
 *I2C:*
@@ -449,11 +449,11 @@ Ob eine Schnittstelle korrekt konfiguriert ist, zeigt erst die Messung. Alle dre
 
    *In WaveForms:* nur das Feld **Rate** der Dekoderzeile ändern und erneut **Single** drücken. Die Rohkanäle bleiben identisch – alles, was sich im Bild ändert, kommt aus der Auswertung, nicht von der Leitung.
 
-6. Betreiben Sie das Analog Discovery unter *Protocol → UART* als **Empfänger** und lassen Sie sich die Zeichenfolge im Klartext anzeigen. Senden Sie anschließend in der Gegenrichtung: Das Gerät schickt einen Rahmen, Ihr Controller empfängt ihn über `halUSCIA0Start()` und `halUSCIA0GetFrame()`.
+6. Betreiben Sie das Analog Discovery unter *Protocol → UART* als **Empfänger** und lassen Sie sich die Zeichenfolge im Klartext anzeigen. Senden Sie anschließend in der Gegenrichtung: Das Gerät schickt einen Frame, Ihr Controller empfängt ihn über `halUSCIA0Start()` und `halUSCIA0GetFrame()`.
 
    *In WaveForms:* **Protocol** → Reiter **UART** → **Send & Receive**. Baudrate und Pinzuordnung im Reiter prüfen, bevor Sie senden; empfangene Zeichen erscheinen im Receive-Fenster, zu sendende tragen Sie im Send-Feld ein. Beim UART gibt es keine Master-/Slave-Rolle – deshalb heißt die Betriebsart hier anders als bei SPI und I2C.
 
-   Wählen Sie das Sync-Muster so, wie Sie es an `halUSCIA0Start()` übergeben haben – sonst erkennt der Empfänger den Rahmenanfang nicht.
+   Wählen Sie das Sync-Muster so, wie Sie es an `halUSCIA0Start()` übergeben haben – sonst erkennt der Empfänger den Frameanfang nicht.
 
 7. **[Meilensteinüberprüfung]** Der Debug-UART ließ sich mit HTerm am PC prüfen, weil der Debugger einen virtuellen COM-Port bereitstellt. Was müsste am Fahrzeug stecken, damit auch eine Schnittstelle ohne diesen Weg am PC ankommt?
 

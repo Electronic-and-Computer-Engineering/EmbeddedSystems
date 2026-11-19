@@ -22,7 +22,7 @@ Daten mit dem PC aus – über USB oder über Bluetooth, entschieden durch ein e
 - [ ] `driverCom.c` ist vervollständigt: Telemetrierahmen packen, Kommandorahmen auspacken und auf das Rahmenende prüfen.
 - [ ] `driverLCDInit()` und `driverComInit()` werden aus `driverInit()` aufgerufen; die Hauptschleife empfängt, zeigt an und sendet.
 - [ ] Der vorgegebene Testsatz kommt am PC unverfälscht an, **einschließlich** `4095` und `-40`.
-- [ ] Das MATLAB-Skript zeigt eigene Messwerte; ein Kommando vom PC verändert Lenkung oder Gas.
+- [ ] Die Gegenstelle am PC zeigt eigene Messwerte; ein Kommando vom PC verändert Lenkung oder Gas.
 - [ ] Die Umschaltung auf Bluetooth ist durch Ändern **einer** Zeile nachgewiesen, ohne Eingriff in `driverCom.c`.
 - [ ] Telemetrierahmen und Kommandorahmen sind am Analog Discovery dekodiert; an der A0-Leitung ist erkennbar, welche SPI-Bytes Befehle und welche Bilddaten sind.
 
@@ -36,6 +36,7 @@ Daten mit dem PC aus – über USB oder über Bluetooth, entschieden durch ein e
   - Seiten 32–41: [Befehlstabelle](https://www.hpinfotech.ro/ST7565.pdf#page=32)
 - Crazy Car Controller FHJ Schaltplan [Crazy Car Schematic](https://fhjoanneum-my.sharepoint.com/:b:/g/personal/florian_mayer_fh-joanneum_at/EfXYu-rqsLRErJbybsbN4AEB_RUMizJhwpb5D_ysimZehA?e=Ti7PtO)
 - Digilent **Analog Discovery** mit **WaveForms** – [Referenzhandbuch](https://digilent.com/reference/test-and-measurement/analog-discovery-3/reference-manual)
+- Gegenstelle am PC: MATLAB oder Python 3 mit `pyserial` und `matplotlib` (`pip install pyserial matplotlib`)
 
 **Wissensüberprüfung**
 
@@ -282,6 +283,18 @@ Die ersten beiden warten intern auf das Ende der vorigen SPI-Übertragung, schal
 
 Ein UART überträgt einen Strom von Bytes ohne Anfang und Ende. Damit daraus Telemetrie wird, braucht es einen Rahmen – und auf beiden Seiten dieselbe Festlegung, in welcher Reihenfolge die Bytes eines 16-Bit-Werts gehen.
 
+Das sind die beiden Rahmen, die Sie in dieser Einheit bauen:
+
+<p align="center">
+  <img src="./media/frameCar.svg" alt="Rahmen vom Auto zum PC">
+</p>
+
+<p align="center">
+  <img src="./media/frameHost.svg" alt="Rahmen vom PC zum Auto">
+</p>
+
+Warum der Rahmen weder eine Länge noch eine Prüfsumme trägt und was das für Ihre Gegenstelle bedeutet, steht im [Unterkapitel](Kommunikation.md#die-beiden-rahmenformate).
+
 Vorgegeben sind der Header mit den Rahmenlängen und der Umschaltung, die Initialisierung und die Gegenstelle am PC. Ihre Arbeit sind die beiden Funktionen, die den Rahmen packen und auspacken:
 
 ```c
@@ -328,6 +341,8 @@ unsigned char halComGetFrame(unsigned char *dest);                          // >
 
    Den COM-Port finden Sie im Gerätemanager unter *MSP Application UART*. Lassen Sie HTerm dabei geschlossen – zwei Programme können denselben Port nicht gleichzeitig öffnen.
 
+   Zusätzlich liegt [`tools/ccMonitor.py`](tools/ccMonitor.py) bereit: dieselbe Gegenstelle mit Oberfläche, Hex-Ansicht und einem Sendeteil für Kommandorahmen. Die brauchen Sie spätestens in der nächsten Aufgabe – und bei der Fehlersuche hier schon, weil sie den empfangenen Rahmen Byte für Byte anzeigt. Dieselben Einstellungen, derselbe Block am Dateianfang: ➡ **[Die Gegenstelle am PC](Kommunikation.md#die-gegenstelle-am-pc)**
+
 7. **Mit dem Testsatz prüfen.** Bevor Sie eigene Messwerte verschicken, senden Sie den vorgegebenen Satz aus `driverCom.c`:
 
    ```c
@@ -364,13 +379,22 @@ Natürlich ist klar, dass wir das CrazyCar grundsätzlich nicht mit dem PC ferns
    | `1` | Lenkwinkel | Ihre Festlegung |
    | `2` | Gas | Ihre Festlegung |
 
+   Die Tabelle gilt für ein Kommando je Rahmen. Es wird **nicht** alles auf einmal geschickt: Wer die Lenkung ändert, schickt einen Rahmen mit `1`, und das Gas bleibt, was es war. Genau deshalb ist dieser Rahmen so kurz und das Senden ereignisgesteuert, während die Telemetrie in der Gegenrichtung dauernd läuft.
+
+   In `ccMonitor.py` tragen Sie dieselbe Tabelle als `TYPEN` ein; je Eintrag erscheint eine Sendezeile mit Schieberegler.
+
 2. **Kommandos auswerten.** Im `if`-Zweig der Hauptschleife die Kommandonummer auf `driverSetSteering()` oder `driverSetThrottle()` abbilden.
 
    > Das Gas reagiert nur, wenn der ESC scharfgeschaltet ist. Steht `driverESCinit()` in Ihrem `driverInit()` noch auskommentiert, bewegt sich nichts – das ist kein Fehler Ihrer Kommandoauswertung. Prüfen Sie die Lenkung zuerst, sie braucht keine Vorbereitung.
 
    > Der Wert kommt als `unsigned int` an, die beiden Funktionen erwarten `signed char` von −100 bis +100. Wie schickt der PC eine −50 durch ein vorzeichenloses 16-Bit-Feld? Legen Sie die Codierung fest und halten Sie sie in Ihrer Kommandotabelle fest.
 
-3. **Vom PC senden.** Im unteren Teil von `crazyCarCom.m` steht der Kommandorahmen als eigener Abschnitt; Nummer und Wert eintragen und den Abschnitt einzeln ausführen.
+3. **Vom PC senden.** Zwei Wege, beide erzeugen denselben Rahmen:
+
+   - `ccMonitor.py` starten, Wert am Schieberegler einstellen, **Setzen**. Der gesendete Rahmen erscheint im Protokoll darunter in Hex – prüfen Sie, dass dort genau die fünf Bytes stehen, die Sie erwarten.
+   - Oder im unteren Teil von `crazyCarCom.m`: Der Kommandorahmen steht dort als eigener Abschnitt, Nummer und Wert eintragen und den Abschnitt einzeln ausführen.
+
+   Für den ersten Versuch ist der Monitor der schnellere Weg, weil Sie den Wert ändern können, ohne etwas neu auszuführen.
 
 4. **Auf dem Display mitschreiben.** Zuletzt empfangenes Kommando und seinen Wert anzeigen. Damit sehen Sie ohne Debugger, ob das Fahrzeug verstanden hat, was gemeint war.
 
@@ -400,7 +424,9 @@ In Einheit 5 haben Sie nachgewiesen, dass die Schnittstellen korrekte Bytes erze
 
    *In WaveForms:* **Logic** → **+ (Add)** → *Protocol* → **UART**. Trigger auf die **fallende Flanke** der TX-Leitung, dann **Single** – ein stehendes Bild lässt sich vermessen.
 
-2. Vergleichen Sie die Bytefolge mit dem, was `crazyCarCom.m` anzeigt. Rechnen Sie nach: Wie viele Bytes hat Ihr Rahmen bei `NUM_VALS` Werten, und wie lange dauert seine Übertragung bei 57600 Baud?
+2. Vergleichen Sie die Bytefolge mit dem, was die Gegenstelle anzeigt. Am schnellsten geht das mit der Hex-Zeile in `ccMonitor.py`: Dort steht derselbe Rahmen, den der Dekoder zeigt – einmal von der Software gelesen, einmal von der Leitung abgenommen. Weichen die beiden voneinander ab, ist das der interessanteste Befund dieser Einheit.
+
+   Rechnen Sie außerdem nach: Wie viele Bytes hat Ihr Rahmen bei `NUM_VALS` Werten, und wie lange dauert seine Übertragung bei 57600 Baud?
 
 **Umschaltung auf Bluetooth**
 

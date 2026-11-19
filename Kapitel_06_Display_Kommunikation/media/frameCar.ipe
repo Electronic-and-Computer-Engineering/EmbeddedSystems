@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<!DOCTYPE ipe SYSTEM "ipe.dtd">
+<ipe version="70218" creator="Ipe 7.2.29">
+<info created="D:20261119120000" modified="D:20261119125126"/>
+<ipestyle name="frames">
+<arrowsize name="normal" value="7"/>
+<color name="black" value="0"/>
+<color name="frei" value="0.96 0.87 0.74"/>
+<color name="gray" value="0.5"/>
+<color name="kennung" value="0.87 0.86 0.82"/>
+<color name="nutzlast" value="0.8 0.91 0.87"/>
+<color name="white" value="1"/>
+<dashstyle name="dashed" value="[3] 0"/>
+<opacity name="opaque" value="1"/>
+<pen name="heavier" value="0.8"/>
+<pen name="normal" value="0.4"/>
+<symbolsize name="normal" value="3"/>
+<textsize name="footnote" value="\footnotesize"/>
+<textsize name="normal" value="\normalsize"/>
+<textsize name="small" value="\small"/>
+<textstyle name="normal" begin="" end=""/>
+<preamble>\usepackage[utf8]{inputenc}\usepackage[T1]{fontenc}</preamble>
+<layout paper="700 210" origin="0 0" frame="700 210"/>
+<titlestyle pos="0 0" size="normal" color="black"  valign="baseline"/>
+</ipestyle>
+<page>
+<layer name="rahmen"/>
+<view layers="rahmen" active="rahmen"/>
+<text layer="rahmen" pos="75 172" stroke="black" type="label" width="112.91" height="6.861" depth="0" valign="baseline">Frame vom Auto zum PC</text>
+<path stroke="black" fill="kennung">
+75 110 m
+129 110 l
+129 144 l
+75 144 l
+h
+</path>
+<text pos="102 127" stroke="black" type="label" width="6.654" height="6.175" depth="0" halign="center" valign="center" size="small">C</text>
+<path stroke="black" fill="kennung">
+137 110 m
+191 110 l
+191 144 l
+137 144 l
+h
+</path>
+<text pos="164 127" stroke="black" type="label" width="5.118" height="6.175" depth="0" halign="center" valign="center" size="small">S</text>
+<path stroke="black" fill="nutzlast">
+199 110 m
+253 110 l
+253 144 l
+199 144 l
+h
+</path>
+<text pos="226 127" stroke="black" type="label" width="25.974" height="6.175" depth="0" halign="center" valign="center" size="small">v0 HB</text>
+<path stroke="black" fill="nutzlast">
+261 110 m
+315 110 l
+315 144 l
+261 144 l
+h
+</path>
+<text pos="288 127" stroke="black" type="label" width="24.823" height="6.175" depth="0" halign="center" valign="center" size="small">v0 LB</text>
+<path stroke="black" fill="nutzlast">
+323 110 m
+377 110 l
+377 144 l
+323 144 l
+h
+</path>
+<text pos="350 127" stroke="black" type="label" width="7.678" height="0.968" depth="0" halign="center" valign="center" size="small">...</text>
+<path stroke="black" fill="nutzlast">
+385 110 m
+439 110 l
+439 144 l
+385 144 l
+h
+</path>
+<text pos="412 127" stroke="black" type="label" width="26.486" height="6.175" depth="0" halign="center" valign="center" size="small">vn HB</text>
+<path stroke="black" fill="nutzlast">
+447 110 m
+501 110 l
+501 144 l
+447 144 l
+h
+</path>
+<text pos="474 127" stroke="black" type="label" width="25.335" height="6.175" depth="0" halign="center" valign="center" size="small">vn LB</text>
+<path stroke="black" fill="kennung">
+509 110 m
+563 110 l
+563 144 l
+509 144 l
+h
+</path>
+<text pos="536 127" stroke="black" type="label" width="6.269" height="6.175" depth="0" halign="center" valign="center" size="small">E</text>
+<path stroke="black" fill="kennung">
+571 110 m
+625 110 l
+625 144 l
+571 144 l
+h
+</path>
+<text pos="598 127" stroke="black" type="label" width="6.654" height="6.175" depth="0" halign="center" valign="center" size="small">C</text>
+<text pos="75 90" stroke="black" type="label" width="330.341" height="5.489" depth="1.55" valign="baseline" size="footnote">Beliebig viele Werte, jeder als High Byte und Low Byte. Wie viele es sind, legen Sie fest.</text>
+<path stroke="black" fill="kennung">
+75 42 m
+101 42 l
+101 57 l
+75 57 l
+h
+</path>
+<text pos="88 49.5" stroke="black" type="label" width="10.818" height="5.489" depth="0" halign="center" valign="center" size="footnote">CS</text>
+<text pos="109 49.5" stroke="black" type="label" width="33.151" height="5.489" depth="1.55" valign="center" size="footnote">Kennung</text>
+<path stroke="black" fill="nutzlast">
+250 42 m
+276 42 l
+276 57 l
+250 57 l
+h
+</path>
+<text pos="263 49.5" stroke="black" type="label" width="12.334" height="5.489" depth="0" halign="center" valign="center" size="footnote">HB</text>
+<text pos="284 49.5" stroke="black" type="label" width="46.441" height="5.489" depth="1.55" valign="center" size="footnote">Wert, 16 Bit</text>
+</page>
+</ipe>
