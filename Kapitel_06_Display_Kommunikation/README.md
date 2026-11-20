@@ -52,10 +52,11 @@ Daten mit dem PC aus – über USB oder über Bluetooth, entschieden durch ein e
 > **VORSICHT:** Bleibt das Programm beim ersten Displayzugriff stehen, setzt Ihr `halUSCIB1Init()` aus Einheit 5 das Statusbit `TxSuc` nicht auf 1. Nach einem Reset steht es auf 0, und `driverLCDSend()` wartet auf ein Ende, das nie kommt.
 
 **Video**
- - *folgt*
+ - [Einführungsvideo - Einheit 6](https://youtu.be/4Aope99ldoM)
 
 ### Durchzuführende Aufgaben
 - [[AUFGABE] A0- und Reset-Leitung setzen](#aufgabe-a0--und-reset-leitung-setzen)
+- [[AUFGABE] Modifikation halUSCB1](#aufgabe-modifikation-haluscb1)
 - [[AUFGABE] driverLCD – Text und Zahlen ausgeben](#aufgabe-driverlcd--text-und-zahlen-ausgeben)
 - [[AUFGABE] driverCom – Frameformat implementieren](#aufgabe-drivercom--frameformat-implementieren)
 - [[AUFGABE] Fernsteuerung und Telemetrie](#aufgabe-fernsteuerung-und-telemetrie)
