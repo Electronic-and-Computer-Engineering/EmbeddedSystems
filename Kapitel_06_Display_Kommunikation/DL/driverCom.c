@@ -47,49 +47,46 @@ void driverComInit(void)
 
 unsigned char driverComSend(const unsigned int *values, unsigned char count)
 {
-    unsigned char n = 0;
+    unsigned char i, n = 0;
 
-    // TODO 1: laeuft noch eine Uebertragung?  -> 0 zurueckgeben, nichts tun.
-    //         Der HAL merkt sich den Zeiger auf comTxFrame, nicht den Inhalt -
-    //         wer den Puffer ueberschreibt, waehrend gesendet wird, verschickt Bruch.
+    // TODO 1: Laeuft noch eine Uebertragung? -> 0 zurueckgeben, nichts tun.
+    //         halComSend() merkt sich den Zeiger auf comTxFrame, nicht den
+    //         Inhalt - wer waehrend des Sendens hineinschreibt, verschickt Bruch.
 
-    // TODO 2: mehr Werte als COM_TX_MAX_VAL  -> auf das Maximum begrenzen.
+    // TODO 2: Mehr als COM_TX_MAX_VAL Werte -> auf das Maximum begrenzen.
 
-    // TODO 3: Frame in comTxFrame[] aufbauen:
-    //
-    //            'C'  'S'   v0_high v0_low   v1_high v1_low   ...   'E'  'C'
-    //
-    //         Ein unsigned int sind zwei Bytes. Die Gegenstelle erwartet
-    //         zuerst das hoeherwertige - siehe Kommunikation.md.
-    //         Verwenden Sie COM_CAR_START_1/_2 und COM_CAR_END_1/_2,
-    //         nicht die Zeichen selbst.
-    //         n mitzaehlen, es ist am Ende die Framelaenge.
+    comTxFrame[n++] = COM_CAR_START_1;              // Car
+    comTxFrame[n++] = COM_CAR_START_2;              // Start
 
-    // TODO 4: Frame abschicken und den Rueckgabewert von halComSend()
-    //         durchreichen.
+    for (i = 0; i < count; i++)
+    {
+        // TODO 3: Jeden Wert in zwei Bytes zerlegen und ablegen.
+        //         Die Gegenstelle erwartet das hoeherwertige zuerst.
+        //         n dabei mitzaehlen.
+    }
 
-    (void)values; (void)count; (void)n;
-    return 0;
+    comTxFrame[n++] = COM_CAR_END_1;                // End
+    comTxFrame[n++] = COM_CAR_END_2;                // Car
+
+    return halComSend(comTxFrame, n);               // n ist jetzt die Rahmenlaenge
 }
+
 
 unsigned char driverComReceive(unsigned char *cmd, unsigned int *value)
 {
     unsigned char frame[COM_RX_LEN];
 
-    // TODO 5: mit halComGetFrame() einen Frame abholen.
-    //         Liefert sie 0, ist keiner da -> 0 zurueckgeben.
-    //         Auf den Frameanfang 'H','S' muessen Sie nicht pruefen, darauf
-    //         hat der HAL bereits synchronisiert.
+    if (halComGetFrame(frame) == 0) return 0;       // kein vollstaendiger Rahmen da
 
-    // TODO 6: Frameende pruefen: frame[COM_RX_END_1] und frame[COM_RX_END_2]
-    //         muessen COM_HOST_END_1 und COM_HOST_END_2 sein. Passt es
-    //         nicht, war es kein gueltiger Frame -> 0.
-    //         Warum diese Pruefung trotz Sync-Muster noetig ist, steht
-    //         im Unterkapitel.
+    // TODO 4: Rahmenende pruefen - frame[COM_RX_END_1] und frame[COM_RX_END_2]
+    //         muessen COM_HOST_END_1 und COM_HOST_END_2 sein.
+    //         Passt es nicht: 0 zurueckgeben, *cmd und *value NICHT anfassen.
 
-    // TODO 7: cmd und value aus dem Frame auspacken und 1 zurueckgeben.
-    //         Die Indizes stehen als COM_RX_... in driverCom.h.
+    // TODO 5: cmd und value auspacken.
+    //         Die beiden Wertbytes wieder zu einem 16-Bit-Wert zusammensetzen,
+    //         in derselben Reihenfolge wie beim Senden. Die Indizes stehen
+    //         als COM_RX_... in driverCom.h.
 
-    (void)frame; (void)cmd; (void)value;
-    return 0;
+    return 1;
 }
+
