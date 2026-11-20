@@ -3,8 +3,8 @@
 # Kommunikation mit dem Fahrzeug
 
 ## Inhalt
-- [Warum ein Rahmen nötig ist](#warum-ein-rahmen-nötig-ist)
-- [Die beiden Rahmenformate](#die-beiden-rahmenformate)
+- [Warum ein Frame nötig ist](#warum-ein-frame-nötig-ist)
+- [Die beiden Frameformate](#die-beiden-frameformate)
 - [Ein Zahlenwert, zwei Bytes](#ein-zahlenwert-zwei-bytes)
 - [Negative Zahlen](#negative-zahlen)
 - [USB oder Bluetooth: die Umschaltung](#usb-oder-bluetooth-die-umschaltung)
@@ -13,39 +13,39 @@
 
 ---
 
-## Warum ein Rahmen nötig ist
+## Warum ein Frame nötig ist
 
 In Einheit 5 haben Sie Zeichenfolgen über den UART geschickt und in HTerm angesehen. Das reicht für einen Funktionsnachweis, nicht für Telemetrie. Ein UART überträgt einen **Strom von Bytes ohne Anfang und Ende** – der Empfänger weiß nicht, wo ein Datensatz beginnt, und bei einem verlorenen Byte verschiebt sich alles Folgende dauerhaft.
 
-Die Lösung ist ein **Rahmen**: eine feste Struktur mit erkennbarem Anfang, bekannter Länge und erkennbarem Ende. Der Empfangsteil in `halUSCIA0` sucht bereits nach einem Sync-Muster – jetzt bekommt dieses Muster einen Inhalt.
+Die Lösung ist ein **Frame**: eine feste Struktur mit erkennbarem Anfang, bekannter Länge und erkennbarem Ende. Der Empfangsteil in `halUSCIA0` sucht bereits nach einem Sync-Muster – jetzt bekommt dieses Muster einen Inhalt.
 
 ---
 
-## Die beiden Rahmenformate
+## Die beiden Frameformate
 
 Beide Richtungen haben ein eigenes Format, und beide sind absichtlich unterschiedlich gekennzeichnet:
 
 **Vom Fahrzeug zum PC** – Telemetrie, beliebig viele Werte:
 
 <p align="center">
-  <img src="./media/frameCar.svg" alt="Rahmen vom Auto zum PC">
+  <img src="./media/frameCar.png" alt="Frame vom Auto zum PC">
 </p>
 
 **Vom PC zum Fahrzeug** – ein Kommando mit einem Wert, feste Länge:
 
 <p align="center">
-  <img src="./media/frameHost.svg" alt="Rahmen vom PC zum Auto">
+  <img src="./media/frameHost.png" alt="Frame vom PC zum Auto">
 </p>
 
-Was in beiden Bildern **nicht** vorkommt, ist so wichtig wie das, was drinsteht: keine Längenangabe, keine Prüfsumme, kein Feld, das den Inhalt beschreibt. Der Rahmen trägt eine Kennung, die Nutzbytes und wieder eine Kennung – mehr nicht. Alles andere ist **Vereinbarung**: Wie viele Werte kommen, in welcher Reihenfolge sie stehen und was sie bedeuten, wissen beide Seiten aus ihrem eigenen Code. Im Fahrzeug steht es als `count` in Ihrem Aufruf von `driverComSend()`, am PC als `NUM_VALS` beziehungsweise `NAMEN` in der Gegenstelle.
+Was in beiden Bildern **nicht** vorkommt, ist so wichtig wie das, was drinsteht: keine Längenangabe, keine Prüfsumme, kein Feld, das den Inhalt beschreibt. Der Frame trägt eine Kennung, die Nutzbytes und wieder eine Kennung – mehr nicht. Alles andere ist **Vereinbarung**: Wie viele Werte kommen, in welcher Reihenfolge sie stehen und was sie bedeuten, wissen beide Seiten aus ihrem eigenen Code. Im Fahrzeug steht es als `count` in Ihrem Aufruf von `driverComSend()`, am PC als `NUM_VALS` beziehungsweise `NAMEN` in der Gegenstelle.
 
-Das ist keine Sparsamkeit, sondern eine Entscheidung. Ein selbstbeschreibender Rahmen müsste auf beiden Seiten ausgewertet werden, und ein Empfänger, der auf eine angekündigte Länge wartet, bleibt stehen, wenn die Ankündigung verlorengeht. Hier gibt es nichts, worauf man vergeblich warten könnte: Kommt Unsinn, setzt der Empfang beim nächsten Sync-Muster wieder auf.
+Das ist keine Sparsamkeit, sondern eine Entscheidung. Ein selbstbeschreibender Frame müsste auf beiden Seiten ausgewertet werden, und ein Empfänger, der auf eine angekündigte Länge wartet, bleibt stehen, wenn die Ankündigung verlorengeht. Hier gibt es nichts, worauf man vergeblich warten könnte: Kommt Unsinn, setzt der Empfang beim nächsten Sync-Muster wieder auf.
 
-Dafür zahlen Sie einen Preis, und den sollten Sie kennen: **Ändern Sie die Anzahl der Werte im Fahrzeug, müssen Sie sie auch in der Gegenstelle ändern.** Dieselbe Festlegung steht an zwei Stellen. Vergisst man eine davon, verwirft der PC stillschweigend jeden Rahmen – ein Fehlerbild, das aussieht, als wäre die Leitung tot.
+Dafür zahlen Sie einen Preis, und den sollten Sie kennen: **Ändern Sie die Anzahl der Werte im Fahrzeug, müssen Sie sie auch in der Gegenstelle ändern.** Dieselbe Festlegung steht an zwei Stellen. Vergisst man eine davon, verwirft der PC stillschweigend jeden Frame – ein Fehlerbild, das aussieht, als wäre die Leitung tot.
 
 `C` steht für Car, `H` für Host. Dass die beiden Richtungen verschiedene Kennungen haben, ist kein Schmuck: Hängt versehentlich eine Schleife zwischen TX und RX, oder lauscht ein Gerät auf der falschen Leitung, fällt es sofort auf, statt plausibel aussehenden Unsinn zu erzeugen.
 
-> **Warum das Rahmenende prüfen, wenn der Anfang doch schon erkannt wurde?** Weil das Sync-Muster auch mitten in den Nutzdaten auftauchen kann. Ein Sensorwert von **18515** wird als die beiden Bytes 72 und 83 übertragen – und das sind genau die ASCII-Codes von `'H'` und `'S'`. Der Empfänger hält diese zwei Datenbytes für einen Rahmenanfang und beginnt an der falschen Stelle. Erst die Prüfung des Rahmenendes deckt das auf: Dort steht dann kein `'E'`, `'H'`, und der Rahmen wird verworfen statt falsch ausgewertet.
+> **Warum das Frameende prüfen, wenn der Anfang doch schon erkannt wurde?** Weil das Sync-Muster auch mitten in den Nutzdaten auftauchen kann. Ein Sensorwert von **18515** wird als die beiden Bytes 72 und 83 übertragen – und das sind genau die ASCII-Codes von `'H'` und `'S'`. Der Empfänger hält diese zwei Datenbytes für einen Frameanfang und beginnt an der falschen Stelle. Erst die Prüfung des Frameendes deckt das auf: Dort steht dann kein `'E'`, `'H'`, und der Frame wird verworfen statt falsch ausgewertet.
 
 ---
 
@@ -81,7 +81,7 @@ Zwei der vier Werte sind unauffällig: Bei 0 und 65535 sind beide Bytes gleich, 
 
 ## Negative Zahlen
 
-Der Rahmen überträgt **keine Vorzeichen**. Er überträgt 16 Bit, mehr nicht. Ob diese 16 Bit eine Zahl von 0 bis 65535 bedeuten oder eine von −32768 bis +32767, steht nirgends im Rahmen – das entscheidet erst, wer die Zahl ausliest.
+Der Frame überträgt **keine Vorzeichen**. Er überträgt 16 Bit, mehr nicht. Ob diese 16 Bit eine Zahl von 0 bis 65535 bedeuten oder eine von −32768 bis +32767, steht nirgends im Frame – das entscheidet erst, wer die Zahl ausliest.
 
 Auf der Fahrzeugseite heißt das: Sie schicken den Wert einfach als `unsigned int` weg, auch wenn er negativ gemeint ist. Das Bitmuster bleibt dasselbe:
 
@@ -108,7 +108,7 @@ Das ist keine Notlösung, sondern genau das, was jedes Protokoll tut. Die Bedeut
 
 Das Fahrzeug hat zwei UARTs: den Debug-UART über den Debugger und den AUX-UART auf der Steckerleiste, an den sich ein Funkmodul stecken lässt. Beide sollen **dasselbe** Protokoll sprechen, und der Treiber soll nicht wissen, über welchen er gerade redet.
 
-> Ob zum Zeitpunkt Ihrer Übung ein Funkmodul am Fahrzeug steckt, sagt Ihnen die Betreuung. Für den Nachweis der Umschaltung brauchen Sie keines: Dass der Rahmen danach auf der **anderen Leitung** und mit **anderem Bittiming** erscheint, sehen Sie am Analog Discovery.
+> Ob zum Zeitpunkt Ihrer Übung ein Funkmodul am Fahrzeug steckt, sagt Ihnen die Betreuung. Für den Nachweis der Umschaltung brauchen Sie keines: Dass der Frame danach auf der **anderen Leitung** und mit **anderem Bittiming** erscheint, sehen Sie am Analog Discovery.
 
 Gelöst ist das mit einem Satz Makros, der zur Übersetzungszeit umgelegt wird:
 
@@ -154,7 +154,7 @@ Die niedrigere Baudrate am Bluetooth ist kein Zufall: Viele Module laufen ab Wer
 
 Der Unterschied bei den Pins ist der Grund, warum für diesen UART **kein Port-Mapping** nötig ist: P8.2 und P8.3 tragen die UCA1-Funktion fest, dort genügt das `PxSEL`-Bit. Das Schlüsselregister `PMAPKEYID` aus Einheit 5 brauchen Sie hier nicht.
 
-> **Vergleichen Sie die beiden Empfangszweige Zeile für Zeile.** Sie sind fast identisch – an einer Stelle aber nicht. Spielen Sie beide Varianten von Hand durch: Sync-Muster `'H','S'`, eintreffender Zeichenstrom `H H S …`. Welche der beiden erkennt den Rahmen, welche nicht, und woran liegt es? Das ist genau der Fall aus dem Kasten oben, diesmal im Code.
+> **Vergleichen Sie die beiden Empfangszweige Zeile für Zeile.** Sie sind fast identisch – an einer Stelle aber nicht. Spielen Sie beide Varianten von Hand durch: Sync-Muster `'H','S'`, eintreffender Zeichenstrom `H H S …`. Welche der beiden erkennt den Frame, welche nicht, und woran liegt es? Das ist genau der Fall aus dem Kasten oben, diesmal im Code.
 
 ---
 
@@ -164,7 +164,7 @@ Zum Fahrzeug gehören zwei Gegenstellen. Beide sprechen dasselbe Protokoll, sie 
 
 **Zum Lesen: [`tools/crazyCarCom.m`](tools/crazyCarCom.m)**
 
-Ein kurzes MATLAB-Skript. Es öffnet den seriellen Port, synchronisiert auf `'C','S'`, prüft das Rahmenende, setzt die Werte zusammen und zeichnet sie auf. Absichtlich kurz und absichtlich ohne Oberfläche: **Sie sollen die Gegenseite Ihres eigenen Protokolls lesen können.** Dieselbe Festlegung steht dort in MATLAB, die Sie in C getroffen haben – wenn eine der beiden Seiten nicht stimmt, sehen Sie an welcher Stelle. Fangen Sie damit an.
+Ein kurzes MATLAB-Skript. Es öffnet den seriellen Port, synchronisiert auf `'C','S'`, prüft das Frameende, setzt die Werte zusammen und zeichnet sie auf. Absichtlich kurz und absichtlich ohne Oberfläche: **Sie sollen die Gegenseite Ihres eigenen Protokolls lesen können.** Dieselbe Festlegung steht dort in MATLAB, die Sie in C getroffen haben – wenn eine der beiden Seiten nicht stimmt, sehen Sie an welcher Stelle. Fangen Sie damit an.
 
 ```matlab
 PORT      = "COM7";        % Gerätemanager -> MSP Application UART
@@ -172,17 +172,17 @@ BAUD      = 57600;         % 57600 über USB, 9600 über Bluetooth
 NUM_VALS  = 2;             % so viele Werte schickt Ihr driverComSend()
 ```
 
-Drei Zeilen sind anzupassen, und alle drei müssen zu Ihrem Fahrzeug passen. Stimmt `NUM_VALS` nicht, läuft die Synchronisation aus dem Tritt und das Skript verwirft jeden Rahmen – ein guter Testfall für Ihre eigene Fehlerprüfung.
+Drei Zeilen sind anzupassen, und alle drei müssen zu Ihrem Fahrzeug passen. Stimmt `NUM_VALS` nicht, läuft die Synchronisation aus dem Tritt und das Skript verwirft jeden Frame – ein guter Testfall für Ihre eigene Fehlerprüfung.
 
 **Zum Arbeiten: [`tools/ccMonitor.py`](tools/ccMonitor.py)**
 
-Eine kleine Oberfläche in Python. Links läuft mit, was das Fahrzeug sendet; rechts schicken Sie Kommandorahmen hin, ohne jedes Mal ein Skript zu ändern. Beide Richtungen zeigt sie zusätzlich in Hex an:
+Eine kleine Oberfläche in Python. Links läuft mit, was das Fahrzeug sendet; rechts schicken Sie Kommandoframes hin, ohne jedes Mal ein Skript zu ändern. Beide Richtungen zeigt sie zusätzlich in Hex an:
 
 ```
 43 53 | FF D8  00 32 | 45 43
 ```
 
-Damit sehen Sie Ihren Rahmen so, wie er auf der Leitung steht – dieselbe Ansicht wie später im UART-Dekoder des Analog Discovery, nur ohne Messgerät. Das macht sie zum nützlichsten Werkzeug bei der Fehlersuche: Steht links ein Rahmen, der anders aussieht als gedacht, liegt der Fehler in `driverComSend()`. Steht gar keiner, liegt er davor.
+Damit sehen Sie Ihren Frame so, wie er auf der Leitung steht – dieselbe Ansicht wie später im UART-Dekoder des Analog Discovery, nur ohne Messgerät. Das macht sie zum nützlichsten Werkzeug bei der Fehlersuche: Steht links ein Frame, der anders aussieht als gedacht, liegt der Fehler in `driverComSend()`. Steht gar keiner, liegt er davor.
 
 Angepasst wird auch hier nur der Block am Dateianfang:
 
@@ -201,7 +201,7 @@ Zwei Dinge sind zu beachten. `pyserial` und `matplotlib` müssen installiert sei
 
 Ohne Fahrzeug lässt sich die Oberfläche mit `python ccMonitor.py --demo` ansehen, und `python ccMonitor.py --selftest` prüft Packen und Auspacken gegen genau den Testsatz, der weiter oben in der Tabelle steht – ohne Port, ohne Fenster.
 
-In beiden Werkzeugen steht dieselbe Vereinbarung wie in Ihrem C-Code, und in beiden steht sie an genau einer Stelle. Das ist der praktische Teil dessen, was im Abschnitt über die Rahmenformate steht: Was nicht im Rahmen steht, muss gepflegt werden.
+In beiden Werkzeugen steht dieselbe Vereinbarung wie in Ihrem C-Code, und in beiden steht sie an genau einer Stelle. Das ist der praktische Teil dessen, was im Abschnitt über die Frameformate steht: Was nicht im Frame steht, muss gepflegt werden.
 
 ---
 

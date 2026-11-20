@@ -28,8 +28,8 @@ void halUSCIA1Init(unsigned int baudrate)
     UCA1CTL1 |= UCSWRST;                // USCI im Reset halten, solange konfiguriert wird
     UCA1CTL1 |= UCSSEL__SMCLK;          // Taktquelle: SMCLK (2,5 MHz)
 
-    // Frame: 8 Datenbits, keine Parit�t, 1 Stoppbit, LSB first, UART-Mode
-    UCA1CTL0 &= ~UCPEN;                 // keine Parit�t
+    // Frame: 8 Datenbits, keine Parität, 1 Stoppbit, LSB first, UART-Mode
+    UCA1CTL0 &= ~UCPEN;                 // keine Parität
     UCA1CTL0 &= ~UC7BIT;                // 8 Datenbits
     UCA1CTL0 &= ~UCSPB;                 // 1 Stoppbit
     UCA1CTL0 &= ~UCSYNC;                // asynchron (UART)
@@ -46,7 +46,7 @@ void halUSCIA1Start(const unsigned char *sync, unsigned char syncLen, unsigned c
 {
     if (frameLen > UART_RX_MAX) frameLen = UART_RX_MAX;
 
-    uartSync     = sync;            // Array muss dauerhaft g�ltig bleiben!
+    uartSync     = sync;            // Array muss dauerhaft gültig bleiben!
     uartSyncLen  = syncLen;
     uartFrameLen = frameLen;
 
@@ -74,20 +74,20 @@ unsigned char halUSCIA1GetFrame(unsigned char *dest)
 
     for (i = 0; i < uartFrameLen; i++) dest[i] = uartRxArray[i];
 
-    uartRxComplete = 0;             // Rahmen freigeben, Empfang l�uft weiter
+    uartRxComplete = 0;             // Frame freigeben, Empfang läuft weiter
     return uartFrameLen;
 }
 
 unsigned char halUSCIA1Send(const unsigned char *data, unsigned char length)
 {
-    if (uartTxLen > 0) return 0;    // Sender besch�ftigt, nichts �bernommen
+    if (uartTxLen > 0) return 0;    // Sender beschäftigt, nichts übernommen
     if (length == 0)   return 0;
 
-    uartTxPtr = data;               // Array muss bis zum Ende der �bertragung g�ltig bleiben!
+    uartTxPtr = data;               // Array muss bis zum Ende der Übertragung gültig bleiben!
     uartTxLen = length;
     UCA1IFG |= UCTXIFG;
-    UCA1IE  |= UCTXIE;               // Sende-Interrupt ansto�en
-    return 1;                       // �bernommen
+    UCA1IE  |= UCTXIE;               // Sende-Interrupt anstoßen
+    return 1;                       // übernommen
 }
 
 unsigned char halUSCIA1TxBusy(void)
@@ -100,19 +100,19 @@ __interrupt void usciA1Isr(void)
 {
     unsigned char rxByte;
 
-    switch (UCA1IV)                     // Lesen l�scht das behandelte Flag
+    switch (UCA1IV)                     // Lesen löscht das behandelte Flag
     {
         case USCI_UCRXIFG:
-            rxByte = UCA1RXBUF;         // Lesen l�scht UCRXIFG
+            rxByte = UCA1RXBUF;         // Lesen löscht UCRXIFG
 
             if((uartRxPos < uartSyncLen) && (rxByte != uartSync[uartRxPos]))
             {
-                uartRxPos = 0;          // passt nicht: wieder auf den Rahmenanfang warten
+                uartRxPos = 0;          // passt nicht: wieder auf den Frameanfang warten
                 break;
             }
             uartRxArray[uartRxPos++] = rxByte;
 
-            if(uartRxPos == uartFrameLen)      // Rahmen vollst�ndig
+            if(uartRxPos == uartFrameLen)      // Frame vollständig
             {
                 uartRxComplete = 1;
                 uartRxPos = 0;
@@ -122,7 +122,7 @@ __interrupt void usciA1Isr(void)
         case USCI_UCTXIFG:
             if (uartTxLen > 0)
             {
-                UCA1TXBUF = *uartTxPtr++;       // Schreiben l�scht UCTXIFG
+                UCA1TXBUF = *uartTxPtr++;       // Schreiben löscht UCTXIFG
                 uartTxLen--;
             }
             else

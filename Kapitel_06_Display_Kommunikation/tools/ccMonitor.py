@@ -3,11 +3,11 @@
 ccMonitor.py  -  Gegenstelle zum Crazy Car mit Oberflaeche
 
 Links laeuft mit, was das Fahrzeug sendet. Rechts schicken Sie Kommandos
-hin. Beide Haelften zeigen die Rahmen zusaetzlich in Hex an - damit sehen
+hin. Beide Haelften zeigen die Frames zusaetzlich in Hex an - damit sehen
 Sie Ihr eigenes Protokoll, nicht nur dessen Ergebnis.
 
-    Rahmen vom Auto:   'C' 'S'  v0_hi v0_lo  v1_hi v1_lo ...  'E' 'C'
-    Rahmen zum Auto:   'H' 'S'  typ  val_hi val_lo  'E' 'H'
+    Frame vom Auto:   'C' 'S'  v0_hi v0_lo  v1_hi v1_lo ...  'E' 'C'
+    Frame zum Auto:   'H' 'S'  typ  val_hi val_lo  'E' 'H'
 
 Aufruf:
     python ccMonitor.py                 Einstellungen aus dem Block unten
@@ -63,7 +63,7 @@ ANZAHL = len(NAMEN)
 # ##### Protokoll ############################################################
 
 def packeKommando(typ, wert):
-    """Baut den Rahmen zum Auto: 'H' 'S' typ hi lo 'E' 'H' (7 Byte)."""
+    """Baut den Frame zum Auto: 'H' 'S' typ hi lo 'E' 'H' (7 Byte)."""
     if not 0 <= typ <= 255:
         raise ValueError("Typ muss zwischen 0 und 255 liegen.")
     muster = wert & 0xFFFF  # negative Werte als Zweierkomplement
@@ -84,7 +84,7 @@ def entpackeWerte(nutzlast, vorzeichen):
 
 
 def alsHex(rohbytes):
-    """Rahmen lesbar machen: Kennung | Werte paarweise | Kennung."""
+    """Frame lesbar machen: Kennung | Werte paarweise | Kennung."""
     h = ["%02X" % b for b in rohbytes]
     if len(h) < 4:
         return " ".join(h)
@@ -96,7 +96,7 @@ def alsHex(rohbytes):
 # ##### Empfang ##############################################################
 
 class Empfaenger(threading.Thread):
-    """Liest im Hintergrund Rahmen und legt Werte in die Ringpuffer."""
+    """Liest im Hintergrund Frames und legt Werte in die Ringpuffer."""
 
     def __init__(self, quelle, zeiten, reihen, t0):
         super().__init__(daemon=True)
@@ -106,7 +106,7 @@ class Empfaenger(threading.Thread):
         self.t0 = t0
         self.sperre = threading.Lock()
         self.laeuft = True
-        self.rahmen = 0
+        self.frame = 0
         self.letzter = b""
         self.letzteZeit = 0.0
         self.fehler = ""
@@ -114,8 +114,8 @@ class Empfaenger(threading.Thread):
     def lies(self, n):
         return self.quelle.read(n)
 
-    def leseRahmen(self):
-        """Synchronisiert auf 'C','S' und liest den Rest des Rahmens."""
+    def leseFrame(self):
+        """Synchronisiert auf 'C','S' und liest den Rest des Frames."""
         b = self.lies(1)
         if not b:
             return None
@@ -140,7 +140,7 @@ class Empfaenger(threading.Thread):
     def run(self):
         try:
             while self.laeuft:
-                werte = self.leseRahmen()
+                werte = self.leseFrame()
                 if werte is None:
                     continue
                 t = time.time() - self.t0
@@ -148,7 +148,7 @@ class Empfaenger(threading.Thread):
                     self.zeiten.append(t)
                     for i, v in enumerate(werte):
                         self.reihen[i].append(v)
-                    self.rahmen += 1
+                    self.frame += 1
                     self.letzteZeit = t
         except Exception as e:  # Port gezogen, Fahrzeug aus
             self.fehler = str(e)
@@ -156,13 +156,13 @@ class Empfaenger(threading.Thread):
 
 
 class DemoQuelle:
-    """Erzeugt Rahmen ohne Fahrzeug, damit die Oberflaeche probiert werden kann."""
+    """Erzeugt Frame ohne Fahrzeug, damit die Oberflaeche probiert werden kann."""
 
     def __init__(self):
         self.puffer = b""
         self.t0 = time.time()
 
-    def _neuerRahmen(self):
+    def _neuerFrame(self):
         t = time.time() - self.t0
         werte = []
         for i in range(ANZAHL):
@@ -174,7 +174,7 @@ class DemoQuelle:
     def read(self, n):
         while len(self.puffer) < n:
             time.sleep(0.1)
-            self.puffer += self._neuerRahmen()
+            self.puffer += self._neuerFrame()
         teil, self.puffer = self.puffer[:n], self.puffer[n:]
         return teil
 
@@ -226,7 +226,7 @@ def starteOberflaeche(quelle, portname):
     leinwand = FigureCanvasTkAgg(bild, master=links)
     leinwand.get_tk_widget().pack(fill="both", expand=True)
 
-    ttk.Label(links, text="Letzter Rahmen").pack(anchor="w", pady=(8, 0))
+    ttk.Label(links, text="Letzter Frame").pack(anchor="w", pady=(8, 0))
     empfangHex = tk.StringVar(value="-")
     ttk.Label(links, textvariable=empfangHex, font=("TkFixedFont", 10)).pack(anchor="w")
 
@@ -242,18 +242,18 @@ def starteOberflaeche(quelle, portname):
         try:
             nummer = typ.get() if hasattr(typ, "get") else int(typ)
             wert = feld.get() if hasattr(feld, "get") else int(feld)
-            rahmen = packeKommando(int(nummer), int(wert))
+            frame = packeKommando(int(nummer), int(wert))
         except Exception:
             protokoll.insert("end", "ungueltige Eingabe\n")
             protokoll.see("end")
             return
         try:
-            quelle.write(rahmen)
+            quelle.write(frame)
         except Exception as e:
             protokoll.insert("end", "Fehler: %s\n" % e)
             protokoll.see("end")
             return
-        protokoll.insert("end", "%s   Typ %d = %d\n" % (alsHex(rahmen), int(nummer), int(wert)))
+        protokoll.insert("end", "%s   Typ %d = %d\n" % (alsHex(frame), int(nummer), int(wert)))
         protokoll.see("end")
 
     zeile = 1
@@ -290,7 +290,7 @@ def starteOberflaeche(quelle, portname):
                command=lambda: sende(freiTyp, freiWert)).grid(row=zeile, column=2)
     zeile += 1
 
-    ttk.Label(rechts, text="Gesendete Rahmen").grid(
+    ttk.Label(rechts, text="Gesendete Frame").grid(
         row=zeile, column=0, columnspan=3, sticky="w", pady=(10, 0))
     zeile += 1
     protokoll.grid(row=zeile, column=0, columnspan=3, sticky="nsew")
@@ -298,7 +298,7 @@ def starteOberflaeche(quelle, portname):
     rechts.columnconfigure(0, weight=1)
     zeile += 1
 
-    zustand = tk.StringVar(value="warte auf Rahmen")
+    zustand = tk.StringVar(value="warte auf Frames")
     ttk.Label(rechts, textvariable=zustand).grid(
         row=zeile, column=0, columnspan=3, sticky="w", pady=(8, 0))
 
@@ -307,7 +307,7 @@ def starteOberflaeche(quelle, portname):
         with leser.sperre:
             t = list(zeiten)
             daten = [list(r) for r in reihen]
-            anzahl = leser.rahmen
+            anzahl = leser.frame
             letzter = leser.letzter
             letzteZeit = leser.letzteZeit
             fehler = leser.fehler
@@ -325,13 +325,13 @@ def starteOberflaeche(quelle, portname):
         if fehler:
             zustand.set("Port: %s" % fehler)
         elif anzahl == 0:
-            zustand.set("warte auf Rahmen")
+            zustand.set("warte auf Frames")
         else:
             still = time.time() - t0 - letzteZeit
             if still > 1.0:
-                zustand.set("%d Rahmen, seit %.1f s nichts mehr" % (anzahl, still))
+                zustand.set("%d Frames, seit %.1f s nichts mehr" % (anzahl, still))
             else:
-                zustand.set("%d Rahmen empfangen" % anzahl)
+                zustand.set("%d Frames empfangen" % anzahl)
 
         wurzel.after(100, auffrischen)
 

@@ -26,14 +26,14 @@
 #define MAX_DIGIT 8
 #define DEZIMAL 10
 
-#define SET_PAGE 0xB0 //0xB0 für erste Page , 0xB1 für zweite Page
+#define SET_PAGE 0xB0 //0xB0 fï¿½r erste Page , 0xB1 fï¿½r zweite Page
 #define LAST_PAGE 0xB7
 
-#define MSB_COL_ADDR 0x10 //0x10, 0x11 ,..,0x1F für spalten über 16
-#define LSB_COL_ADDR 0x00 //0x01, 0x02 ,..,0x0F für spalten bis 15
+#define MSB_COL_ADDR 0x10 //0x10, 0x11 ,..,0x1F fï¿½r spalten ï¿½ber 16
+#define LSB_COL_ADDR 0x00 //0x01, 0x02 ,..,0x0F fï¿½r spalten bis 15
 
 // ##### Functions #####
-void lcdSend(const unsigned char *data, unsigned char dataLength, unsigned char isData);
+void driverLCDSend(const unsigned char *data, unsigned char dataLength, unsigned char isData);
 
 void driverLCDInit(void);
 void driverLCDClear(void);

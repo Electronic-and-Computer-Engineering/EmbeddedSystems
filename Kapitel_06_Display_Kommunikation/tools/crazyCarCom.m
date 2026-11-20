@@ -1,10 +1,10 @@
 % crazyCarCom.m  -  Gegenstelle zum Crazy Car
 %
-% Liest die Telemetrierahmen des Fahrzeugs und zeichnet sie mit.
-% Optional schickt es Kommandorahmen zurueck.
+% Liest die Telemetrieframes des Fahrzeugs und zeichnet sie mit.
+% Optional schickt es Kommandoframes zurueck.
 %
-% Rahmen vom Auto:   'C' 'S'  v0_hi v0_lo  v1_hi v1_lo ...  'E' 'C'
-% Rahmen zum Auto:   'H' 'S'  cmd  val_hi val_lo  'E' 'H'
+% Frame vom Auto:   'C' 'S'  v0_hi v0_lo  v1_hi v1_lo ...  'E' 'C'
+% Frame zum Auto:   'H' 'S'  cmd  val_hi val_lo  'E' 'H'
 %
 % Das ist absichtlich ein kurzes Skript und kein GUI: Sie sollen die
 % Gegenseite Ihres eigenen Protokolls lesen koennen.
@@ -39,7 +39,7 @@ while toc(t0) < DURATION
     b = uint8(read(s, 1, "uint8"));
     if isempty(b) || b ~= uint8('S'), continue; end
 
-    % --- Nutzdaten und Rahmenende ----------------------------------------
+    % --- Nutzdaten und Frameende ----------------------------------------
     payload = uint8(read(s, 2*NUM_VALS, "uint8"));
     tail    = uint8(read(s, 2, "uint8"));
 
@@ -52,7 +52,7 @@ while toc(t0) < DURATION
 
     % --- negative Werte: oberhalb von 32767 liegt der negative Bereich ---
     % Uebertragen wird immer nur das 16-Bit-Muster. Ob ein Wert negativ
-    % gemeint ist, steht nicht im Rahmen - das entscheidet erst der Leser.
+    % gemeint ist, steht nicht im Frame - das entscheidet erst der Leser.
     neg = (SIGNED == 1) & (vals > 32767);
     vals(neg) = vals(neg) - 65536;
     data(end+1, :) = [toc(t0), vals];   %#ok<SAGROW>
@@ -63,7 +63,7 @@ end
 clear s;
 
 if isempty(data)
-    warning("Kein gueltiger Rahmen empfangen. Port, Baudrate und Rahmenende pruefen.");
+    warning("Kein gueltiger Frame empfangen. Port, Baudrate und Frameende pruefen.");
     return;
 end
 

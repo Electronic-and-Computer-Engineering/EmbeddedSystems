@@ -15,11 +15,7 @@
 #include "halUSCIB1.h"
 #include "halUCS.h"
 
-extern volatile USCIB1_SPICom LCD_Data;        // aus Ihrem SPI-Modul, Einheit 5
-
 const unsigned char emptyPage[LCD_MAX_COLM] = {0};
-#define FONT_CHAR_COUNT  (sizeof(font_table) / sizeof(font_table[0]))
-
 
 /* ########## vorgegeben ########## */
 
@@ -29,11 +25,11 @@ const unsigned char emptyPage[LCD_MAX_COLM] = {0};
  * kopieren und die Uebertragung anstossen. Das Chip Select setzt
  * halUSCIB1Transmit() aus Einheit 5, nicht diese Funktion.
  */
-void lcdSend(const unsigned char *data, unsigned char dataLength, unsigned char isData)
+void driverLCDSend(const unsigned char *data, unsigned char dataLength, unsigned char isData)
 {
     unsigned char i;
 
-    while (LCD_Data.Status.B.TxSuc == 0);   // vorherige Uebertragung abwarten
+    while (halUSCIB1Busy());   // SPI Function, reading ==> LCD_Data.Status.B.TxSuc == 0 vorherige Uebertragung abwarten
 
     if (isData) halSetLCDData();            // A0 = 1: die Bytes sind Bildpunkte
     else        halSetLCDCmd();             // A0 = 0: die Bytes sind Befehle
@@ -49,12 +45,12 @@ void lcdSend(const unsigned char *data, unsigned char dataLength, unsigned char 
 
 void driverLCDWriteCommand(const unsigned char *data, unsigned char dataLength)
 {
-    lcdSend(data, dataLength, 0);
+    driverLCDSend(data, dataLength, 0);
 }
 
 void driverLCDWriteData(const unsigned char *data, unsigned char dataLength)
 {
-    lcdSend(data, dataLength, 1);
+    driverLCDSend(data, dataLength, 1);
 }
 
 /*
@@ -74,7 +70,7 @@ void driverLCDInit(void)
 
     driverLCDWriteCommand(initCmds, 9);
     driverLCDClear();
-    while (LCD_Data.Status.B.TxSuc == 0);
+    while (halUSCIB1Busy());
 }
 
 /*
@@ -121,21 +117,18 @@ void driverLCDClear(void)
 
 void driverLCDWriteText(const char *text, unsigned char textLength, unsigned char page, unsigned char col)
 {
-    // TODO 1: Cursor auf (page, col) setzen, dann Zeichen fuer Zeichen die
-    //         sechs Spalten aus font_table[] als Daten senden.
-    //         Die Breite eines Zeichens steht als fonts_width_max im
-    //         Fontheader. col nach jedem Zeichen mitfuehren.
-    //
-    //         Drei Faelle, die Sie abfangen muessen:
-    //           - das Zeichen passt nicht mehr in die Zeile
-    //                 -> naechste Seite, Spalte 0, Cursor neu setzen
-    //           - die letzte Seite ist voll
-    //                 -> abbrechen
-    //           - das Zeichen steht nicht in der Tabelle (Index >= FONT_CHAR_COUNT)
-    //                 -> Ersatzzeichen ausgeben, z. B. '?'
-    //
-    //         Vorsicht: char ist signed. Ein Zeichen ueber 127 ergibt sonst
-    //         einen negativen Index in die Tabelle.
+    unsigned char n;
+
+    driverLCDSetPosition(page, col);
+
+    for (n = 0; n < textLength; n++)
+    {
+        driverLCDWriteData(font_table[(unsigned char)text[n]], fonts_width_max);
+        col += fonts_width_max;
+
+        // TODO: Zeilenende? -> page weiterzaehlen, col auf 0, Cursor neu setzen
+        //       letzte Page voll -> abbrechen
+    }
 }
 
 void driverLCDWriteUInt(unsigned int number, unsigned char page, unsigned char col)
@@ -151,3 +144,4 @@ void driverLCDWriteUInt(unsigned int number, unsigned char page, unsigned char c
     //         Denken Sie an den Fall number == 0: eine abweisende Schleife
     //         laeuft dort kein einziges Mal.
 }
+

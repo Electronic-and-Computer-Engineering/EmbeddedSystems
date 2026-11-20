@@ -17,7 +17,7 @@ Diese Einheit ist die erste, in der sich der Driver Layer ohne jede Hardware pr�
 
 ## Was sich ohne Gegenstelle prüfen lässt
 
-Beim Rahmenformat ist das Prüfbare besonders klar abgegrenzt: **Packen und Auspacken sind reine Rechnerei.** Dafür braucht es weder einen PC am anderen Ende noch ein Bluetooth-Modul – nur einen Puffer und einen erwarteten Inhalt.
+Beim Frameformat ist das Prüfbare besonders klar abgegrenzt: **Packen und Auspacken sind reine Rechnerei.** Dafür braucht es weder einen PC am anderen Ende noch ein Bluetooth-Modul – nur einen Puffer und einen erwarteten Inhalt.
 
 Das ist der Unterschied zu allem bisher. Die Tests der Einheiten 2 bis 5 prüften Registerinhalte, also Konfiguration. Hier prüfen Sie zum ersten Mal **Logik**: eine Umwandlung, die richtig oder falsch sein kann, unabhängig von jeder Hardware.
 
@@ -28,20 +28,20 @@ Beim Display ist die Lage umgekehrt. Ob ein Zeichen an der richtigen Stelle steh
 ## Anforderungen an Ihre Testmodule
 
 ```
-test/tstDL/testDLCom.c/.h       Rahmenformat
+test/tstDL/testDLCom.c/.h       Frameformat
 test/tstDL/testDLLcd.c/.h       Textausgabe und Zahlendarstellung
 ```
 
 ### `testDLCom` – mindestens 5 Fälle
 
-Für die Sendeseite müssen Sie an den Rahmenpuffer herankommen, ohne die Übertragung anzustoßen. Überlegen Sie, wie – das ist Teil der Aufgabe.
+Für die Sendeseite müssen Sie an den Framepuffer herankommen, ohne die Übertragung anzustoßen. Überlegen Sie, wie – das ist Teil der Aufgabe.
 
-- Ein Rahmen mit zwei Werten hat die Länge `COM_TX_LEN(2)` und beginnt mit `COM_CAR_START_1`, `COM_CAR_START_2`.
+- Ein Frame mit zwei Werten hat die Länge `COM_TX_LEN(2)` und beginnt mit `COM_CAR_START_1`, `COM_CAR_START_2`.
 - Der Wert `4095` erscheint als die beiden Bytes `15` und `255`, in dieser Reihenfolge. Nehmen Sie bewusst diesen Wert und nicht `0` oder `65535` – dort sind beide Bytes gleich, und der Test würde auch bei vertauschter Reihenfolge bestehen.
-- Der Rahmen endet mit `COM_CAR_END_1`, `COM_CAR_END_2`.
+- Der Frame endet mit `COM_CAR_END_1`, `COM_CAR_END_2`.
 - Mehr als `COM_TX_MAX_VAL` Werte werden begrenzt und sprengen den Puffer nicht.
-- `driverComReceive()` liefert bei einem Rahmen mit falschem Rahmenende eine 0 und schreibt **nichts** nach `*cmd` und `*value`.
-- Ein gültiger Rahmen wird korrekt ausgepackt: Kommando und 16-Bit-Wert stimmen.
+- `driverComReceive()` liefert bei einem Frame mit falschem Frameende eine 0 und schreibt **nichts** nach `*cmd` und `*value`.
+- Ein gültiger Frame wird korrekt ausgepackt: Kommando und 16-Bit-Wert stimmen.
 
 Der vierte und der fünfte Fall sind die wertvollsten. Beide prüfen das Verhalten im **Fehlerfall**, und beide fallen im Laborbetrieb nie auf – bis zu dem Tag, an dem ein Byte verloren geht.
 
@@ -53,12 +53,12 @@ Geprüft wird, was **Sie** geschrieben haben, nicht das Vorgegebene. `driverLCDS
 - `driverLCDWriteText()` bricht am Zeilenende in die nächste Seite um. Ein Text, der bei Spalte 125 beginnt, muss auf zwei Seiten landen.
 - `driverLCDWriteText()` bricht ab, wenn die letzte Seite voll ist, statt über das Display hinauszuschreiben.
 
-Dafür brauchen Sie einen Weg, die erzeugten Bytes abzufangen statt sie ans Display zu schicken – dieselbe Frage wie beim Rahmenpuffer, und die Antwort darauf ist der eigentliche Lerninhalt dieses Testmoduls.
+Dafür brauchen Sie einen Weg, die erzeugten Bytes abzufangen statt sie ans Display zu schicken – dieselbe Frage wie beim Framepuffer, und die Antwort darauf ist der eigentliche Lerninhalt dieses Testmoduls.
 
 ### Allgemeine Anforderungen
 
 - Jeder Testfall prüft **eine** Aussage und stellt seinen Ausgangszustand selbst her.
-- Verglichen wird gegen die `#define` aus `driverCom.h` und `driverLCD.h`, nie gegen Zahlenwerte oder Zeichen. Für die Rahmenkennungen stehen `COM_CAR_START_1`, `COM_CAR_END_2` und die übrigen Namen bereit, für die Rahmenlänge `COM_TX_LEN(n)`.
+- Verglichen wird gegen die `#define` aus `driverCom.h` und `driverLCD.h`, nie gegen Zahlenwerte oder Zeichen. Für die Framekennungen stehen `COM_CAR_START_1`, `COM_CAR_END_2` und die übrigen Namen bereit, für die Framelänge `COM_TX_LEN(n)`.
 - Kein Testfall darf eine Übertragung auslösen, die auf Hardware wartet.
 - `comTxFrame` ist in `driverCom.c` definiert und im Header nicht sichtbar. Wie Ihr Testmodul trotzdem hinkommt, ist Teil der Aufgabe – aber ändern Sie dafür nichts am Treiber, was Sie danach nicht erklären können.
 
