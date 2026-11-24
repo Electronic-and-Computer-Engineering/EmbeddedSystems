@@ -1,0 +1,179 @@
+<?xml version="1.0"?>
+<!DOCTYPE ipe SYSTEM "ipe.dtd">
+<ipe version="70218" creator="Ipe 7.2.29">
+<info created="D:20261124000000" modified="D:20261124114631"/>
+<ipestyle name="frames">
+<symbol name="arrow/normal(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<arrowsize name="normal" value="7"/>
+<color name="black" value="0"/>
+<color name="frei" value="0.96 0.87 0.74"/>
+<color name="gray" value="0.5"/>
+<color name="kennung" value="0.87 0.86 0.82"/>
+<color name="nutzlast" value="0.8 0.91 0.87"/>
+<color name="white" value="1"/>
+<dashstyle name="dashed" value="[3] 0"/>
+<opacity name="opaque" value="1"/>
+<pen name="heavier" value="0.8"/>
+<pen name="normal" value="0.4"/>
+<symbolsize name="normal" value="3"/>
+<textsize name="footnote" value="\footnotesize"/>
+<textsize name="normal" value="\normalsize"/>
+<textsize name="small" value="\small"/>
+<textstyle name="normal" begin="" end=""/>
+<preamble>\usepackage[utf8]{inputenc}\usepackage[T1]{fontenc}</preamble>
+<layout paper="560 432" origin="0 0" frame="560 432"/>
+<titlestyle pos="0 0" size="normal" color="black"  valign="baseline"/>
+</ipestyle>
+<page>
+<layer name="rahmen"/>
+<view layers="rahmen" active="rahmen"/>
+<path layer="rahmen" matrix="1 0 0 1 0 48" stroke="black" fill="white">
+55 336 m
+265 336 l
+265 372 l
+55 372 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="160 360" stroke="black" type="label" width="27.128" height="6.724" depth="2.24" halign="center" valign="center" size="small">main()</text>
+<text matrix="1 0 0 1 0 48" pos="160 348" stroke="black" type="label" width="69.053" height="5.489" depth="1.55" halign="center" valign="center" size="footnote">startet das System</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="white">
+55 280 m
+265 280 l
+265 316 l
+55 316 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="160 304" stroke="black" type="label" width="45.342" height="6.724" depth="2.24" halign="center" valign="center" size="small">driverInit()</text>
+<text matrix="1 0 0 1 0 48" pos="160 292" stroke="black" type="label" width="76.962" height="5.489" depth="0" halign="center" valign="center" size="footnote">setzt alle Treiber auf</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="white">
+55 224 m
+265 224 l
+265 260 l
+55 260 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="160 248" stroke="black" type="label" width="64.28" height="6.724" depth="2.24" halign="center" valign="center" size="small">driverComInit()</text>
+<text matrix="1 0 0 1 0 48" pos="160 236" stroke="black" type="label" width="92.898" height="5.489" depth="1.55" halign="center" valign="center" size="footnote">vorgegeben, zwei Aufrufe</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="nutzlast">
+55 168 m
+265 168 l
+265 204 l
+55 204 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="160 192" stroke="black" type="label" width="88.828" height="6.724" depth="2.24" halign="center" valign="center" size="small">halComInit(baudrate)</text>
+<text matrix="1 0 0 1 0 48" pos="160 180" stroke="black" type="label" width="63.495" height="5.489" depth="1.55" halign="center" valign="center" size="footnote">Takt, 8N1, Teiler</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="nutzlast">
+55 112 m
+265 112 l
+265 148 l
+55 148 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="160 136" stroke="black" type="label" width="66.56" height="6.724" depth="2.24" halign="center" valign="center" size="small">halComStart(...)</text>
+<text matrix="1 0 0 1 0 48" pos="160 124" stroke="black" type="label" width="76.826" height="5.489" depth="1.55" halign="center" valign="center" size="footnote">Empfang einschalten</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="nutzlast">
+55 56 m
+265 56 l
+265 92 l
+55 92 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="160 80" stroke="black" type="label" width="44.651" height="6.724" depth="2.24" halign="center" valign="center" size="small">usciA0Isr()</text>
+<text matrix="1 0 0 1 0 48" pos="160 68" stroke="black" type="label" width="74.058" height="5.489" depth="0" halign="center" valign="center" size="footnote">sammelt Frames ein</text>
+<path matrix="1 0 0 1 0 48" stroke="black" arrow="normal/normal">
+160 336 m
+160 316 l
+</path>
+<path matrix="1 0 0 1 0 48" stroke="black" arrow="normal/normal">
+160 280 m
+160 260 l
+</path>
+<path matrix="1 0 0 1 0 48" stroke="black" arrow="normal/normal">
+160 224 m
+160 204 l
+</path>
+<path matrix="1 0 0 1 0 48" stroke="black" arrow="normal/normal">
+160 168 m
+160 148 l
+</path>
+<path matrix="1 0 0 1 0 48" stroke="black" dash="dashed" arrow="normal/normal">
+160 112 m
+160 92 l
+</path>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="kennung">
+300 168 m
+510 168 l
+510 204 l
+300 204 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="405 192" stroke="black" type="label" width="82.398" height="6.176" depth="2.27" halign="center" valign="center" size="small">COM\_BAUDRATE</text>
+<text matrix="1 0 0 1 0 48" pos="405 180" stroke="black" type="label" width="60.551" height="5.489" depth="0" halign="center" valign="center" size="footnote">57600 über USB</text>
+<path matrix="1 0 0 1 0 48" stroke="black" arrow="normal/normal">
+300 186 m
+265 186 l
+</path>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="kennung">
+300 112 m
+510 112 l
+510 148 l
+300 148 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="405 136" stroke="black" type="label" width="139.393" height="6.176" depth="2.27" halign="center" valign="center" size="small">comSyncHost, 2, COM\_RX\_LEN</text>
+<text matrix="1 0 0 1 0 48" pos="405 124" stroke="black" type="label" width="101.168" height="5.489" depth="1.55" halign="center" valign="center" size="footnote">Muster, Länge, Framelänge</text>
+<path matrix="1 0 0 1 0 48" stroke="black" arrow="normal/normal">
+300 130 m
+265 130 l
+</path>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="kennung">
+300 56 m
+510 56 l
+510 92 l
+300 92 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="405 80" stroke="black" type="label" width="37.745" height="6.175" depth="0" halign="center" valign="center" size="small">RXD-Pin</text>
+<text matrix="1 0 0 1 0 48" pos="405 68" stroke="black" type="label" width="53.893" height="5.489" depth="1.55" halign="center" valign="center" size="footnote">Bytes vom PC</text>
+<path matrix="1 0 0 1 0 48" stroke="black" arrow="normal/normal">
+300 74 m
+265 74 l
+</path>
+<text matrix="1 0 0 1 0 48" pos="24 354" stroke="black" type="label" width="11.629" height="5.489" depth="0" valign="center" size="footnote">AL</text>
+<text matrix="1 0 0 1 0 48" pos="24 298" stroke="black" type="label" width="11.75" height="5.489" depth="0" valign="center" size="footnote">DL</text>
+<text matrix="1 0 0 1 0 48" pos="24 186" stroke="black" type="label" width="17.97" height="5.489" depth="0" valign="center" size="footnote">HAL</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="white">
+55 24 m
+75 24 l
+75 36 l
+55 36 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="83 30" stroke="black" type="label" width="46.812" height="5.489" depth="1.55" valign="center" size="footnote">Driver Layer</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="nutzlast">
+165 24 m
+185 24 l
+185 36 l
+165 36 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="193 30" stroke="black" type="label" width="17.97" height="5.489" depth="0" valign="center" size="footnote">HAL</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="kennung">
+255 24 m
+275 24 l
+275 36 l
+255 36 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="283 30" stroke="black" type="label" width="30.215" height="5.489" depth="1.55" valign="center" size="footnote">Eingang</text>
+<text matrix="1 0 0 1 0 48" pos="365 30" stroke="black" type="label" width="122.697" height="5.489" depth="1.55" valign="center" size="footnote">gestrichelt: Freigabe, kein Aufruf</text>
+</page>
+</ipe>

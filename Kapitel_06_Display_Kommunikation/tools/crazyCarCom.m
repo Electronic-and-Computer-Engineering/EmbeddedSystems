@@ -11,7 +11,7 @@
 
 PORT      = "COM7";        % <- anpassen. Geraetemanager -> MSP Application UART
 BAUD      = 57600;         % 57600 ueber USB, 9600 ueber Bluetooth
-NUM_VALS  = 4;             % so viele Werte schickt Ihr driverComSend()
+NUM_VALS  = 4;             % muss zu COM_TX_VAL_COUNT passen
 SIGNED    = [0 0 0 1];     % 1 = diesen Wert als vorzeichenbehaftet lesen
                            %     (passend zum Testsatz 0 / 4095 / 65535 / -40)
 DURATION  = 30;            % Sekunden mitschreiben

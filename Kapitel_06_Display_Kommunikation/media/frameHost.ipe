@@ -1,8 +1,16 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70218" creator="Ipe 7.2.29">
-<info created="D:20261119120000" modified="D:20261119125107"/>
+<info created="D:20261124000000" modified="D:20261124110756"/>
 <ipestyle name="frames">
+<symbol name="arrow/normal(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
 <arrowsize name="normal" value="7"/>
 <color name="black" value="0"/>
 <color name="frei" value="0.96 0.87 0.74"/>
@@ -26,90 +34,80 @@
 <page>
 <layer name="rahmen"/>
 <view layers="rahmen" active="rahmen"/>
-<text layer="rahmen" pos="137 172" stroke="black" type="label" width="112.91" height="6.861" depth="0" valign="baseline">Frame vom PC zum Auto</text>
-<path stroke="black" fill="kennung">
+<path layer="rahmen" matrix="1 0 0 1 0 48" stroke="black" fill="kennung">
+75 110 m
+129 110 l
+129 144 l
+75 144 l
+h
+</path>
+<text matrix="1 0 0 1 0 48" pos="102 127" stroke="black" type="label" width="6.908" height="6.175" depth="0" halign="center" valign="center" size="small">H</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="kennung">
 137 110 m
 191 110 l
 191 144 l
 137 144 l
 h
 </path>
-<text pos="164 127" stroke="black" type="label" width="6.908" height="6.175" depth="0" halign="center" valign="center" size="small">H</text>
-<path stroke="black" fill="kennung">
+<text matrix="1 0 0 1 0 48" pos="164 127" stroke="black" type="label" width="5.118" height="6.175" depth="0" halign="center" valign="center" size="small">S</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="nutzlast">
 199 110 m
 253 110 l
 253 144 l
 199 144 l
 h
 </path>
-<text pos="226 127" stroke="black" type="label" width="5.118" height="6.175" depth="0" halign="center" valign="center" size="small">S</text>
-<path stroke="black" fill="frei">
+<text matrix="1 0 0 1 0 48" pos="226 127" stroke="black" type="label" width="16.891" height="6.175" depth="0" halign="center" valign="center" size="small">cmd</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="nutzlast">
 261 110 m
 315 110 l
 315 144 l
 261 144 l
 h
 </path>
-<text pos="288 127" stroke="black" type="label" width="13.308" height="5.517" depth="1.74" halign="center" valign="center" size="small">typ</text>
-<path stroke="black" fill="nutzlast">
+<text matrix="1 0 0 1 0 48" pos="288 127" stroke="black" type="label" width="28.021" height="6.175" depth="0" halign="center" valign="center" size="small">val HB</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="nutzlast">
 323 110 m
 377 110 l
 377 144 l
 323 144 l
 h
 </path>
-<text pos="350 127" stroke="black" type="label" width="13.434" height="6.175" depth="0" halign="center" valign="center" size="small">HB</text>
-<path stroke="black" fill="nutzlast">
+<text matrix="1 0 0 1 0 48" pos="350 127" stroke="black" type="label" width="26.87" height="6.175" depth="0" halign="center" valign="center" size="small">val LB</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="kennung">
 385 110 m
 439 110 l
 439 144 l
 385 144 l
 h
 </path>
-<text pos="412 127" stroke="black" type="label" width="12.283" height="6.175" depth="0" halign="center" valign="center" size="small">LB</text>
-<path stroke="black" fill="kennung">
+<text matrix="1 0 0 1 0 48" pos="412 127" stroke="black" type="label" width="6.269" height="6.175" depth="0" halign="center" valign="center" size="small">E</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="kennung">
 447 110 m
 501 110 l
 501 144 l
 447 144 l
 h
 </path>
-<text pos="474 127" stroke="black" type="label" width="6.269" height="6.175" depth="0" halign="center" valign="center" size="small">E</text>
-<path stroke="black" fill="kennung">
-509 110 m
-563 110 l
-563 144 l
-509 144 l
+<text matrix="1 0 0 1 0 48" pos="474 127" stroke="black" type="label" width="6.908" height="6.175" depth="0" halign="center" valign="center" size="small">H</text>
+<text matrix="1 0 0 1 0 48" pos="75 90" stroke="black" type="label" width="303.009" height="5.493" depth="2.18" valign="center" size="footnote">Eine Kommandonummer und ein Wert. Feste Länge: COM\_RX\_LEN = 7 Byte.</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="kennung">
+75 42 m
+101 42 l
+101 57 l
+75 57 l
 h
 </path>
-<text pos="536 127" stroke="black" type="label" width="6.908" height="6.175" depth="0" halign="center" valign="center" size="small">H</text>
-<text pos="137 90" stroke="black" type="label" width="240.381" height="5.489" depth="1.55" valign="baseline" size="footnote">Immer drei Nutzbytes. Der Typ sagt, welcher Wert gesetzt wird.</text>
-<path stroke="black" fill="kennung">
-137 42 m
-163 42 l
-163 57 l
-137 57 l
+<text matrix="1 0 0 1 0 48" pos="88 49.5" stroke="black" type="label" width="10.818" height="5.489" depth="0" halign="center" valign="center" size="footnote">CS</text>
+<text matrix="1 0 0 1 0 48" pos="109 49.5" stroke="black" type="label" width="33.151" height="5.489" depth="1.55" valign="center" size="footnote">Kennung</text>
+<path matrix="1 0 0 1 0 48" stroke="black" fill="nutzlast">
+250 42 m
+276 42 l
+276 57 l
+250 57 l
 h
 </path>
-<text pos="150 49.5" stroke="black" type="label" width="11.045" height="5.489" depth="0" halign="center" valign="center" size="footnote">HS</text>
-<text pos="171 49.5" stroke="black" type="label" width="33.151" height="5.489" depth="1.55" valign="center" size="footnote">Kennung</text>
-<path stroke="black" fill="frei">
-312 42 m
-338 42 l
-338 57 l
-312 57 l
-h
-</path>
-<text pos="325 49.5" stroke="black" type="label" width="12.229" height="4.857" depth="1.55" halign="center" valign="center" size="footnote">typ</text>
-<text pos="346 49.5" stroke="black" type="label" width="47.518" height="5.489" depth="1.55" valign="center" size="footnote">frei vergeben</text>
-<path stroke="black" fill="nutzlast">
-487 42 m
-513 42 l
-513 57 l
-487 57 l
-h
-</path>
-<text pos="500 49.5" stroke="black" type="label" width="12.334" height="5.489" depth="0" halign="center" valign="center" size="footnote">HB</text>
-<text pos="521 49.5" stroke="black" type="label" width="46.441" height="5.489" depth="1.55" valign="center" size="footnote">Wert, 16 Bit</text>
+<text matrix="1 0 0 1 0 48" pos="263 49.5" stroke="black" type="label" width="12.334" height="5.489" depth="0" halign="center" valign="center" size="footnote">HB</text>
+<text matrix="1 0 0 1 0 48" pos="284 49.5" stroke="black" type="label" width="46.441" height="5.489" depth="1.55" valign="center" size="footnote">Wert, 16 Bit</text>
 </page>
 </ipe>

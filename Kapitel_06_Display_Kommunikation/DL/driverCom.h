@@ -47,11 +47,11 @@
 #define COM_RX_END_2    6
 
 // ##### Frame vom Auto: 'C','S', Werte (je high/low), 'E','C' #####
-#define COM_TX_MAX_VAL  10                              // Sensorwerte
+// Die Anzahl der Werte ist fest. Beide Seiten kennen sie, im Frame steht sie nicht.
+#define COM_TX_VAL_COUNT 4                              // Werte je Telemetrieframe
 #define COM_TX_HEADER   2       // 'C','S'
 #define COM_TX_FOOTER   2       // 'E','C'
-#define COM_TX_MAX_LEN  (COM_TX_HEADER + 2 * COM_TX_MAX_VAL + COM_TX_FOOTER)
-#define COM_TX_LEN(n)   (COM_TX_HEADER + 2 * (n) + COM_TX_FOOTER)   // Laenge bei n Werten
+#define COM_TX_LEN      (COM_TX_HEADER + 2 * COM_TX_VAL_COUNT + COM_TX_FOOTER)   // = 12
 
 // ##### Testwerte #####
 // Fester Satz zum Pruefen der Uebertragung. Diese vier Zahlen muessen am PC
@@ -61,7 +61,7 @@ extern const unsigned int comTestVals[COM_TEST_COUNT];
 
 // ##### Funktionen #####
 void driverComInit(void);
-unsigned char driverComSend(const unsigned int *values, unsigned char count);
+unsigned char driverComSend(const unsigned int *values);   // COM_TX_VAL_COUNT Werte
 unsigned char driverComReceive(unsigned char *cmd, unsigned int *value);   // 0 = nichts empfangen
 
 #endif /* DL_DRIVERCOM_H_ */

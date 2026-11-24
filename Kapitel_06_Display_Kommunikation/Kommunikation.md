@@ -4,6 +4,7 @@
 
 ## Inhalt
 - [Warum ein Frame nötig ist](#warum-ein-frame-nötig-ist)
+- [Wer die Vereinbarung besitzt](#wer-die-vereinbarung-besitzt)
 - [Die beiden Frameformate](#die-beiden-frameformate)
 - [Ein Zahlenwert, zwei Bytes](#ein-zahlenwert-zwei-bytes)
 - [Negative Zahlen](#negative-zahlen)
@@ -17,7 +18,65 @@
 
 In Einheit 5 haben Sie Zeichenfolgen über den UART geschickt und in HTerm angesehen. Das reicht für einen Funktionsnachweis, nicht für Telemetrie. Ein UART überträgt einen **Strom von Bytes ohne Anfang und Ende** – der Empfänger weiß nicht, wo ein Datensatz beginnt, und bei einem verlorenen Byte verschiebt sich alles Folgende dauerhaft.
 
+Dass daraus Frames werden, ist allein eine **Vereinbarung** – und wer sie besitzt, gibt sie nach unten weiter. Dieser Satz trägt alles Weitere in dieser Einheit.
+
 Die Lösung ist ein **Frame**: eine feste Struktur mit erkennbarem Anfang, bekannter Länge und erkennbarem Ende. Der Empfangsteil in `halUSCIA0` sucht bereits nach einem Sync-Muster – jetzt bekommt dieses Muster einen Inhalt.
+
+---
+
+## Wer die Vereinbarung besitzt
+
+Die Vereinbarung gehört `driverCom`: Startmuster, Framelänge, Bedeutung der Felder, Baudrate. Der HAL kennt nichts davon – er führt aus, was ihm beim Start gesagt wurde. Sichtbar wird das an der vorgegebenen Initialisierung:
+
+```c
+void driverComInit(void)
+{
+    halComInit(COM_BAUDRATE);
+    halComStart(comSyncHost, 2, COM_RX_LEN);
+}
+```
+
+<p align="center">
+  <img src="./media/initKette.svg" alt="Aufrufkette der UART-Initialisierung">
+</p>
+
+Alle vier Eingänge rechts stammen aus `driverCom.h` und `driverCom.c` – keiner aus dem HAL:
+
+| Eingang | Bedeutung | steht in |
+|---|---|---|
+| `COM_BAUDRATE` | 57600 über USB | `driverCom.h` |
+| `comSyncHost` | das Startmuster `'H'`, `'S'` | `driverCom.c`, global und `const` |
+| `2` | Länge dieses Musters | Aufruf in `driverComInit()` |
+| `COM_RX_LEN` | Gesamtlänge des Kommandoframes | `driverCom.h` |
+
+Welches der beiden UART-Module dabei angesprochen wird, steht nicht in dieser Funktion: `halComInit` und `halComStart` sind Makros aus `driverCom.h`. Der Treiber erbt das Modul aus seinem eigenen Header und muss es nicht kennen – dasselbe Prinzip wie bei `halComSend()`.
+
+**Deshalb steht die UART-Initialisierung ab dieser Einheit im Treiber und nicht mehr in `halInit()`.** Die Baudrate ist Teil der Vereinbarung. Bliebe der Aufruf in `halInit()`, stünde sie an zwei Stellen – oder `halGeneral.c` müsste `driverCom.h` einbinden, der HAL also einen Header des Driver Layer. Beides widerspricht der Aufrufrichtung im Bild: Aufrufe gehen nach unten, Eingänge kommen von oben. In Einheit 5 war die Initialisierung in `halInit()` richtig, weil es über dem UART noch keinen Treiber gab.
+
+### Was `halComStart()` tut
+
+Kein Vorgang, sondern eine Übergabe:
+
+<p align="center">
+  <img src="./media/halComStart.svg" alt="Innenleben von halComStart">
+</p>
+
+Vier Dinge passieren, und jedes hat eine Folge:
+
+- **Die Form wird gemerkt, nicht kopiert.** `uartSync` erhält den *Zeiger* auf `comSyncHost`. Die Empfangs-ISR liest dort bei jedem einzelnen Byte nach – deshalb ist das Array global und `const` und darf keine lokale Variable sein.
+- **Der Zustand wird zurückgesetzt.** Ein halb empfangener Frame aus einem früheren Durchlauf würde sonst weitergeführt.
+- **Ein altes Zeichen wird verworfen.** Zwischen `halComInit()` und `halComStart()` kann bereits ein Byte eingetroffen sein; es gehört zu keinem Frame.
+- **Freigegeben wird zuletzt.** Die Interrupts sind global schon frei, weil `halInit()` vor `driverInit()` läuft. Das erste Byte kann unmittelbar nach dieser Zeile eintreffen – dann muss der Zustand darüber bereits stimmen.
+
+Beim Senden übergeben Sie die Daten, beim Empfangen einmal vorher die Form:
+
+| | Senden | Empfangen |
+|---|---|---|
+| anstoßen | `halComSend(data, len)` – jedes Mal | `halComStart(sync, syncLen, frameLen)` – einmal beim Init |
+| Arbeit | die ISR schiebt Bytes hinaus | die ISR sammelt Bytes ein |
+| Ergebnis | `halComTxBusy()` fragt nach | `halComGetFrame()` entnimmt |
+
+Beachten Sie das Wort in der letzten Zelle: `halComGetFrame()` liest nicht, sie **entnimmt**. Nach dem Aufruf ist der Frame aus dem Puffer verschwunden, ein zweiter Aufruf liefert 0. Jeder Frame kommt genau einmal bei Ihnen an – was Sie nicht auspacken, ist weg.
 
 ---
 
@@ -25,7 +84,7 @@ Die Lösung ist ein **Frame**: eine feste Struktur mit erkennbarem Anfang, bekan
 
 Beide Richtungen haben ein eigenes Format, und beide sind absichtlich unterschiedlich gekennzeichnet:
 
-**Vom Fahrzeug zum PC** – Telemetrie, beliebig viele Werte:
+**Vom Fahrzeug zum PC** – Telemetrie, feste Länge:
 
 <p align="center">
   <img src="./media/frameCar.png" alt="Frame vom Auto zum PC">
@@ -37,11 +96,15 @@ Beide Richtungen haben ein eigenes Format, und beide sind absichtlich unterschie
   <img src="./media/frameHost.png" alt="Frame vom PC zum Auto">
 </p>
 
-Was in beiden Bildern **nicht** vorkommt, ist so wichtig wie das, was drinsteht: keine Längenangabe, keine Prüfsumme, kein Feld, das den Inhalt beschreibt. Der Frame trägt eine Kennung, die Nutzbytes und wieder eine Kennung – mehr nicht. Alles andere ist **Vereinbarung**: Wie viele Werte kommen, in welcher Reihenfolge sie stehen und was sie bedeuten, wissen beide Seiten aus ihrem eigenen Code. Im Fahrzeug steht es als `count` in Ihrem Aufruf von `driverComSend()`, am PC als `NUM_VALS` beziehungsweise `NAMEN` in der Gegenstelle.
+Beide Frames haben eine **feste Länge**: 12 Byte zum PC, 7 Byte zurück. Diese Länge steht aber **nicht im Frame**. Was in beiden Bildern nicht vorkommt, ist so wichtig wie das, was drinsteht: keine Längenangabe, keine Prüfsumme, kein Feld, das den Inhalt beschreibt. Der Frame trägt eine Kennung, die Nutzbytes und wieder eine Kennung – mehr nicht.
+
+Die Länge ist also **Vereinbarung**, nicht Ansage. Wie viele Werte kommen, in welcher Reihenfolge sie stehen und was sie bedeuten, wissen beide Seiten aus ihrem eigenen Code: im Fahrzeug als `COM_TX_VAL_COUNT` in `driverCom.h`, am PC als `NUM_VALS` beziehungsweise `NAMEN` in der Gegenstelle.
 
 Das ist keine Sparsamkeit, sondern eine Entscheidung. Ein selbstbeschreibender Frame müsste auf beiden Seiten ausgewertet werden, und ein Empfänger, der auf eine angekündigte Länge wartet, bleibt stehen, wenn die Ankündigung verlorengeht. Hier gibt es nichts, worauf man vergeblich warten könnte: Kommt Unsinn, setzt der Empfang beim nächsten Sync-Muster wieder auf.
 
-Dafür zahlen Sie einen Preis, und den sollten Sie kennen: **Ändern Sie die Anzahl der Werte im Fahrzeug, müssen Sie sie auch in der Gegenstelle ändern.** Dieselbe Festlegung steht an zwei Stellen. Vergisst man eine davon, verwirft der PC stillschweigend jeden Frame – ein Fehlerbild, das aussieht, als wäre die Leitung tot.
+Die feste Länge nimmt Ihnen in dieser Einheit eine ganze Fehlerklasse ab: Es gibt keinen Frame, der mal kürzer und mal länger ist, und damit nichts, was aus dem Tritt geraten kann. Dafür zahlen Sie einen Preis, und den sollten Sie kennen: **Ändern Sie die Anzahl der Werte im Fahrzeug, müssen Sie sie auch in der Gegenstelle ändern.** Dieselbe Festlegung steht an zwei Stellen. Vergisst man eine davon, verwirft der PC stillschweigend jeden Frame – ein Fehlerbild, das aussieht, als wäre die Leitung tot.
+
+> **Das Format ist ein Vorschlag, keine Vorschrift.** In dieser Einheit halten sich alle an dieses Frameformat, damit die mitgelieferten Gegenstellen passen und die Fehlersuche vergleichbar bleibt. Sobald die Übertragung in beide Richtungen nachweislich läuft, können Sie es ändern: mehr Werte, andere Reihenfolge, zusätzliche Felder, eine Prüfsumme, mehrere Frametypen. Die Übertragung gehört Ihrem Team – Sie müssen nur beide Seiten gleichzeitig anpassen und begründen können, warum Ihr Format tut, was es tut.
 
 `C` steht für Car, `H` für Host. Dass die beiden Richtungen verschiedene Kennungen haben, ist kein Schmuck: Hängt versehentlich eine Schleife zwischen TX und RX, oder lauscht ein Gerät auf der falschen Leitung, fällt es sofort auf, statt plausibel aussehenden Unsinn zu erzeugen.
 
@@ -169,7 +232,7 @@ Ein kurzes MATLAB-Skript. Es öffnet den seriellen Port, synchronisiert auf `'C'
 ```matlab
 PORT      = "COM7";        % Gerätemanager -> MSP Application UART
 BAUD      = 57600;         % 57600 über USB, 9600 über Bluetooth
-NUM_VALS  = 2;             % so viele Werte schickt Ihr driverComSend()
+NUM_VALS  = 4;             % muss zu COM_TX_VAL_COUNT passen
 ```
 
 Drei Zeilen sind anzupassen, und alle drei müssen zu Ihrem Fahrzeug passen. Stimmt `NUM_VALS` nicht, läuft die Synchronisation aus dem Tritt und das Skript verwirft jeden Frame – ein guter Testfall für Ihre eigene Fehlerprüfung.

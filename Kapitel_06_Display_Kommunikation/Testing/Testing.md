@@ -36,10 +36,10 @@ test/tstDL/testDLLcd.c/.h       Textausgabe und Zahlendarstellung
 
 Für die Sendeseite müssen Sie an den Framepuffer herankommen, ohne die Übertragung anzustoßen. Überlegen Sie, wie – das ist Teil der Aufgabe.
 
-- Ein Frame mit zwei Werten hat die Länge `COM_TX_LEN(2)` und beginnt mit `COM_CAR_START_1`, `COM_CAR_START_2`.
+- Ein Telemetrieframe hat immer die Länge `COM_TX_LEN` und beginnt mit `COM_CAR_START_1`, `COM_CAR_START_2`.
 - Der Wert `4095` erscheint als die beiden Bytes `15` und `255`, in dieser Reihenfolge. Nehmen Sie bewusst diesen Wert und nicht `0` oder `65535` – dort sind beide Bytes gleich, und der Test würde auch bei vertauschter Reihenfolge bestehen.
 - Der Frame endet mit `COM_CAR_END_1`, `COM_CAR_END_2`.
-- Mehr als `COM_TX_MAX_VAL` Werte werden begrenzt und sprengen den Puffer nicht.
+- Alle `COM_TX_VAL_COUNT` Werte stehen im Frame, je zwei Bytes, höherwertiges zuerst.
 - `driverComReceive()` liefert bei einem Frame mit falschem Frameende eine 0 und schreibt **nichts** nach `*cmd` und `*value`.
 - Ein gültiger Frame wird korrekt ausgepackt: Kommando und 16-Bit-Wert stimmen.
 
@@ -58,7 +58,7 @@ Dafür brauchen Sie einen Weg, die erzeugten Bytes abzufangen statt sie ans Disp
 ### Allgemeine Anforderungen
 
 - Jeder Testfall prüft **eine** Aussage und stellt seinen Ausgangszustand selbst her.
-- Verglichen wird gegen die `#define` aus `driverCom.h` und `driverLCD.h`, nie gegen Zahlenwerte oder Zeichen. Für die Framekennungen stehen `COM_CAR_START_1`, `COM_CAR_END_2` und die übrigen Namen bereit, für die Framelänge `COM_TX_LEN(n)`.
+- Verglichen wird gegen die `#define` aus `driverCom.h` und `driverLCD.h`, nie gegen Zahlenwerte oder Zeichen. Für die Framekennungen stehen `COM_CAR_START_1`, `COM_CAR_END_2` und die übrigen Namen bereit, für die Framelänge `COM_TX_LEN`.
 - Kein Testfall darf eine Übertragung auslösen, die auf Hardware wartet.
 - `comTxFrame` ist in `driverCom.c` definiert und im Header nicht sichtbar. Wie Ihr Testmodul trotzdem hinkommt, ist Teil der Aufgabe – aber ändern Sie dafür nichts am Treiber, was Sie danach nicht erklären können.
 

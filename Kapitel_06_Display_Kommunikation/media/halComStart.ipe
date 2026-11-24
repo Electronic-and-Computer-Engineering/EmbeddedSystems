@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<!DOCTYPE ipe SYSTEM "ipe.dtd">
+<ipe version="70218" creator="Ipe 7.2.29">
+<info created="D:20261124000000" modified="D:20261124112943"/>
+<ipestyle name="frames">
+<symbol name="arrow/normal(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<arrowsize name="normal" value="7"/>
+<color name="black" value="0"/>
+<color name="frei" value="0.96 0.87 0.74"/>
+<color name="gray" value="0.5"/>
+<color name="kennung" value="0.87 0.86 0.82"/>
+<color name="nutzlast" value="0.8 0.91 0.87"/>
+<color name="white" value="1"/>
+<dashstyle name="dashed" value="[3] 0"/>
+<opacity name="opaque" value="1"/>
+<pen name="heavier" value="0.8"/>
+<pen name="normal" value="0.4"/>
+<symbolsize name="normal" value="3"/>
+<textsize name="footnote" value="\footnotesize"/>
+<textsize name="normal" value="\normalsize"/>
+<textsize name="small" value="\small"/>
+<textstyle name="normal" begin="" end=""/>
+<preamble>\usepackage[utf8]{inputenc}\usepackage[T1]{fontenc}</preamble>
+<layout paper="560 430" origin="0 0" frame="560 430"/>
+<titlestyle pos="0 0" size="normal" color="black"  valign="baseline"/>
+</ipestyle>
+<page>
+<layer name="rahmen"/>
+<view layers="rahmen" active="rahmen"/>
+<path layer="rahmen" matrix="1 0 0 1 8 48" stroke="black" fill="white">
+160 330 m
+400 330 l
+400 366 l
+160 366 l
+h
+</path>
+<text matrix="1 0 0 1 8 48" pos="280 354" stroke="black" type="label" width="158.312" height="6.724" depth="2.24" halign="center" valign="center" size="small">halComStart(sync, syncLen, frameLen)</text>
+<text matrix="1 0 0 1 8 48" pos="280 342" stroke="black" type="label" width="156.929" height="5.493" depth="2.18" halign="center" valign="center" size="footnote">begrenzt frameLen auf UART\_RX\_MAX</text>
+<path matrix="1 0 0 1 8 48" stroke="black" arrow="normal/normal">
+280 330 m
+280 296 l
+</path>
+<path matrix="1 0 0 1 8 48" stroke="black" dash="dashed">
+60 220 m
+480 220 l
+480 296 l
+60 296 l
+h
+</path>
+<text matrix="1 0 0 1 8 48" pos="270 284" stroke="black" type="label" width="170.47" height="6.178" depth="1.74" halign="center" valign="center" size="small">halSharedUART.h · gemeinsamer Zustand</text>
+<path matrix="1 0 0 1 8 48" stroke="black" fill="kennung">
+75 234 m
+265 234 l
+265 270 l
+75 270 l
+h
+</path>
+<text matrix="1 0 0 1 8 48" pos="170 258" stroke="black" type="label" width="53.407" height="6.175" depth="0" halign="center" valign="center" size="small">Form merken</text>
+<text matrix="1 0 0 1 8 48" pos="170 246" stroke="black" type="label" width="108.231" height="5.489" depth="1.55" halign="center" valign="center" size="footnote">uartSync, syncLen, frameLen</text>
+<path matrix="1 0 0 1 8 48" stroke="black" fill="kennung">
+280 234 m
+465 234 l
+465 270 l
+280 270 l
+h
+</path>
+<text matrix="1 0 0 1 8 48" pos="372.5 258" stroke="black" type="label" width="87.143" height="6.175" depth="0" halign="center" valign="center" size="small">Zustand zurücksetzen</text>
+<text matrix="1 0 0 1 8 48" pos="372.5 246" stroke="black" type="label" width="105.993" height="5.489" depth="1.55" halign="center" valign="center" size="footnote">uartRxPos, uartRxComplete</text>
+<path matrix="1 0 0 1 8 48" stroke="black" arrow="normal/normal">
+280 220 m
+280 186 l
+</path>
+<path matrix="1 0 0 1 8 48" stroke="black" fill="white">
+160 150 m
+400 150 l
+400 186 l
+160 186 l
+h
+</path>
+<text matrix="1 0 0 1 8 48" pos="280 174" stroke="black" type="label" width="111.059" height="6.175" depth="0" halign="center" valign="center" size="small">UCA0IFG \&amp;= \textasciitilde{}UCRXIFG</text>
+<text matrix="1 0 0 1 8 48" pos="280 162" stroke="black" type="label" width="85.898" height="5.489" depth="0" halign="center" valign="center" size="footnote">altes Zeichen verwerfen</text>
+<path matrix="1 0 0 1 8 48" stroke="black" arrow="normal/normal">
+280 150 m
+280 116 l
+</path>
+<path matrix="1 0 0 1 8 48" stroke="black" fill="white">
+160 80 m
+400 80 l
+400 116 l
+160 116 l
+h
+</path>
+<text matrix="1 0 0 1 8 48" pos="280 104" stroke="black" type="label" width="87.387" height="6.724" depth="2.24" halign="center" valign="center" size="small">UCA0IE \textbar{}= UCRXIE</text>
+<text matrix="1 0 0 1 8 48" pos="280 92" stroke="black" type="label" width="96.548" height="5.489" depth="1.55" halign="center" valign="center" size="footnote">ab hier läuft der Empfang</text>
+<path matrix="1 0 0 1 8 48" stroke="black" arrow="normal/normal">
+280 80 m
+280 46 l
+</path>
+<path matrix="1 0 0 1 8 48" stroke="black" fill="nutzlast">
+160 10 m
+400 10 l
+400 46 l
+160 46 l
+h
+</path>
+<text matrix="1 0 0 1 8 48" pos="280 34" stroke="black" type="label" width="44.651" height="6.724" depth="2.24" halign="center" valign="center" size="small">usciA0Isr()</text>
+<text matrix="1 0 0 1 8 48" pos="280 22" stroke="black" type="label" width="105.704" height="5.489" depth="1.55" halign="center" valign="center" size="footnote">bei jedem Byte, ohne Aufruf</text>
+<path matrix="1 0 0 1 8 48" stroke="black" dash="dashed" arrow="normal/normal">
+160 28 m
+30 28 l
+30 257 l
+60 257 l
+</path>
+</page>
+</ipe>

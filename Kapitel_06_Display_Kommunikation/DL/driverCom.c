@@ -13,10 +13,10 @@
 #include "halUSCIA1.h"   // beide einbinden, die Auswahl macht COM_USE_BT
 
 const unsigned char comSyncHost[2] = {COM_HOST_START_1, COM_HOST_START_2};    // Frameanfang vom Host
-unsigned char comTxFrame[COM_TX_MAX_LEN];           // wird vom HAL per Zeiger gesendet
+unsigned char comTxFrame[COM_TX_LEN];               // wird vom HAL per Zeiger gesendet
 
 /*
- * Fester Satz Testwerte. Vier Faelle, die jeweils etwas anderes pruefen:
+ * Fester Satz als moegliche Testwerte. Vier Faelle, die jeweils etwas anderes pruefen:
  *
  *       0      Randfall, beide Bytes null
  *    4095      braucht beide Bytes; bei vertauschter Reihenfolge
@@ -45,7 +45,7 @@ void driverComInit(void)
 
 /* ########## Ihre Arbeit ########## */
 
-unsigned char driverComSend(const unsigned int *values, unsigned char count)
+unsigned char driverComSend(const unsigned int *values)
 {
     unsigned char i, n = 0;
 
@@ -53,14 +53,12 @@ unsigned char driverComSend(const unsigned int *values, unsigned char count)
     //         halComSend() merkt sich den Zeiger auf comTxFrame, nicht den
     //         Inhalt - wer waehrend des Sendens hineinschreibt, verschickt Bruch.
 
-    // TODO 2: Mehr als COM_TX_MAX_VAL Werte -> auf das Maximum begrenzen.
-
     comTxFrame[n++] = COM_CAR_START_1;              // Car
     comTxFrame[n++] = COM_CAR_START_2;              // Start
 
-    for (i = 0; i < count; i++)
+    for (i = 0; i < COM_TX_VAL_COUNT; i++)
     {
-        // TODO 3: Jeden Wert in zwei Bytes zerlegen und ablegen.
+        // TODO 2: Jeden Wert in zwei Bytes zerlegen und ablegen.
         //         Die Gegenstelle erwartet das hoeherwertige zuerst.
         //         n dabei mitzaehlen.
     }
@@ -68,7 +66,7 @@ unsigned char driverComSend(const unsigned int *values, unsigned char count)
     comTxFrame[n++] = COM_CAR_END_1;                // End
     comTxFrame[n++] = COM_CAR_END_2;                // Car
 
-    return halComSend(comTxFrame, n);               // n ist jetzt die Rahmenlaenge
+    return halComSend(comTxFrame, n);               // n ist jetzt COM_TX_LEN
 }
 
 
@@ -76,13 +74,13 @@ unsigned char driverComReceive(unsigned char *cmd, unsigned int *value)
 {
     unsigned char frame[COM_RX_LEN];
 
-    if (halComGetFrame(frame) == 0) return 0;       // kein vollstaendiger Rahmen da
+    if (halComGetFrame(frame) == 0) return 0;       // kein vollstaendiger Frame da
 
-    // TODO 4: Rahmenende pruefen - frame[COM_RX_END_1] und frame[COM_RX_END_2]
+    // TODO 3: Frameende pruefen - frame[COM_RX_END_1] und frame[COM_RX_END_2]
     //         muessen COM_HOST_END_1 und COM_HOST_END_2 sein.
     //         Passt es nicht: 0 zurueckgeben, *cmd und *value NICHT anfassen.
 
-    // TODO 5: cmd und value auspacken.
+    // TODO 4: cmd und value auspacken.
     //         Die beiden Wertbytes wieder zu einem 16-Bit-Wert zusammensetzen,
     //         in derselben Reihenfolge wie beim Senden. Die Indizes stehen
     //         als COM_RX_... in driverCom.h.
